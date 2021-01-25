@@ -124,5 +124,5 @@ Project Link: [https://github.com/skelletore/064bachelor2021](https://github.com
 [stars-url]: https://github.com/skelletore/064bachelor2021/stargazers
 [issues-shield]: https://img.shields.io/github/issues/skelletore/064bachelor2021.svg?style=for-the-badge
 [issues-url]: https://github.com/skelletore/064bachelor2021/issues
-[license-shield]: https://img.shields.io/github/license/skelletore/064bachelor2021.svg?style=for-the-badge
+[license-shield]: https://img.shields.io/badge/license-CC%20(by--nc--sa)-green
 [license-url]: https://creativecommons.org/licenses/by-nc-sa/4.0/en/legalcode

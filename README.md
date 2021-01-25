@@ -7,7 +7,7 @@
 ***
 ***
 *** To avoid retyping too much info. Do a search and replace for the following:
-*** github_username, repo_name, twitter_handle, email, project_title, project_description
+*** jorgstei, Web-Platform-for-Adaptive-Comparative-Judgement, twitter_handle, email, project_title, project_description
 -->
 
 <!-- PROJECT SHIELDS -->
@@ -31,15 +31,13 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`github_username`, `repo_name`, `twitter_handle`, `email`, `project_title`, `project_description`
-
 ### Built With
 
-- []()
-- []()
-- []()
+- [Svelte]()
+- [MongoDB]()
+- [Express]()
+- [Axios]()
+- [Cors]()
 
 <!-- GETTING STARTED -->
 
@@ -99,7 +97,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the Creative Commons (by-nc-sa) License. See `LICENSE` for more information.
 
 <!-- CONTACT -->
 

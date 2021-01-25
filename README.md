@@ -19,11 +19,11 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 
-[![Contributors][contributors-shield]][https://github.com/jorgstei https://github.com/DukeLaze]
+[![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![CCO License][license-shield]][https://creativecommons.org/licenses/by-nc-sa/4.0/en/legalcode]
+[![CCO License][license-shield]][license-url]
 
 <!-- ABOUT THE PROJECT -->
 
@@ -125,4 +125,4 @@ Project Link: [https://github.com/skelletore/064bachelor2021](https://github.com
 [issues-shield]: https://img.shields.io/github/issues/skelletore/064bachelor2021.svg?style=for-the-badge
 [issues-url]: https://github.com/skelletore/064bachelor2021/issues
 [license-shield]: https://img.shields.io/github/license/skelletore/064bachelor2021.svg?style=for-the-badge
-[license-url]: https://github.com/skelletore/064bachelor2021/blob/master/LICENSE.txt
+[license-url]: https://creativecommons.org/licenses/by-nc-sa/4.0/en/legalcode

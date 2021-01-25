@@ -21,6 +21,6 @@ server.use(bodyParser.json())
 server.get("/", (req, res) => res.send("Test OK."))
 
 const comparisonObjectRoute = require('./routes/comparison_object_route')
-server.use("/api/comparisonelement", comparisonObjectRoute)
+server.use("/api/comparisonobject", comparisonObjectRoute)
 
-server.listen(3000, () => console.log("Server running on port 3000."))
+server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000."))

@@ -1,16 +1,16 @@
 const {Router} = require('express')
-const ComparisonElement = require('../models/ComparisonObject')
+const ComparisonObject = require('../models/ComparisonObject')
 
 const router = Router()
 //Get all
 router.get("/", async (req, res) => {
-    console.log("Called get for comparisonelements")
+    console.log("Called get for comparisonobject")
     try {
-        const comparisonElements = await ComparisonElement.find()
-        if(!comparisonElements){
-            throw new Error('comparisonelement.js GET: Could not find any transactions')
+        const comparisonObjects = await ComparisonObject.find()
+        if(!comparisonObjects){
+            throw new Error('comparison_object_route.js GET: Could not find any transactions')
         }
-        res.status(200).json(comparisonElements)
+        res.status(200).json(comparisonObjects)
     } catch (error) {
         res.status(404).json({message: "Empty collection"})
     }
@@ -20,7 +20,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     console.log("called get 1 by id for comparionobject")
     try {
-        const comparionObject = await ComparisonElement.findById(req.params.id)
+        const comparionObject = await ComparisonObject.findById(req.params.id)
         if(!comparionObject || comparionObject._id == null){
             throw new Error('GET 1 by id, id ' + req.params.id + ' does not exist.')
         }
@@ -34,14 +34,22 @@ router.get("/:id", async (req, res) => {
 router.get("/random/pair", async (req, res) => {
     console.log("called get random pair for comparisonobject")
     try { 
-        const count = await ComparisonElement.countDocuments()
+        const count = await ComparisonObject.countDocuments()
         if(count < 2){
             throw new Error("Too few elements in collection.")
         }
         const random_skip = Math.floor(Math.random() * count)
-        const random_skip2 = Math.floor(Math.random() * count-1);
-        const comparisonObject1 = await ComparisonElement.findOne().skip(random_skip)
-        const comparisonObject2 = await ComparisonElement.findOne({_id: {$ne: comparisonObject1._id}}).skip(random_skip2)
+        const random_skip2 = Math.floor(Math.random() * count);
+        const comparisonObject1 = await ComparisonObject.findOne().skip(random_skip)
+        let comparisonObject2 = null
+        while(true){
+            comparisonObject2 = await ComparisonObject.findOne({_id: {$ne: comparisonObject1._id}}).skip(random_skip2)
+            if(comparisonObject2 != null){
+                if(comparisonObject1._id != comparisonObject2._id){
+                    break
+                }
+            }
+        } 
         if(!comparisonObject1 || !comparisonObject2 || comparisonObject1._id == null || comparisonObject2._id == null){
             throw new Error("Get 2 random failed.")
         }
@@ -55,7 +63,7 @@ router.get("/random/pair", async (req, res) => {
 router.put("/:id", async (req, res) => {
     console.log("called put/update one by id for comparisonobject with id: ", req.params.id)
     try {
-        let doc = await ComparisonElement.findById(req.params.id)
+        let doc = await ComparisonObject.findById(req.params.id)
         if(!doc || doc._id == null){
             console.log("doc: ", doc)
             throw new Error("No document with id: ", req.params.id)
@@ -79,12 +87,12 @@ router.put("/:id", async (req, res) => {
 //Insert one
 router.post("/", async (req, res) => {
     const {type, data} = req.body
-    const comparionElement = new ComparisonElement({type, data})
+    const comparionElement = new ComparisonObject({type, data})
 
     try {
         const transaction = await comparionElement.save();
         if(!transaction){
-            throw new Error('comparisonelement.js POST: Failed to save object')
+            throw new Error('comparison_object_route.js POST: Failed to save object')
         }
         res.status(201).json(transaction)
     } catch (error) {

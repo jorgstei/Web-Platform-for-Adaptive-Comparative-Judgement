@@ -21,10 +21,6 @@
 </nav>
 
 <style>
-    div {
-        background-color: saddlebrown;
-
-    }
     nav {
         margin: 0;
         padding: 0;

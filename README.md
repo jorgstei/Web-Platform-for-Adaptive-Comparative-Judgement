@@ -19,11 +19,11 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 
-[![Contributors][contributors-shield]][contributors-url]
+[![Contributors][contributors-shield]][https://github.com/jorgstei https://github.com/DukeLaze]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+[![CCO License][license-shield]][https://creativecommons.org/licenses/by-nc-sa/4.0/en/legalcode]
 
 <!-- ABOUT THE PROJECT -->
 

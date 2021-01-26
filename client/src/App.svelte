@@ -7,6 +7,7 @@
 	import LandingPage from "./Landing_page.svelte";
 	import AboutProject from "./AboutProject.svelte";
 	import CreateQuiz from "./CreateQuiz.svelte";
+	import ComparativeObjectServiceTest from "./ComparisonObjectServiceTest.svelte"
 	
 	export let url=""
 </script>
@@ -15,7 +16,7 @@
 	<Navbar></Navbar>
 
 	<Route path="/">
-		<LandingPage></LandingPage>
+		<LandingPage studyTitle="Eksamensoppgave 3b TDAT2001 vår 2020"></LandingPage>
 	</Route>
 
 	<Route path="register">
@@ -36,6 +37,10 @@
 
 	<Route path="about">
 		<AboutProject></AboutProject>
+	</Route>
+
+	<Route path="test">
+		<ComparativeObjectServiceTest></ComparativeObjectServiceTest>
 	</Route>
 
 	<Footer></Footer>

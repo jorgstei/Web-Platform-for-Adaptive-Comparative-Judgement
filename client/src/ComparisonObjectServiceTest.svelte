@@ -1,15 +1,15 @@
 <script>
     import { object_without_properties } from "svelte/internal";
-import Footer from "./Footer.svelte";
+    import Footer from "./Footer.svelte";
     import Navbar from "./Navbar.svelte";
-    import {comparisonOjbectService} from "./Services/ComparisonObjectService"
+    import {comparisonObjectService} from "./Services/ComparisonObjectService"
     let all = null
-    comparisonOjbectService.getAllComparisonObjects().then(data => all = data)
+    comparisonObjectService.getAllComparisonObjects().then(data => all = data)
     console.log(all)
     let byID = null
-    $: all && comparisonOjbectService.getComparisonObjectByID(all[0]._id).then(data => byID = data)
+    $: all && comparisonObjectService.getComparisonObjectByID(all[0]._id).then(data => byID = data)
     let randomPair = null
-    comparisonOjbectService.getRandomPairComparisonObject().then(data => randomPair = data.data)
+    comparisonObjectService.getRandomPairComparisonObject().then(data => randomPair = data.data)
 </script>
 <Navbar></Navbar>
 <main>

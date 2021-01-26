@@ -11,6 +11,7 @@
             <Link to="login"><li>Log in</li></Link>
             <Link to="about"><li>About</li></Link>
             <Link to="create_quiz"><li>Create Quiz</li></Link>
+            <Link to="test"><li>Test</li></Link>
         </ul>
     </nav>
 </div>

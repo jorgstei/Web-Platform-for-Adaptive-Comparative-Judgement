@@ -39,4 +39,4 @@ export default class ComparisonObjectService extends Service{
     }
 }
 
-export let comparisonOjbectService = new ComparisonObjectService()
+export let comparisonObjectService = new ComparisonObjectService()

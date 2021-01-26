@@ -14,7 +14,6 @@
 		}
 		navigate("/quiz");
 	}
-	
 </script>
 
 
@@ -22,7 +21,7 @@
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>You've been asked to participate in the judgement of "{studyTitle} with id: {page_id}"</h2>
+		<h2>You've been asked to participate in the judgement of "{studyTitle}"</h2>
 		<CostumInput onClickFunc={validate} funcParams={params} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 	<!--

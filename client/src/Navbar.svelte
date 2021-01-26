@@ -1,26 +1,25 @@
-<nav id="navbar">
-    <img id="logo" src="img/logo.png" alt="ASD">
-    <img id="name" src="img/name.png" alt="ASD">
-    <ul>
-        <li><a class="active" href="#home">Home</a></li>
-        <li><a href="#news">News</a></li>
-        <li><a href="#about">About</a></li>
-    </ul>
-    <!--
-    <div id="logoWrapper">
-        <img id="logo" src="img/logo.png" alt="ASD"> 
-    </div>
-    <ul>
-        <li><a class="active" href="#home">Home</a></li>
-        <li><a href="#news">News</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="#about">About</a></li>
-    </ul>
-    -->
+<script>
+    import {Link} from "svelte-routing";
+</script>
 
-</nav>
+<div id="navWrapper">
+    <nav id="navbar">
+        <img id="logo" src="img/logo.png" alt="ASD">
+        <img id="name" src="img/name.png" alt="ASD">
+        <ul>
+            <Link to="/"><li>Home</li></Link>
+            <Link to="login"><li>Log in</li></Link>
+            <Link to="about"><li>About</li></Link>
+            <Link to="create_quiz"><li>Create Quiz</li></Link>
+        </ul>
+    </nav>
+</div>
+
 
 <style>
+    #navWrapper{
+        margin-bottom: 5vh;
+    }
     nav {
         margin: 0;
         padding: 0;
@@ -52,9 +51,6 @@
 
     li {
         float: left;
-    }
-
-    li a {
         display: block;
         color: white;
         text-align: center;
@@ -62,7 +58,7 @@
         text-decoration: none;
     }
 
-    li a:hover {
+    li:hover {
         background-color: #111;
     }
 

@@ -1,8 +1,10 @@
 <script>   
-    export let newUser;
     import { sha512 } from 'js-sha512'
     import secureRandom from 'secure-random'
+
     let showErrorField = false;
+    export let newUser;
+    
     const login = () => {
         const email = document.getElementById("email").value;
         const pw = document.getElementById("password").value;
@@ -56,39 +58,75 @@
     const generateSalt = () => {
 
     }
+
+
 </script>
 
-
-<div class="wrapper">
-    {#if !newUser}
-        <label class="inputLabel" for="email">Email</label>
-        <input id="email" class="inputfield" name="email" type="text">
-
-        <label class="inputLabel" for="pw1">Password</label>
-        <input id="pw1" class="inputfield" name="pw1" type="password">
-
-        <label class="inputLabel" for="pw2">Repeat password</label>
-        <input id="pw2" class="inputfield" name="pw2" type="password">
-
-        <button class="submitBtn" on:click={register}>Register user</button>
-    
+<main>
+    {#if newUser}
+        <h1>Welcome to ACJ!</h1>
+        <h2>Please register below to join us</h2>
     {:else}
-        <label class="inputLabel" for="email">Email</label>
-        <input id="email" class="inputfield" name="email" type="text">
-
-        <label class="inputLabel" for="password">Password</label>
-        <input id="password" class="inputfield" name="password" type="password">
-
-        <button class="submitBtn" on:click={login}>Log in</button>
+        <h1>Welcome back to ACJ!</h1>
+        <h2>Log in below to continue making quizz's'z</h2>
     {/if}
+    
+    <div class="wrapper">
+        {#if newUser}
 
-    <p id="errorField"></p>
-    
-    
-</div>
+            <label class="inputLabel" for="email">Email</label>
+            <input id="email" class="inputfield" name="email" type="text">
+
+            <label class="inputLabel" for="pw1">Password</label>
+            <input id="pw1" class="inputfield" name="pw1" type="password">
+
+            <label class="inputLabel" for="pw2">Repeat password</label>
+            <input id="pw2" class="inputfield" name="pw2" type="password">
+
+            <button class="submitBtn" on:click={register}>Register user</button>
+        
+        {:else}
+            <label class="inputLabel" for="email">Email</label>
+            <input id="email" class="inputfield" name="email" type="text">
+
+            <label class="inputLabel" for="password">Password</label>
+            <input id="password" class="inputfield" name="password" type="password">
+
+            <button class="submitBtn" on:click={login}>Log in</button>
+        {/if}
+
+        <p id="errorField"></p>
+    </div>
+</main>
+
 
 
 <style>
+    h1 {
+		padding-top: 10vh;
+		color: #000000;
+		font-size: 3em;
+		font-weight: 100;
+	}
+	h2 {
+		color: #000000;
+		font-size: 1.5em;
+		font-weight: 100;
+		margin-bottom: 15vh;
+	}
+
+    main {
+		text-align: center;
+		/*background-color: #aaaaaa;*/
+		background-color: rgb(255, 245, 196);
+		margin: auto;
+		top:0;
+        display:grid;
+        grid-template-rows: 2fr 1fr 8fr;
+        width: 100vw;
+        height: 100vh;
+	}
+
     .wrapper{
         width: 80%;
         margin: auto;

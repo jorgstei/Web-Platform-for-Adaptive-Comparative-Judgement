@@ -1,36 +1,35 @@
 <script>
-	import Card from "./Card.svelte";
 	import CostumInput from "./CostumInput.svelte";
-	import Footer from "./Footer.svelte";
-	import Navbar from "./Navbar.svelte";
-	import Quiz from "./Quiz.svelte";
-	export let studyTitle;
+	import queryString from "query-string";
+	import {navigate} from "svelte-routing";
 
+	export let studyTitle;
+	let params = queryString.parse(window.location.search);
+	let page_id = params.id;
 
 	let validate = (id, actualCode) => {
 		let code = document.getElementById(id);
 		if(code == actualCode){
 
 		}
+		navigate("/quiz");
 	}
-	let params = []
+	
 </script>
 
 
 
-<Navbar></Navbar>
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>You've been asked to participate in the judgement of "{studyTitle}"</h2>
-	<CostumInput onClickFunc={validate} funcParams={params} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
+		<h2>You've been asked to participate in the judgement of "{studyTitle} with id: {page_id}"</h2>
+		<CostumInput onClickFunc={validate} funcParams={params} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 	<!--
 	<Card title="Yo" w="400px" h="400px" alt="Pillars of creation" img="https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/pillars_of_creation.jpg"></Card>
 	<Card title="Yo" w="400px" h="400px" alt="Førersete" img="https://toonclips.com/600/cartoon-guy-in-a-tireless-car-on-blocks-by-toonaday-538.jpg"></Card>
 	-->
 </main>
-<Footer></Footer>
 
 
 <style>

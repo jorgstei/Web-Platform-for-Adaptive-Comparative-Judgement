@@ -3,7 +3,7 @@ import Landing_page from './Landing_page.svelte'
 import LoginPage from './LoginPage.svelte'
 import AboutProject from './AboutProject.svelte'
 
-const app = new AboutProject({
+const app = new App({
 	target: document.body,
 	props: {
 		studyTitle: "Eksamensoppgave 3b"

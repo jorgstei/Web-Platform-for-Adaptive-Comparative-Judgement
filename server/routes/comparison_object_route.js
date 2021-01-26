@@ -102,10 +102,13 @@ router.post("/", async (req, res) => {
 
 //Delete one
 router.delete("/:id", async (req, res) => {
-    try {
-        
-    } catch (error) {
-        
+    console.log("called delete by id for comparisonobject")
+    const result = await ComparisonObject.deleteOne({_id: req.params.id})
+    if(result.deletedCount == 1){
+        res.sendStatus(204)
+    }
+    else{
+        res.sendStatus(404)
     }
 })
 

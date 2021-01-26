@@ -25,7 +25,8 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
-        background-color: #333;
+        /*background-color: #333;*/
+        background-color: rgb(18, 73, 144);
         position: fixed;
         display: grid;
         grid-template-columns: 3fr 5fr 3fr;
@@ -41,9 +42,12 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
-        background-color: #333;
+        /*background-color: #333;*/
+        background-color: rgb(18, 73, 144);
         height: 5vh;
         top: 0;
+        position: fixed;
+        right:0;
     }
 
     li {

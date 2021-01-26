@@ -8,7 +8,8 @@
         margin: 0;
         padding: 0;
         overflow: hidden;
-        background-color: #333;
+        /*background-color: #333;*/
+        background-color: rgb(18, 73, 144);
         position: fixed;
         display: grid;
         bottom: 0;

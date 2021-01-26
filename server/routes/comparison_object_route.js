@@ -39,10 +39,10 @@ router.get("/random/pair", async (req, res) => {
             throw new Error("Too few elements in collection.")
         }
         const random_skip = Math.floor(Math.random() * count)
-        const random_skip2 = Math.floor(Math.random() * count);
         const comparisonObject1 = await ComparisonObject.findOne().skip(random_skip)
         let comparisonObject2 = null
         while(true){
+            const random_skip2 = Math.floor(Math.random() * count);
             comparisonObject2 = await ComparisonObject.findOne({_id: {$ne: comparisonObject1._id}}).skip(random_skip2)
             if(comparisonObject2 != null){
                 if(comparisonObject1._id != comparisonObject2._id){

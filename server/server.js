@@ -6,13 +6,15 @@ const server = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
-
+ 
 const mongoConnectionString = process.env.MongoDBConnectionString;
 mongoose.connect(mongoConnectionString,
     {
         useNewUrlParser: true,
         useCreateIndex: true,
         useUnifiedTopology: true,
+        sslValidate: false,
+        checkServerIdentity: false
     }).then(() => console.log("Sucessfully connected to MongoDB!"))
     .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))
 

@@ -16,7 +16,8 @@
 <style>
 	main {
 		text-align: center;
-		background-color: #aaaaaa;
+		/*background-color: #aaaaaa;*/
+		background-color: rgb(255, 245, 196);
 		margin: auto;
 		top:0;
         display:grid;

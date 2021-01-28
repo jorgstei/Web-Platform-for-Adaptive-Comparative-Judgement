@@ -18,6 +18,9 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "sirv-cli": "^1.0.0"
+    "js-sha512": "^0.8.0",
+    "query-string": "^6.13.8",
+    "sirv-cli": "^1.0.0",
+    "svelte-routing": "^1.5.0"
   }
 }

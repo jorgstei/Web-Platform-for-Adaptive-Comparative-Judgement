@@ -1,6 +1,5 @@
 <script>   
     import { sha512 } from 'js-sha512'
-    import secureRandom from 'secure-random'
 
     let showErrorField = false;
     export let newUser;

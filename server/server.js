@@ -18,11 +18,19 @@ mongoose.connect(mongoConnectionString,
     }).then(() => console.log("Sucessfully connected to MongoDB!"))
     .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))
 
-server.use(cors())
+server.use(cors({
+    origin: ["http://localhost:5000", "http://127.0.0.1:5000"],
+    credentials: true
+}))
 server.use(bodyParser.json())
-server.get("/", (req, res) => res.send("Test OK."))
+
+const auth = require("./routes/authentication")
+server.use("/auth", auth.router)
 
 const comparisonObjectRoute = require('./routes/comparison_object_route')
 server.use("/api/comparisonobject", comparisonObjectRoute)
+
+const userRoute = require('./routes/user_route')
+server.use("/api/user", userRoute)
 
 server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000."))

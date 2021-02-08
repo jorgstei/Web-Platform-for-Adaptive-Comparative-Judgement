@@ -1,13 +1,21 @@
 <script>   
     import { sha512 } from 'js-sha512'
+    import { userService } from "./Services/UserService"
 
     let showErrorField = false;
-    export let newUser;
+    export const newUser = false;
+    console.log("NewUser?: ", newUser)
     
     const login = () => {
         const email = document.getElementById("email").value;
         const pw = document.getElementById("password").value;
         let [formIsValid, errormsg] = checkValues(email, pw);
+        if(formIsValid){
+            userService.login({email: email, password: pw})
+        }
+        else{
+            console.log(errormsg)
+        }
         console.log("Welcome " + email + " with password " + pw);
     }
 
@@ -62,7 +70,7 @@
 </script>
 
 <main>
-    {#if newUser}
+    {#if newUser == true}
         <h1>Welcome to ACJ!</h1>
         <h2>Please register below to join us</h2>
     {:else}

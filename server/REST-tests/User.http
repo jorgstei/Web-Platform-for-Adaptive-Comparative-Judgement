@@ -1,0 +1,54 @@
+### Get all (-hashed, -salt)
+GET http://localhost:3000/api/user
+
+### Get one by id (-hashed, -salt)
+GET http://localhost:3000/api/user/6019c0adc8bc9cd2f03eacc5
+
+### Delete one by ID
+DELETE http://localhost:3000/api/user/60141d8f250404c624f3003a
+
+### Insert one
+POST http://localhost:3000/api/user HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "admin@admin.no",
+    "password": "123qweasdzxc123wertas",
+    "role": "admin"
+}
+
+### LOGIN TEST
+GET http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@admin.no",
+    "password": "123qweasdzxc123wertas"
+}
+
+### Get all with admin account
+GET http://localhost:3000/api/user
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTIzNTE4NjEuNTMzLCJ1c2VyaWQiOiI2MDE5YzBhZGM4YmM5Y2QyZjAzZWFjYzUiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MTIzNTAwNjF9.d6Xzuhf5C_BjSnP1RbNwkG71yV3c7dnQ2H0z9b8ODIw
+
+### Insert one
+POST http://localhost:3000/api/user HTTP/1.1
+Content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTIzNTE4NjEuNTMzLCJ1c2VyaWQiOiI2MDE5YzBhZGM4YmM5Y2QyZjAzZWFjYzUiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MTIzNTAwNjF9.d6Xzuhf5C_BjSnP1RbNwkG71yV3c7dnQ2H0z9b8ODIw
+
+{
+    "email": "test2@admin.no",
+    "password": "123qweasdzxc123wertas",
+    "role": "scientist"
+}
+
+### Get all (-hashed, -salt)
+GET http://localhost:3000/api/user
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTIzNTE4NjEuNTMzLCJ1c2VyaWQiOiI2MDE5YzBhZGM4YmM5Y2QyZjAzZWFjYzUiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MTIzNTAwNjF9.d6Xzuhf5C_BjSnP1RbNwkG71yV3c7dnQ2H0z9b8ODIw
+
+### Get one by id (-hashed, -salt)
+GET http://localhost:3000/api/user/601412eb70e65708148ca352
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTIzNTE4NjEuNTMzLCJ1c2VyaWQiOiI2MDE5YzBhZGM4YmM5Y2QyZjAzZWFjYzUiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MTIzNTAwNjF9.d6Xzuhf5C_BjSnP1RbNwkG71yV3c7dnQ2H0z9b8ODIw
+
+### Delete one by ID
+DELETE http://localhost:3000/api/user/6014117576546abd9824a915
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTIzNTE4NjEuNTMzLCJ1c2VyaWQiOiI2MDE5YzBhZGM4YmM5Y2QyZjAzZWFjYzUiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2MTIzNTAwNjF9.d6Xzuhf5C_BjSnP1RbNwkG71yV3c7dnQ2H0z9b8ODIw

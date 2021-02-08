@@ -1,8 +1,8 @@
 <script>
     import { object_without_properties } from "svelte/internal";
-    import Footer from "./Footer.svelte";
-    import Navbar from "./Navbar.svelte";
-    import {comparisonObjectService} from "./Services/ComparisonObjectService"
+    import Footer from "../Footer.svelte";
+    import Navbar from "../Navbar.svelte";
+    import {comparisonObjectService} from "../Services/ComparisonObjectService"
     let all = null
     comparisonObjectService.getAllComparisonObjects().then(data => all = data)
     console.log(all)

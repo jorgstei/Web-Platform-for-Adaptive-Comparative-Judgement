@@ -7,7 +7,8 @@
 	import LandingPage from "./Landing_page.svelte";
 	import AboutProject from "./AboutProject.svelte";
 	import CreateQuiz from "./CreateQuiz.svelte";
-	import ComparativeObjectServiceTest from "./ComparisonObjectServiceTest.svelte"
+	import ComparativeObjectServiceTest from "./test_pages/ComparisonObjectServiceTest.svelte"
+	import UserServiceTest from "./test_pages/UserServiceTest.svelte"
 	
 	export let url=""
 </script>
@@ -20,11 +21,11 @@
 	</Route>
 
 	<Route path="register">
-		<LoginFields newUser=true></LoginFields>
+		<LoginFields newUser></LoginFields>
 	</Route>
 
 	<Route path="login">
-		<LoginFields newUser=false></LoginFields>
+		<LoginFields></LoginFields>
 	</Route>
 
 	<Route path="quiz">
@@ -40,7 +41,7 @@
 	</Route>
 
 	<Route path="test">
-		<ComparativeObjectServiceTest></ComparativeObjectServiceTest>
+		<UserServiceTest/>
 	</Route>
 
 	<Footer></Footer>

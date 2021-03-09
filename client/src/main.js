@@ -1,7 +1,7 @@
-import App from './App.svelte';
-import Landing_page from './Landing_page.svelte'
-import LoginPage from './LoginPage.svelte'
-import AboutProject from './AboutProject.svelte'
+import App from './Pages/App.svelte';
+import Landing_page from './Pages/Landing_page.svelte'
+import LoginPage from './Pages/LoginPage.svelte'
+import AboutProject from './Pages/AboutProject.svelte'
 
 const app = new App({
 	target: document.body,

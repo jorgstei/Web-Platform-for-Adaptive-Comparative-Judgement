@@ -58,7 +58,7 @@ This is an example of how to list things you need to use the software and how to
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/skelletore/064bachelor2021.git
+   git clone https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement.git
    ```
 2. Install NPM packages
    ```sh
@@ -79,7 +79,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Roadmap
 
-See the [open issues](https://github.com/skelletore/064bachelor2021/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/issues) for a list of proposed features (and known issues).
 
 <!-- CONTRIBUTING -->
 
@@ -103,7 +103,7 @@ Distributed under the Creative Commons (by-nc-sa) License. See `LICENSE` for mor
 
 ## Contact
 
-Project Link: [https://github.com/skelletore/064bachelor2021](https://github.com/skelletore/064bachelor2021)
+Project Link: [https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement](https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement)
 
 <!-- ACKNOWLEDGEMENTS -->
 
@@ -116,13 +116,13 @@ Project Link: [https://github.com/skelletore/064bachelor2021](https://github.com
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/skelletore/064bachelor2021.svg?style=for-the-badge
-[contributors-url]: https://github.com/skelletore/064bachelor2021/graphs/contributors
+[contributors-shield]: https://img.shields.io/github/contributors/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement.svg?style=for-the-badge
+[contributors-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/contributors
 [forks-shield]: https://img.shields.io/github/forks/skelletore/064bachelor2021.svg?style=for-the-badge
 [forks-url]: https://github.com/skelletore/064bachelor2021/network/members
 [stars-shield]: https://img.shields.io/github/stars/skelletore/064bachelor2021.svg?style=for-the-badge
 [stars-url]: https://github.com/skelletore/064bachelor2021/stargazers
 [issues-shield]: https://img.shields.io/github/issues/skelletore/064bachelor2021.svg?style=for-the-badge
-[issues-url]: https://github.com/skelletore/064bachelor2021/issues
+[issues-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/issues
 [license-shield]: https://img.shields.io/badge/license-CC%20(by--nc--sa)-green
 [license-url]: https://creativecommons.org/licenses/by-nc-sa/4.0/en/legalcode

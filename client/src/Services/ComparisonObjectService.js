@@ -10,7 +10,7 @@ export default class ComparisonObjectService extends Service{
                 "Content-Type": "application/json; charset=utf-8"
             }
         })
-        .then(response => {console.log(response.data);return response.data})
+        .then(response => {return response.data})
         .catch(error => console.error(error))
     }
 

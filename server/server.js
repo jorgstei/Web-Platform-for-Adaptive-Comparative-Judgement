@@ -18,11 +18,28 @@ mongoose.connect(mongoConnectionString,
     }).then(() => console.log("Sucessfully connected to MongoDB!"))
     .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))
 
-server.use(cors())
+server.use(cors({
+    origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000"],
+    credentials: true
+}))
 server.use(bodyParser.json())
-server.get("/", (req, res) => res.send("Test OK."))
+
+const mailtest = require("./routes/nodemailertest")
+server.use("/mailtest", mailtest)
+
+const auth = require("./routes/authentication")
+server.use("/auth", auth.router)
+
+const surveyRoute = require('./routes/survey_route')
+server.use("/api/survey", surveyRoute)
+
+const surveyAnswerRoute = require('./routes/survey_answer_route')
+server.use("/api/surveyanswer", surveyAnswerRoute)
 
 const comparisonObjectRoute = require('./routes/comparison_object_route')
 server.use("/api/comparisonobject", comparisonObjectRoute)
+
+const userRoute = require('./routes/user_route')
+server.use("/api/user", userRoute)
 
 server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000."))

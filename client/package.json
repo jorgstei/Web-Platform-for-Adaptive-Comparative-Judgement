@@ -4,20 +4,27 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public"
+    "start": "sirv public --host --single"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
-    "rollup": "^2.3.4",
+    "rollup": "^2.37.1",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.0.0",
     "rollup-plugin-terser": "^7.0.0",
+    "rollup-watch": "^3.2.2",
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "@zerodevx/svelte-toast": "^0.1.4",
     "axios": "^0.21.1",
-    "sirv-cli": "^1.0.0"
+    "file-saver": "^2.0.5",
+    "js-sha512": "^0.8.0",
+    "query-string": "^6.13.8",
+    "sirv-cli": "^1.0.0",
+    "svelte-routing": "^1.5.0",
+    "sweetalert": "^2.1.2"
   }
 }

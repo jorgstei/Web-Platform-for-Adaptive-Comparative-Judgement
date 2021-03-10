@@ -69,7 +69,7 @@
 <div class="wrapper">
     <h1>Invite a researcher!</h1>
     <select name="role" id="role_dropdown">
-        <option value="scientist">Researcher</option>
+        <option value="researcher">Researcher</option>
         <option value="admin">Admin</option>
     </select>
     <label class="inputLabel" for="email">Email</label>

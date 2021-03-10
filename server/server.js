@@ -1,11 +1,16 @@
 if(process.env.NODE_ENV !== 'production'){
     require('dotenv').config()
 }
+else{
+    console.log("NO ENV PROVIDED")
+}
 const express = require('express')
 const server = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+const { hash } = require('./Utility/hashing')
+const User = require('./models/User')
  
 const mongoConnectionString = process.env.MongoDBConnectionString;
 mongoose.connect(mongoConnectionString,
@@ -15,7 +20,16 @@ mongoose.connect(mongoConnectionString,
         useUnifiedTopology: true,
         sslValidate: false,
         checkServerIdentity: false
-    }).then(() => console.log("Sucessfully connected to MongoDB!"))
+    }).then(() => {
+        console.log("Sucessfully connected to MongoDB!")
+        //If this is a fresh instance of mongodb, we'll have to create a service admin
+        const anyAdminUser = User.find({role: "admin"})
+        if(anyAdminUser.length < 1){
+            const hashNSalt = hash(process.env.AdminPassword)
+            const createAdminResult = User.create(process.env.AdminUserName, "Admin", "Admin", hashNSalt.hash, hashNSalt.salt, "admin")
+            console.log(createAdminResult)
+        }
+    })
     .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))
 
 server.use(cors({

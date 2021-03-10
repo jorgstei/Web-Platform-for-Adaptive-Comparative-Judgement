@@ -26,7 +26,7 @@ mongoose.connect(mongoConnectionString,
         const anyAdminUser = await User.find({role: "admin"})
         if(anyAdminUser.length < 1){
             const hashNSalt = hash(process.env.AdminPassword)
-            const email = process.env.AdminUserName
+            const email = process.env.AdminUsername
             const hashed = hashNSalt.hash
             const salt = hashNSalt.salt
             const firstName = "Admin"

@@ -21,8 +21,11 @@
         data2DArray = [];
         for (let i = 0; i < data.length; i++) {
             // add data according to tableAttributes array
-            let email;
-            await userService.getUserByID(data[i].owners[0].owner_id).then((data)=>{ email = data.email});
+            let email = "No owner";
+            console.log("Owners:", data[i].owners)
+            if(data[i].owners != undefined && data[i].owners.length > 0 && data[i].owners[0].owner_id != null){
+                await userService.getUserByID(data[i].owners[0].owner_id).then((data)=>{ if(data != null && data != undefined && data.email != null) email = data.email});
+            }
             let arr = [data[i].title, email, data[i].dateCreated.split("T")[0], data[i].items.length, data[i].active, data[i]._id]
             data2DArray.push(arr);
         }

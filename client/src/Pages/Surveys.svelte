@@ -15,7 +15,7 @@
             data = await surveyService.getAllSurveys().catch(err => console.log("Admin could not fetch all surveys\n", err));
             console.log("All survey data", data)
         }
-        else if(userInfo.role == "scientist"){
+        else if(userInfo.role == "researcher"){
             data = await surveyService.getSurveyByUserID(userInfo.userid).catch(err => console.log("Scientist could not fetch their surveys\n", err));
         }
         

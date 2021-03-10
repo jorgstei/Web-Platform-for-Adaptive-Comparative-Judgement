@@ -9,20 +9,21 @@
     console.log("in surveys")
     let data2DArray;
 	onMount(async () => {
+        console.log("userinfo in surveys", userInfo);
         let data;
         if(userInfo.role == "admin"){
-            data = await surveyService.getAllSurveys();
+            data = await surveyService.getAllSurveys().catch(err => console.log("Admin could not fetch all surveys\n", err));
             console.log("All survey data", data)
         }
         else if(userInfo.role == "scientist"){
-            data = await surveyService.getSurveyByUserID(userInfo.userid);
+            data = await surveyService.getSurveyByUserID(userInfo.userid).catch(err => console.log("Scientist could not fetch their surveys\n", err));
         }
         
         data2DArray = [];
         for (let i = 0; i < data.length; i++) {
             // add data according to tableAttributes array
             let email;
-            await userService.getUserByID(data[i].owners[0].owner_id).then((data)=>{ email = data.email});
+            await userService.getUserByID(data[i].owners[0].owner_id).then((data)=>{ email = data.email}).catch(err => console.log("Could not getUserByID\n", err));
             let arr = [data[i].title, email, data[i].dateCreated.split("T")[0], data[i].items.length, data[i].active, data[i]._id]
             data2DArray.push(arr);
         }

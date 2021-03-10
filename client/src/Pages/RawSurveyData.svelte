@@ -24,13 +24,14 @@
     
     let currentContentView = "linearRanking";
     let linearRanking = null;
+    let allJudges = null;
     let surveyStatistics = null;
     let answerValues= [];
     let answerHeaders = ["winner", "loser", "judge id"];
 	let getSurveyAnswers = async ()=>{
         await surveyAnswerService.getBySurveyID(surveyID)
         .then((answers)=>{
-            console.log("Survey answers: ", data);
+            console.log("Survey answers: ", answers);
 
             // Transform JSON and try to get answer
             let newJSON = [];
@@ -45,7 +46,7 @@
                 )
                 answerValues.push([e.winner_id, e.loser_id, e.judge_id]);
             });
-            console.log("Transformed answer values, attempting to send to analyzing module: ", answerValues);
+            console.log("Transformed answer values, attempting to send to analyzing module:\n", answerValues);
 
             axios.defaults.withCredentials = false;
             axios(
@@ -58,7 +59,8 @@
             )
             .then(async (response) => {
                 surveyStatistics = response.data;
-                console.log("Successfully recieved statistics for the survey: ", surveyStatistics);
+                console.log("Successfully recieved statistics for the survey:\n", surveyStatistics);
+                allJudges = response.data.judges;
                 linearRanking = surveyStatistics.result.sort((a,b)=> {
                     return b.score - a.score;
                 })
@@ -71,7 +73,13 @@
                 
                 console.log("Transformed linear ranking from", linearRanking, "to", linearRanking2DArray);
                 linearRanking = linearRanking2DArray;
-                    
+                
+                let allJudges2DArray= [];
+                allJudges.forEach(e => {
+                    allJudges2DArray.push([e.judge, e.agree, e.infit, e.outfit]);
+                });
+                console.log("Transformed all judges from", allJudges, "to", allJudges2DArray);
+                allJudges = allJudges2DArray;
             })
             .catch(error => console.log("Could not fetch statistics for the survey. Failed with error:\n", error))
         .catch(error => console.log("Could not fetch answers for the survey. Failed with error:\n", error))
@@ -103,7 +111,7 @@
         console.log("Current content view is: ", currentContentView);
     }
     
-    $: answerValues & survey & surveyStatistics & linearRanking & currentContentView;
+    $: answerValues & survey & surveyStatistics & linearRanking & allJudges & currentContentView;
 </script>
 
 <div id="surveyDataWrapper">
@@ -140,7 +148,9 @@
     {:else if currentContentView=="rawdata"}
         <Table bind:tableData={answerValues} tableAttributes={answerHeaders} element={btn}></Table>
     {:else if currentContentView=="byJudge"}
-
+        {#if allJudges != null}
+            <Table bind:tableData={allJudges} tableAttributes={["id", "agree", "infit", "outfit"]}></Table>
+        {/if}
     {:else if currentContentView=="byItem"}
 
     {/if}

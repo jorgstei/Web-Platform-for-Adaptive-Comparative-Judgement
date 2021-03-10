@@ -121,7 +121,7 @@ router.get("/:id", auth, async (req, res) => {
     console.log("Called get survey by id")
     try {
         const survey = await Survey.findOne({_id: req.params.id})
-        if(req.role !== "admin" && req.userid !== survey.owner_id){
+        if(req.role !== "admin" && req.userid !== survey.owners.find(owner => owner.owner_id == req.userid)){
             res.sendStatus(403)
             return
         }
@@ -198,29 +198,53 @@ router.put("/:id", auth, async (req, res) => {
 
 //Delete one by ID
 router.delete("/:id", auth, async (req, res) => {
-    if(req.role !== "admin" && req.userid !== surveyDoc.owner_id){
-        res.sendStatus(401)
-        return
-    }
     try {
         const surveyDoc = await Survey.findOne({_id: req.params.id})
+        console.log(surveyDoc.owners)
+        console.log("userid:", req.userid)
+        const foundOwner = surveyDoc.owners.find(owner => owner.owner_id === req.userid)
+        console.log(foundOwner)
+        if(req.role !== "admin" && req.userid !== foundOwner.owner_id ){
+            res.sendStatus(401)
+            return
+        }
         if(surveyDoc._id == null){
             res.sendStatus(404)
             return
         }
-        //Remember to clean up the assosiated SurveyAnswers
-        const deleteSurveyAnswersResponse = await SurveyAnswer.deleteMany({survey_id: surveyDoc._id})
-        if(deleteSurveyAnswersResponse.n != deleteSurveyAnswersResponse.deletedCOunt || ok != 1){
-
-        }
-        //Finally clean up the Survey itself
-        const result = await Survey.deleteOne({_id: req.params.id})
-        if(result.deletedCount == 1){
-            res.sendStatus(204)
+        if(req.role === "admin"){
+            //Remember to clean up the assosiated SurveyAnswers
+            await SurveyAnswer.deleteMany({survey_id: surveyDoc._id})
+            //Finally clean up the Survey itself
+            const result = await Survey.deleteOne({_id: req.params.id})
+            if(result.deletedCount == 1){
+                res.sendStatus(204)
+            }
+            else{
+                res.sendStatus(404)
+            }
         }
         else{
-            res.sendStatus(404)
+            const updateSurveysResult = await Survey.updateOne(
+                {_id: surveyDoc._id},
+                {
+                    $pull: 
+                    {
+                        owners: 
+                        {
+                            owner_id: req.userid
+                        }
+                    }
+                })
+            console.log(updateSurveysResult)
+            if(updateSurveysResult.n === 1 && updateSurveysResult.nModified === 1 && updateSurveysResult.ok === 1){
+                res.sendStatus(204)
+            }
+            else{
+                res.sendStatus(500)
+            }
         }
+
     } catch (error) {
         console.log("delete survey error:", error)
         res.sendStatus(500)

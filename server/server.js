@@ -24,10 +24,21 @@ mongoose.connect(mongoConnectionString,
         console.log("Sucessfully connected to MongoDB!")
         //If this is a fresh instance of mongodb, we'll have to create a service admin
         const anyAdminUser = await User.find({role: "admin"})
-        console.log("Find any admin user:",anyAdminUser)
-        const hashNSalt = hash(process.env.AdminPassword)
-        const createAdminResult = await User.create(process.env.AdminUserName, "Admin", "Admin", hashNSalt.hash, hashNSalt.salt, "admin")
-        console.log("CreateAdminResult:",createAdminResult)
+        if(anyAdminUser.length < 1){
+            const hashNSalt = hash(process.env.AdminPassword)
+            const email = process.env.AdminUserName
+            const hashed = hashNSalt.hash
+            const salt = hashNSalt.salt
+            const firstName = "Admin"
+            const lastName = firstName
+            const role = "admin"
+            const adminObj = {email, firstName, lastName, hashed, salt, role}
+            const createAdminResult = await User.create(adminObj)
+            console.log("CreateAdminResult:",createAdminResult)
+        }
+        else{
+            console.log("Found existing admin user.")
+        }
         
     })
     .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))

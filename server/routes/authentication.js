@@ -8,7 +8,7 @@ const router = Router()
     Expected fields in token:
     exp - expire time
     userid - to lookup userinfo and rights (or none if judge)
-    role - f.ex. admin, scientist, judge
+    role - f.ex. admin, researcher, judge
 */
 /**
  * @apiDefine AuthMiddleware

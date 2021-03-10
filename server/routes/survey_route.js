@@ -145,7 +145,7 @@ router.post("/", auth, async (req, res) => {
         purpose, mediaType, accessibility
     } = req.body
     const owner_id = req.userid;
-    if(req.role !== "admin" && req.role !== "scientist"){
+    if(req.role !== "admin" && req.role !== "researcher"){
         res.sendStatus(403)
         return
     }
@@ -177,7 +177,7 @@ router.put("/:id", auth, async (req, res) => {
         res.sendStatus(404)
     }
     const userIsOwner = await surveyDoc.owners.some(e => {(e.owner_id == owner_id) && e.rights.editSurvey == true })
-    if(req.role !== "admin" && req.role !== "scientist" && !userIsOwner){
+    if(req.role !== "admin" && req.role !== "researcher" && !userIsOwner){
         res.sendStatus(403)
         return
     }

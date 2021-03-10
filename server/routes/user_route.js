@@ -125,7 +125,7 @@ router.post("/invite_link", auth, async (req,res) => {
  * @apiVersion 0.1.0
  * @apiSuccess (200) {Object[]} users An array of all user objects
  * @apiSuccess (200) {String} users.email The users registered email
- * @apiSuccess (200) {String} users.role The users role (admin/scientist)
+ * @apiSuccess (200) {String} users.role The users role (admin/researcher)
  * @apiSuccess (200) {String} firstName The users first name (including middle names)
  * @apiSuccess (200) {String} lastName The users last name.
  * @apiError (403) {String} 403 Forbidden
@@ -156,7 +156,7 @@ router.get("/", auth, async (req, res) => {
  * @apiVersion 0.1.0
  * @apiParam {String} id The ID of the user you want to get. (Mongoose ObjectId)
  * @apiSuccess (200) {String} email The users registered email
- * @apiSuccess (200) {String} role The users role (admin/scientist)
+ * @apiSuccess (200) {String} role The users role (admin/researcher)
  * @apiSuccess (200) {String} firstName The users first name (including middle names)
  * @apiSuccess (200) {String} lastName The users last name.
  * @apiUse AuthMiddleware

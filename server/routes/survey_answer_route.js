@@ -60,11 +60,14 @@ router.get("/judge/:id", auth, async (req, res) => {
         res.status(404).json({message: "Empty collection"})
     }
 })
-//Get all by survey
+//Get all by survey id
 router.get("/survey/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-        if(req.role !== "admin" && req.role !== "researcher"){
+        console.log("get all by survey id role: ", req.role)
+        //TODO: Fix this check once we've updated all users to the correct naming
+        if(req.role !== "admin" && req.role !== "researcher" && req.role !== "scientist"){
+            console.log("get all by survey id role: ", req.role)
             res.sendStatus(403)
             return
         }

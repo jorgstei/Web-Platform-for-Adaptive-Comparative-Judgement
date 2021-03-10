@@ -2,11 +2,9 @@
     import OptionBox from "../Components/OptionBox.svelte";
     import swal from "sweetalert";
     import {surveyService} from "../Services/SurveyService";
-    import {comparisonObjectService} from "../Services/ComparisonObjectService";
     import { navigate } from "svelte-routing";
     import queryString from "query-string";
     import { onMount } from "svelte";
-    import {sha512} from "js-sha512";
     export let purpose = "research";
     export let surveyMediaType = "text";
     export let accessibility = "open";

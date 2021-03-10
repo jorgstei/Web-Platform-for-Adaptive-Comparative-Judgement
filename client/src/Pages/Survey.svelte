@@ -1,6 +1,5 @@
 <script>
     import Card from "../Components/Card.svelte";
-    import {comparisonObjectService} from "../Services/ComparisonObjectService";
     import {userService} from "../Services/UserService"
     import {surveyService} from "../Services/SurveyService"
     import {surveyAnswerService} from "../Services/SurveyAnswerService"

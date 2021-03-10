@@ -21,7 +21,7 @@
         const pw2 = document.getElementById("pw2").value;
         const errorField = document.getElementById("errorField");
         
-        let [formIsValid, errormsg] = checkValues(email, pw1,pw2);
+        let [formIsValid, errormsg] = checkValues(firstName, lastName, email,pw1,pw2);
         if(formIsValid){
             errorField.innerHTML = "";
             let userObj = {
@@ -54,19 +54,19 @@
         let valuesAreValid = true;
         let errormsg = "";
         console.log("In checkValues with firstname, lastname, email, pw1, pw2: ", firstName, lastName, email, pw1, pw2);
-        // Regex that excludes "bad" characters (, / \ @ and any whitespace) before/after the required @ and .
-        // Requires 1 or more characters before and after @ and . 
-        const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+\.[^,\/\\\s@]+/;
-
-        //psycopath
-        //(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
-        
+        //TODO: Add maximum email length, regex takes a loooot of work
+        //https://emailregex.com/
+        const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+        console.log("email:",email)
+        console.log("email tested:", email_regex.test(email))
+    
         // Checks if each field has a value
         if(firstName === "" || lastName === "" || email === "" || pw1 === "" || pw2 === ""){
             valuesAreValid = false;
             errormsg = "Every field must be filled."
         }
         // Check that the given mail contains an "@" and ".". Also ensures there are no whitespaces in the email (spaces, tabs, etc.)
+
         else if(!email_regex.test(email)){
             valuesAreValid = false;
             errormsg = "Your email must contain '@' and '.' and can not have whitespaces."

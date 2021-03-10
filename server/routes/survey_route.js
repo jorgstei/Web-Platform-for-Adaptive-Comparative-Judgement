@@ -1,6 +1,5 @@
 const {Router} = require('express')
 const Survey = require('../models/Survey')
-const ComparisonObject = require("../models/ComparisonObject")
 const SurveyAnswer = require("../models/SurveyAnswer")
 const {auth} = require("./authentication")
 
@@ -214,17 +213,6 @@ router.delete("/:id", auth, async (req, res) => {
         if(deleteSurveyAnswersResponse.n != deleteSurveyAnswersResponse.deletedCOunt || ok != 1){
 
         }
-        //Remember to clean up the assosiated ComparisonObjects
-        console.log("comparison_object_ids", surveyDoc.comparison_object_ids)
-        const deleteComparisonObjectsResponse = await ComparisonObject.deleteMany(
-            {
-                _id: 
-                {
-                    $in: surveyDoc.comparison_object_ids
-                }
-            }
-        )
-        console.log("deleteComparisonObjectsResponse:", deleteComparisonObjectsResponse)
         //Finally clean up the Survey itself
         const result = await Survey.deleteOne({_id: req.params.id})
         if(result.deletedCount == 1){

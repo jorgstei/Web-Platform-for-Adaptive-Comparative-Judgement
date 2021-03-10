@@ -5,6 +5,7 @@ const {auth} = require("./authentication")
 const nodemailer = require('nodemailer')
 const sjcl = require('sjcl')
 const jwt = require("jsonwebtoken")
+const Survey = require('../models/Survey')
 
 const router = Router()
 
@@ -86,7 +87,7 @@ router.post("/invite_link", auth, async (req,res) => {
     try {
         const transporter = nodemailer.createTransport(
             {
-                host: "smtp.stud.ntnu.no",
+                host: "smtp.ansatt.ntnu.no",
                 port: 587,
                 secure: false,
                 requireTLS: true,
@@ -201,8 +202,7 @@ router.post("/", async (req, res) => {
     const [real, role] = await verifyUserRegistration(token, email)
     console.log("New user role:",role)
     const userDoc = await User.findOne({email: email})
-    console.log("User doc id: " + userDoc._id);
-    if(userDoc._id != null){
+    if(userDoc != null && userDoc._id != null){
         res.status(409).json({Error: "This registration link has already been used."})
         return
     }
@@ -324,6 +324,18 @@ router.delete("/:id", auth, async (req, res) => {
         return
     }
     const result = await User.deleteOne({_id: req.params.id})
+    const updateSurveysResult = await Survey.updateMany(
+        {"owners.owner_id": req.params.id},
+        {
+            $pull: 
+            {
+                owners: 
+                {
+                    owner_id: req.params.id
+                }
+            }
+        })
+    console.log(updateSurveysResult)
     if(result.deletedCount == 1){
         res.sendStatus(204)
     }

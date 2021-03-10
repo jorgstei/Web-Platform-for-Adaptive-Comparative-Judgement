@@ -24,9 +24,6 @@ server.use(cors({
 }))
 server.use(bodyParser.json())
 
-const mailtest = require("./routes/nodemailertest")
-server.use("/mailtest", mailtest)
-
 const auth = require("./routes/authentication")
 server.use("/auth", auth.router)
 
@@ -35,9 +32,6 @@ server.use("/api/survey", surveyRoute)
 
 const surveyAnswerRoute = require('./routes/survey_answer_route')
 server.use("/api/surveyanswer", surveyAnswerRoute)
-
-const comparisonObjectRoute = require('./routes/comparison_object_route')
-server.use("/api/comparisonobject", comparisonObjectRoute)
 
 const userRoute = require('./routes/user_route')
 server.use("/api/user", userRoute)

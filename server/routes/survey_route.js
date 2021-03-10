@@ -121,7 +121,8 @@ router.get("/:id", auth, async (req, res) => {
     console.log("Called get survey by id")
     try {
         const survey = await Survey.findOne({_id: req.params.id})
-        if(req.role !== "admin" && req.userid !== survey.owners.find(owner => owner.owner_id == req.userid)){
+        const foundOwner = survey.owners.find(owner => owner.owner_id === req.userid)
+        if(req.role !== "admin" && req.userid !== foundOwner.owner_id){
             res.sendStatus(403)
             return
         }

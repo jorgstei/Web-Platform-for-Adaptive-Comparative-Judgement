@@ -18,6 +18,7 @@
         margin: auto;
         display: grid;
         grid-template-columns: auto;
+        
     }
     .inputLabel{
         font-size: 1.5em;
@@ -41,9 +42,10 @@
         width: 15%;
         margin: auto;
         margin-top: 2em;
-        font-size: 1em;
-        background-color: rgba(100, 100, 100, 0.05);
+        font-size: 1.2em;
+        background-color: rgba(58, 2, 2, 0.05);
         border-color: rgba(100, 100, 100, 0.05);
+        color: rgba(20,20,20,0.9);
     }
     .submitBtn:hover{
         background-color:  rgba(100, 100, 100, 0.3);

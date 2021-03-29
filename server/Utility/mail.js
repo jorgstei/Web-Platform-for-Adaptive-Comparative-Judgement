@@ -5,13 +5,13 @@ const nodemailer = require('nodemailer')
     {
         to: The recipient email address
         subject: The subject of the email
-        content
+        html: HTML representation of the mail content/body
     }
 */
 async function sendMail(mailOptions){
     const transporter = nodemailer.createTransport(
         {
-            host: "smtp.stud.ntnu.no",
+            host: "smtp.ansatt.ntnu.no",
             port: 587,
             secure: false,
             requireTLS: true,
@@ -24,14 +24,12 @@ async function sendMail(mailOptions){
             }
         }  
     )
-    await transporter.sendMail(
-        await transporter.sendMail(
-            {
-                from: process.env.MAIL_FROM_STRING,
-                to: email,
-                subject: "You have been invited to join ACJ",
-                html: body_intro + body_invite_link + body_outro
-            }
-        )
+    mailOptions.from = process.env.MAIL_FROM_STRING
+    const result = await transporter.sendMail(
+        mailOptions
     )
+    transporter.close()
+    return result;
 }
+
+module.exports = sendMail

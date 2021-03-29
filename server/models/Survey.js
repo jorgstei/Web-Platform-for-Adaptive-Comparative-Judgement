@@ -4,7 +4,7 @@ const {Schema, model} = require('mongoose')
 const childOwnerRightsSchema = new Schema(
     {
         //An owner implicitly has rights to VIEW the survey
-        manageMemebers:{
+        manageMembers:{
             type: Boolean,
             required: true,
             default: false
@@ -23,7 +23,7 @@ const childOwnerRightsSchema = new Schema(
 )
 const childOwnerSchema = new Schema(
     {
-        owner_id: {
+        ownerId: {
             type: String,
             required: true
         },

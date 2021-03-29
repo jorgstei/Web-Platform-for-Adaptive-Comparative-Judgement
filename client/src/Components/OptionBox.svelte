@@ -27,7 +27,8 @@
         <div class="deleteOption">
             <button class="deleteButton"
             on:click={(e) => {
-                let optionWrapper = e.target.parentElement.parentElement.parentElement;
+                let optionWrapper = e.target.parentElement.parentElement.parentElement.parentElement;
+                console.log("I want to remove element: ", optionWrapper);
                 optionWrapper.remove();
             }}>
             <img class="trashcan_icon"src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete-icon">
@@ -64,6 +65,7 @@
     .trashcan_icon {
         max-width: 100%;
         margin: auto;
+        min-width: 2vw;
     }
     
     .deleteButton{

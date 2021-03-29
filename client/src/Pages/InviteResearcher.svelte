@@ -69,7 +69,7 @@
 <div class="wrapper">
     <h1>Invite a researcher!</h1>
     <select name="role" id="role_dropdown">
-        <option value="scientist">Researcher</option>
+        <option value="researcher">Researcher</option>
         <option value="admin">Admin</option>
     </select>
     <label class="inputLabel" for="email">Email</label>
@@ -91,8 +91,10 @@
     h1 {
 		padding: 0;
         margin-top: 0;
-		color: #000000;
+		color: #000;
 		font-size: 3rem;
+		font-weight: 100;
+        padding-top: 10vh;
 		font-weight: 100;
 	}
 
@@ -102,6 +104,7 @@
         grid-template-rows: auto;
         text-align: center;
         background-color: #eee;
+        margin-left: 0;
     }
     .inputLabel{
         font-size: 1.5em;
@@ -117,7 +120,6 @@
         text-align: center;
         background-color: rgba(200, 200, 200, 0.3);
         border-color: rgba(200, 200, 200, 0.3);
-        
     }
     .inputfield:hover{
         background-color: rgba(150, 150, 150, 0.7);

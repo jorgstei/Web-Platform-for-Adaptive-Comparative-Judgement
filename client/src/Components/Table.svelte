@@ -3,19 +3,21 @@
     import {onMount} from 'svelte'
     import { toast } from "@zerodevx/svelte-toast";
     import { navigate, Link } from "svelte-routing";
-    export let tableTitle;
+    export let tableTitle = undefined;
     export let tableAttributes = ["full name", "email", "joined on", "id", "share", "delete"];
-    export let tableData;
-    export let deleteFunc;
-    export let copyFunc;
+    export let tableData = undefined;
+    export let deleteFunc = undefined;
+    export let copyFunc = undefined;
     export let element = document.createElement("p");
+    export let userRights = undefined;
+    export let surveyActivityStatus = undefined;
     console.log("in table",tableData)
     
     $: tableData
     $: deleteFunc
-     
     onMount(()=>{
         document.getElementsByClassName("container")[0].insertBefore(element, document.getElementsByClassName("main_table")[0]);
+        
     })
     
 </script>
@@ -35,48 +37,62 @@
                         <td class="col">{datapoint}</td>
                     {/each}
                     {#if tableAttributes.indexOf('data') != -1}
-
+                        {#if userRights[tableData.findIndex(e=>e==row)].viewResults}
                         <td class="col"><Link to={"survey_data/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://png.pngtree.com/element_our/20190601/ourlarge/pngtree-file-download-icon-image_1344466.jpg" alt="Survey data link"></Link></td>
+                        {:else}
+                        <td class="col disabledLink"><img class="small_icon" src="../img/disabled_download.jpg" alt="You cant access survey data image"></td>
+                        {/if}
                     {/if}
                     {#if tableAttributes.indexOf('edit') != -1}
-                    <td class="col"><Link to={"edit_survey/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://p.kindpng.com/picc/s/154-1541056_edit-edit-icon-svg-hd-png-download.png" alt="Edit survey button"></Link></td>
-
+                        {#if userRights[tableData.findIndex(e=>e==row)].editSurvey}
+                        <td class="col"><Link to={"edit_survey/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://p.kindpng.com/picc/s/154-1541056_edit-edit-icon-svg-hd-png-download.png" alt="Edit survey button"></Link></td>
+                        {:else}
+                        <td class="col disabledLink"><img class="small_icon" src="../img/disabled_edit.jpg" alt="You cant edit survey image"></td>
+                        {/if}
                     {/if}
                     {#if tableAttributes.indexOf('share') != -1}
-                        <td class="col"><img class="small_icon" src="https://w7.pngwing.com/pngs/592/864/png-transparent-computer-icons-icon-design-cut-copy-and-paste-taobao-clothing-promotional-copy-text-rectangle-emoticon-thumbnail.png" alt="Share link button" 
+                        {#if surveyActivityStatus[tableData.findIndex(e=>e==row)] === true}
+                            <td class="col"><img class="small_icon" src="https://w7.pngwing.com/pngs/592/864/png-transparent-computer-icons-icon-design-cut-copy-and-paste-taobao-clothing-promotional-copy-text-rectangle-emoticon-thumbnail.png" alt="Share link button" 
                             on:click={()=>{
                                 navigator.clipboard.writeText(window.location.href.split("/admin_board")[0] + "/?takeSurvey=1&surveyID=" + row[tableAttributes.indexOf("id")])
                                 .then(()=>{
                                     toast.push("Link to the survey has been copied to your clipboard!", {duration: 2000});
                                 })
                             }}></td>
+                        {:else}
+                            <td class="col disabledLink"><img class="small_icon" src="../img/disabled_share.png" alt="Share link button"></td>
+                        {/if}
                     {/if}
                     
                     {#if tableAttributes.indexOf('delete') != -1}
-                    <td class="col"><img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
-                    on:click={()=>{
-                        let content_id = row[tableAttributes.indexOf("id")];
-                        
-                        
-                        swal({
-                        title: "Are you sure?",
-                        text: "Are you sure you want to delete this " + tableTitle.toLowerCase().substring(0,tableTitle.length-1) + " ?",
-                        icon: "warning",
-                        dangerMode: true,
-                        buttons: ["Cancel", "Delete"]
-                        })
-                        .then(async willDelete => {
-                            if (willDelete) {
-                                await deleteFunc(content_id).then(()=> {
-                                    swal("Deleted!", tableTitle.substring(0,tableTitle.length-1) + " has been deleted!", "success");
-                                        tableData = tableData.filter(e => e[tableAttributes.indexOf("id")] != content_id);
-                                }).catch((err)=>{
-                                    swal("Could not delete", "Due to error: " + err, "error");
+                        {#if userRights[tableData.findIndex(e=>e==row)].editSurvey}
+                            <td class="col"><img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
+                            on:click={()=>{
+                                let content_id = row[tableAttributes.indexOf("id")];
+                                
+                                
+                                swal({
+                                title: "Are you sure?",
+                                text: "Are you sure you want to delete this " + tableTitle.toLowerCase().substring(0,tableTitle.length-1) + " ?",
+                                icon: "warning",
+                                dangerMode: true,
+                                buttons: ["Cancel", "Delete"]
                                 })
+                                .then(async willDelete => {
+                                    if (willDelete) {
+                                        await deleteFunc(content_id).then(()=> {
+                                            swal("Deleted!", tableTitle.substring(0,tableTitle.length-1) + " has been deleted!", "success");
+                                                tableData = tableData.filter(e => e[tableAttributes.indexOf("id")] != content_id);
+                                        }).catch((err)=>{
+                                            swal("Could not delete", "Due to error: " + err, "error");
+                                        })
+                                    }
+                                });
                             }
-                        });
-                    }
-                    }></td>
+                            }></td>
+                        {:else}
+                        <td class="col disabledLink"><img class="small_icon" src="../img/disabled_delete.png" alt="Delete option button"></td>
+                        {/if}
                     {/if}
                 </tr>
             {/each}
@@ -140,4 +156,8 @@ table{
     --toastContainerBottom: 5vh;
     --toastContainerLeft: calc(50vw - 8rem);
     }  
+.disabledLink :hover{
+    color: red;
+    cursor: not-allowed;
+}
 </style>

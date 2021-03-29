@@ -16,7 +16,7 @@
                 <Link to="login"><li>Log in</li></Link>
             {:else}
                 <Link to="admin_board"><li>Board</li></Link>
-                <li on:click={() => {userService.logout().then(()=>{userInfo=null; navigate("/")})}}>Log out</li>
+                <li id="logout-btn" on:click={() => {userService.logout().then(()=>{userInfo=null; navigate("/")})}}>Log out</li>
             {/if}
         </ul>
     </nav>
@@ -24,7 +24,9 @@
 
 
 <style>
-    
+    #logout-btn{
+        cursor: pointer;
+    }
     nav {
         margin: 0;
         padding: 0;

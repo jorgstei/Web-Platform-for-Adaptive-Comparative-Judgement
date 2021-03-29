@@ -5,17 +5,20 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server",
-    "docs": "apidoc -i ./ -o apidoc/ -e node_modules",
+    "docs": "apidoc -i ./ -o apidoc/ -e node_modules -e apidoc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Lasse Seivaag, Jørgen Steig",
   "license": "SEE LICENSE IN license.txt",
   "dependencies": {
+    "apidoc": "^0.26.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
+    "escape-string-regexp": "^4.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "mongo-escape": "^2.0.6",
     "mongoose": "^5.11.13",
     "nodemailer": "^6.5.0",
     "sjcl": "^1.0.8"

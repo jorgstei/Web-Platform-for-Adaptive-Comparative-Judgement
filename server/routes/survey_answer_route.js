@@ -51,7 +51,7 @@ router.get("/judge/:id", auth, async (req, res) => {
             res.sendStatus(403)
             return
         }
-        const surveyAnswers = await SurveyAnswer.find({judge_id: req.params.id})
+        const surveyAnswers = await SurveyAnswer.find({judgeId: req.params.id})
         if(!surveyAnswers){
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
@@ -71,7 +71,7 @@ router.get("/survey/:id", auth, async (req, res) => {
             res.sendStatus(403)
             return
         }
-        const surveyAnswers = await SurveyAnswer.find({survey_id: req.params.id})
+        const surveyAnswers = await SurveyAnswer.find({surveyId: req.params.id})
         if(!surveyAnswers){
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
@@ -111,14 +111,14 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(404)
         return
     }
-    const surveyDoc = await Survey.findOne({_id: surveyAnswerDoc.survey_id})
+    const surveyDoc = await Survey.findOne({_id: surveyAnswerDoc.surveyId})
     console.log("delete surveyAnswerDoc: ", surveyAnswerDoc)
     console.log("delete surveyDoc: ", surveyDoc)
     if(!surveyDoc || !surveyDoc._id){
         res.sendStatus(404)
         return
     }
-    if(req.role !== "admin" && req.userid !== surveyDoc.owner_id){
+    if(req.role !== "admin" && req.userid !== surveyDoc.ownerId){
         res.sendStatus(403)
         return
     }

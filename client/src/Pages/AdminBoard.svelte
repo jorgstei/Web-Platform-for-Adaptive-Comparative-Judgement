@@ -57,26 +57,23 @@
 <style>
     main {
         display: grid;
-        grid-template-areas:
-        "menu contentWrapper contentWrapper contentWrapper contentWrapper contentWrapper";
+        grid-template-columns: 1fr 5fr;
+        grid-column-gap: 0;
         width: 100vw;
         height: 95vh;
-        grid-column-gap: 1vw;
         padding-top: 5vh;
         text-align: center;
-        
     }
 
     #menuWrapper {
         width: 15vw;
         padding-top: 10vh;
         padding-left: 2vw;
-        grid-area: menu;
+        padding-right: 0;
+        margin-right: 0;
     }
+
     .contentWrapper {
-        grid-area: contentWrapper;
-        margin-left: 0;
-        justify-content:center;
         max-width: fit-content;
     }
     

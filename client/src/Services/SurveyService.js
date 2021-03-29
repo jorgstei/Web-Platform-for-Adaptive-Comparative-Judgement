@@ -32,6 +32,16 @@ export default class SurveyService extends Service{
         .catch(error => console.log(error))
     }
 
+    getSurveyByIdAsJudge(id){
+        return axios({
+            method: "get",
+            url: this.path + "/survey/judge/"+id,
+            withCredentials: true
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
     postSurvey(survey){
         return axios({
             method: "post",
@@ -87,6 +97,31 @@ export default class SurveyService extends Service{
             }
         })        
         .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
+    getSorted(field, skip, limit, direction){
+        return axios({
+            method: "get",
+            url: this.path+"/survey/function/sort",
+            data:{
+                field:field,
+                skip:skip,
+                limit:limit,
+                direction:direction
+            }
+        })        
+        .then(response => response)
+        .catch(error => console.log(error))
+    }
+
+    search(data, term){
+        return axios({
+            method: "get",
+            url: this.post+"/survey/function/search/"+term,
+            data: data
+        })        
+        .then(response => response)
         .catch(error => console.log(error))
     }
 }

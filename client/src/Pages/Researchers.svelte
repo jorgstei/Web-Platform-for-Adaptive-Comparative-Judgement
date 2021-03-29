@@ -13,7 +13,7 @@
         data2DArray = [];
         for (let i = 0; i < data.length; i++) {
             // add data according to tableAttributes array
-            let arr = [data.firstName != null & data.lastName != null ? data.firstName + " " + data.lastName: data[i].email.split('@')[0], data[i].email, "18.02.2021", data[i]._id]
+            let arr = [(data[i].firstName != null && data[i].lastName != null) ? data[i].firstName + " " + data[i].lastName : data[i].email.split('@')[0], data[i].email, "18.02.2021", data[i]._id]
             data2DArray.push(arr);
         }
         console.log("Tranformed researchers data 2D array", data2DArray);

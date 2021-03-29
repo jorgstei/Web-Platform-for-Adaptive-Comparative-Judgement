@@ -22,12 +22,20 @@
         })
     });
     
-    let currentContentView = "linearRanking";
+
+    let linearRankingHeaders = ["option", "infit", "outfit", "wins", "theta"];
     let linearRanking = null;
+    let allJudgesHeaders = ["id", "agree", "infit", "outfit"];
     let allJudges = null;
+    let allItemsHeaders = ["option", "infit", "outfit", "propscore", "theta", "wins", "losses", "total comparisons", "option number"];
+    let allItems2DArray = null;
+    
+    let currentContentView = "linearRanking";
+
     let surveyStatistics = null;
+    
     let answerValues= [];
-    let answerHeaders = ["winner", "loser", "judge id"];
+    let answerHeaders = ["judge id", "left option", "right option", "result"];
 	let getSurveyAnswers = async ()=>{
         await surveyAnswerService.getBySurveyID(surveyID)
         .then((answers)=>{
@@ -35,16 +43,16 @@
 
             // Transform JSON and try to get answer
             let newJSON = [];
-            answers.forEach(e => {
+            answers.forEach( e => {
                 newJSON.push(
                     {
-                        "judgeName": e.judge_id,
-                        "left": e.winner_id,
-                        "right": e.loser_id,
-                        "result": 1
+                        "judgeName": e.judgeId,
+                        "left": e.leftOption,
+                        "right": e.rightOption,
+                        "result": e.winner
                     }
                 )
-                answerValues.push([e.winner_id, e.loser_id, e.judge_id]);
+                answerValues.push([e.judgeId, e.leftOption, e.rightOption, e.winner]);
             });
             console.log("Transformed answer values, attempting to send to analyzing module:\n", answerValues);
 
@@ -62,17 +70,28 @@
                 console.log("Successfully recieved statistics for the survey:\n", surveyStatistics);
                 allJudges = response.data.judges;
                 linearRanking = surveyStatistics.result.sort((a,b)=> {
-                    return b.score - a.score;
+                    return b.theta - a.theta;
                 })
-
+                
                 let linearRanking2DArray = [];
+                allItems2DArray = [];
                 for (let i = 0; i < linearRanking.length; i++) {
+                    console.log("Survey items: ", survey.items);
+                    console.log("Linrank individual: ", linearRanking[i].individual);
                     let answerWithSameId = survey.items.find(obj => obj._id == linearRanking[i].individual);
-                    linearRanking2DArray.push([answerWithSameId.data, linearRanking[i].infit, linearRanking[i].outfit, linearRanking[i].score])
+                    if(answerWithSameId == undefined || answerWithSameId == null){
+                        linearRanking2DArray.push(["none", "NaN", "NaN", "NaN"]);
+                        allItems2DArray.push(["none", "NaN", "NaN", "NaN", "Nan", "NaN", "Nan", "NaN", "Nan"]);
+                    }
+                    else{
+                        linearRanking2DArray.push([answerWithSameId.data, linearRanking[i].infit, linearRanking[i].outfit, linearRanking[i].score, linearRanking[i].theta])
+                        allItems2DArray.push([answerWithSameId.data, linearRanking[i].infit, linearRanking[i].outfit, linearRanking[i].propscore, linearRanking[i].theta,  linearRanking[i].N1, linearRanking[i].N0, linearRanking[i].Ntot, linearRanking[i].id])
+                    }
                 }
                 
                 console.log("Transformed linear ranking from", linearRanking, "to", linearRanking2DArray);
                 linearRanking = linearRanking2DArray;
+                allItems2DArray = allItems2DArray;
                 
                 let allJudges2DArray= [];
                 allJudges.forEach(e => {
@@ -80,6 +99,9 @@
                 });
                 console.log("Transformed all judges from", allJudges, "to", allJudges2DArray);
                 allJudges = allJudges2DArray;
+
+                
+
             })
             .catch(error => console.log("Could not fetch statistics for the survey. Failed with error:\n", error))
         .catch(error => console.log("Could not fetch answers for the survey. Failed with error:\n", error))
@@ -89,29 +111,68 @@
     }
     getSurveyAnswers();
 
-    let downloadFunc = (headers, rows)=> {
-        let csvContent = "SEP=, \r\n" + headers.join(',') + "\r\n";
-        rows.forEach(e => {
-            csvContent += e.join(",") + "\r\n";
-        });
-        let blob = new Blob([csvContent], {type: "text/csv;charset=utf-8"});
-        saveAs(blob, "survey_data.csv")
-    }
+    
 
-    let btn = document.createElement("button");
-    btn.innerHTML = "Download as .csv";
-    btn.style.float = "";
-    btn.onclick = ()=>{
-        console.log("You just clicked the button! Downloading...");
-        downloadFunc(answerHeaders, answerValues);
-    }
+    
 
+    //Updates current content view based on value of the dropdown menu
     let updateCurrentContentView = () => {
         currentContentView = document.getElementById("viewDropdown").value;
         console.log("Current content view is: ", currentContentView);
     }
+
+    /*  Downloads data as a csv file
+    *   @param {string[]} headers - The headers for the csv file
+    *   @param {*[]} rows - Array of arrays which contain the data for each row
+    *   @param {string} - Filename of the csv-file. Should not contain the .csv extension at the end
+    *   
+    */
+    let downloadFunc = (headers, rows, filename)=> {
+        console.log("In download func");
+        console.log("rows: ", rows);
+        let csvContent = "SEP=, \r\n" + headers.join(',') + "\r\n";
+        rows.forEach(e => {
+            console.log("E", e);
+            csvContent += e.join(",") + "\r\n";
+        });
+        let blob = new Blob([csvContent], {type: "text/csv;charset=utf-8"});
+        saveAs(blob, filename + ".csv")
+    }
+
+    //Download as csv buttons
+    let csvDownloadRawDataButton = document.createElement("button");
+    csvDownloadRawDataButton.innerHTML = "Download as .csv";
+    csvDownloadRawDataButton.style.float = "";
+    csvDownloadRawDataButton.onclick = ()=>{
+        console.log("You just clicked the download raw data button! Downloading...");
+        downloadFunc(answerHeaders, answerValues, survey.title + "_raw_data");
+    }
+
+    let csvDownloadByItemButton = document.createElement("button");
+    csvDownloadByItemButton.innerHTML = "Download as .csv";
+    csvDownloadByItemButton.style.float = "";
+    csvDownloadByItemButton.onclick = ()=>{
+        console.log("You just clicked the download by item button! Downloading...");
+        downloadFunc(allItemsHeaders, allItems2DArray, survey.title + "_survey_data");
+    }
+
+    let csvDownloadByJudgeButton = document.createElement("button");
+    csvDownloadByJudgeButton.innerHTML = "Download as .csv";
+    csvDownloadByJudgeButton.style.float = "";
+    csvDownloadByJudgeButton.onclick = ()=>{
+        console.log("You just clicked the download by judge button! Downloading...");
+        downloadFunc(allJudgesHeaders, allJudges, survey.title + "_judge_data");
+    }
+
+    let csvDownloadLinearRankingButton = document.createElement("button");
+    csvDownloadLinearRankingButton.innerHTML = "Download as .csv";
+    csvDownloadLinearRankingButton.style.float = "";
+    csvDownloadLinearRankingButton.onclick = ()=>{
+        console.log("You just clicked the download linear ranking button! Downloading...");
+        downloadFunc(linearRankingHeaders, linearRanking, survey.title + "_basic_survey_data");
+    }
     
-    $: answerValues & survey & surveyStatistics & linearRanking & allJudges & currentContentView;
+    $: answerValues & survey & surveyStatistics & linearRanking & allJudges & allItems2DArray & currentContentView;
 </script>
 
 <div id="surveyDataWrapper">
@@ -142,17 +203,29 @@
         </li>
     </ul>
     {#if currentContentView=="linearRanking"}
-        {#if linearRanking != null}
-            <Table bind:tableData={linearRanking} tableAttributes={["option", "infit", "outfit", "score"]}></Table>
+        {#if linearRanking != null && linearRanking.length > 0}
+            <Table bind:tableData={linearRanking} tableAttributes={linearRankingHeaders} element={csvDownloadLinearRankingButton}></Table>
+        {:else}
+            <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}
     {:else if currentContentView=="rawdata"}
-        <Table bind:tableData={answerValues} tableAttributes={answerHeaders} element={btn}></Table>
+        {#if answerValues != null && answerValues.length > 0}
+            <Table bind:tableData={answerValues} tableAttributes={answerHeaders} element={csvDownloadRawDataButton}></Table>
+        {:else}
+            <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
+        {/if}
     {:else if currentContentView=="byJudge"}
-        {#if allJudges != null}
-            <Table bind:tableData={allJudges} tableAttributes={["id", "agree", "infit", "outfit"]}></Table>
+        {#if allJudges != null && allJudges.length > 0}
+            <Table bind:tableData={allJudges} tableAttributes={allJudgesHeaders} element={csvDownloadByJudgeButton}></Table>
+        {:else}
+            <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}
     {:else if currentContentView=="byItem"}
-
+        {#if allItems2DArray != null && allItems2DArray.length > 0}
+            <Table bind:tableData={allItems2DArray} tableAttributes={allItemsHeaders} element={csvDownloadByItemButton}></Table>
+        {:else}
+            <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
+        {/if}
     {/if}
 
 </div>
@@ -177,7 +250,7 @@
         margin-right: 1vw;
     }
     select {
-        width: 10vw;
+        width: 20vw;
         text-align: center;
     }
     label {

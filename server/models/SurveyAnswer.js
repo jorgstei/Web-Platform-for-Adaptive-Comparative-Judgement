@@ -2,19 +2,24 @@ const {Schema, model} = require('mongoose')
 
 const SurveySchema = new Schema(
     {
-        judge_id: {
+        judgeId: {
             type: String,
             required: true
         },
-        winner_id:{
+        leftOption:{
             type: String,
             required: true
         },
-        loser_id: {
+        rightOption:{
             type: String,
             required: true
         },
-        survey_id: {
+        winner:{
+            type: Number,
+            required: true,
+            enum: [0, 1]
+        },
+        surveyId: {
             type: String,
             required: true
         }

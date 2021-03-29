@@ -78,6 +78,38 @@ export default class UserService extends Service{
         .catch(error => console.log(error))
     }
 
+    search(term){
+        return axios({
+            method: "get",
+            url: "http://localhost:3000/api/user/search/"+term,
+            withCredentials: true
+        })
+        .then(response => response)
+        .catch(error => console.log(error))
+    }
+
+    patchForgottenPassword(data){
+        return axios({
+            method: "patch",
+            url: this.path + "/user/forgotten_password",
+            data: data,
+            withCredentials: true
+        })
+        .then(response => response)
+        .catch(error => console.error(error))
+    }
+
+    sendForgottenPasswordLink(data){
+        return axios({
+            method: "post",
+            url: this.path + "/user/forgotten_my_password",
+            data: data,
+            withCredentials: true
+        })
+        .then(response => response)
+        .catch(error => console.error(error))
+    }
+
     sendInviteLink(userObj){
         return axios({
             method: "post",

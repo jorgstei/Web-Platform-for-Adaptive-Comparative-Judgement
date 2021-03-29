@@ -20,16 +20,17 @@
     let randomPair = null;
     surveyService.getRandomPairForSurveyByID(surveyID).then(data => randomPair = data.data);
     let counter = 0;
-    const maxCounter = 5;
+    const maxCounter = 10;
     const transition_distance = 300;
 
     let leftChoiceClicked = () => {
         const answer = 
         {
-            judge_id: userInfo.userid,
-            survey_id: surveyID,
-            winner_id: randomPair[0]._id,
-            loser_id: randomPair[1]._id
+            judgeId: userInfo.userid,
+            surveyId: surveyID,
+            leftOption: randomPair[0]._id,
+            rightOption: randomPair[1]._id,
+            winner: 1,
         }
         surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res))
         if(counter < maxCounter){
@@ -42,10 +43,11 @@
     let rightChoiceClicked = () => {
         const answer = 
         {
-            judge_id: userInfo.userid,
-            survey_id: surveyID,
-            winner_id: randomPair[1]._id,
-            loser_id: randomPair[0]._id
+            judgeId: userInfo.userid,
+            surveyId: surveyID,
+            leftOption: randomPair[0]._id,
+            rightOption: randomPair[1]._id,
+            winner: 0,
         }
         surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res))
         if(counter < maxCounter){
@@ -128,12 +130,13 @@
 <style>
     main {
         margin:auto;
+        margin-top: 0;
         width: 100vw;
         height: 100vh;
     }
     #container {
         margin: auto;
-        margin-top: 10%;
+        padding-top: 10%;
         width: 80%;
         height: 80%;
         display: grid;
@@ -143,7 +146,7 @@
     }
     #thank_you_message {
         margin: auto;
-        margin-top: 10%;
+        padding-top: 10%;
         width: 70%;
         height: 60%;
         text-align: center;

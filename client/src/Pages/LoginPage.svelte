@@ -1,14 +1,13 @@
 <script>   
-    import { sha512 } from 'js-sha512';
     import { userService } from "../Services/UserService";
-    import {Link, navigate} from "svelte-routing";
-import swal from 'sweetalert';
+    import {navigate} from "svelte-routing";
+    import swal from 'sweetalert';
+import Link from "svelte-routing/src/Link.svelte";
 
     let showErrorField = false;
     export let newUser = false;
     export let userInfo;
     export let changePassword = false;
-    export let forgottenPassword;
 
     console.log("NewUser?: ", newUser)
 
@@ -72,20 +71,27 @@ import swal from 'sweetalert';
     // Checks the validity of fields. Optional third parameter for password 2. Optional third parameter for if user is changing password or not.
     // If the user is changing password the email parameter should be the old password, and it will not be checked for @ . and whitespaces.
     const checkValues = (email, pw1, pw2=pw1, changingPassword=false) => {
+        
         let valuesAreValid = true;
         let errormsg = "";
         console.log("Checking values email, pw1, pw2", email, pw1, pw2);
+        const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+        
         // Checks if each field has a value
         if(email === "" || pw1 === "" || pw2 === ""){
             valuesAreValid = false;
             errormsg = "Every field must be filled."
         }
         
+        else if(email.length > 64){
+            valuesAreValid = false;
+            errormsg = "This email is too long. Please choose a shorter one (below 64 characters).";
+        }
         // Check that the given mail contains an "@" and ".". Also ensures there are no whitespaces in the email (spaces, tabs, etc.)
-        else if(!/@/.test(email) || !/./.test(email) || /\s/.test(email)){
+        else if(!email_regex.test(email)){
             if(!changingPassword){
                 valuesAreValid = false;
-                errormsg = "Your email must contain '@' and '.' and can not have whitespaces."
+                errormsg = "This email is not valid. Please double check that it contains '@' and '.', and does not include whitespaces."
             }
         }
         // Checks that the passwords match.
@@ -112,10 +118,6 @@ import swal from 'sweetalert';
 <main>
     {#if changePassword==true}
         <h1>Change password</h1>
-    {:else if forgottenPassword==true}
-        <h1>Forgotten password</h1>
-        <h2>Submit your email below to recieve an email with instructions on how to create a new password</h2>
-        <h2>Since this website is actually decent there is no possible way for us to recover your previous password</h2>
     {:else}
         <h1>Welcome back to ACJ!</h1>
         <h2>Log in below to see your surveys, and continue making new ones.</h2>
@@ -147,6 +149,7 @@ import swal from 'sweetalert';
             <p id="errorField"></p>
 
             <button class="submitBtn" on:click={login}>Log in</button>
+            <Link to="forgotten_password">Forgotten your password?</Link>
 
         {/if}
 

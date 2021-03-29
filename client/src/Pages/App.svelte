@@ -3,7 +3,6 @@
 	import { SvelteToast } from '@zerodevx/svelte-toast'
 	import {surveyService} from "../Services/SurveyService"
 	import {userService} from "../Services/UserService"
-
 	import Footer from "../Components/Footer.svelte";
 	import Navbar from "../Components/Navbar.svelte";
 	import Survey from "./Survey.svelte";
@@ -15,6 +14,8 @@
 	import UserServiceTest from "../test_pages/UserServiceTest.svelte"
 	import AdminBoard from "./AdminBoard.svelte";
 	import RegisterAccount from "./RegisterAccount.svelte";
+	import ForgottenPassword from "./ForgottenPassword.svelte";
+	import IntroductionToSurvey from "./IntroductionToSurvey.svelte";
 
 	export let url="";
 	let userInfo = null;
@@ -58,7 +59,15 @@
 		<LoginPage newUser="false" bind:userInfo={userInfo}></LoginPage>
 	</Route>
 
+	<Route path="forgotten_password">
+		<ForgottenPassword></ForgottenPassword>
+	</Route>
+
 	<Route path="survey">
+		<IntroductionToSurvey surveyID={params.surveyID} bind:userInfo={userInfo}/>
+	</Route>
+	
+	<Route path="take_survey">
 		<Survey surveyID={params.surveyID} bind:userInfo={userInfo}/>
 	</Route>
 

@@ -5,7 +5,36 @@ const Survey = require('../models/Survey')
 
 const router = Router()
 
-//Get all
+/**
+ * @apiDefine SuccessGetSurveyAnswerArray
+ * @apiSuccess (200) {String} surveyanswers._id The id of this surveyanswer
+ * @apiSuccess (200) {String} surveyanswers.judgeId the ID of the judge that created this answer
+ * @apiSuccess (200) {String} surveyanswers.leftOption the ID of the Survey.item that was in the left position
+ * @apiSuccess (200) {String} surveyanswers.rightOption the ID of the Survey.item that was in the right position
+ * @apiSuccess (200) {Number=0,1} surveyanswers.winner 1 means the left option was picked, 0 means the right option was picked.
+ * @apiSuccess (200) {String} surveyanswers.surveyId The ID of the survey that holds these items, and the judge was participating in. 
+ */
+
+ /**
+ * @apiDefine SuccessGetSurveyAnswer
+ * @apiSuccess (200) {String} _id The id of this surveyanswer
+ * @apiSuccess (200) {String} judgeId the ID of the judge that created this answer
+ * @apiSuccess (200) {String} leftOption the ID of the Survey.item that was in the left position
+ * @apiSuccess (200) {String} rightOption the ID of the Survey.item that was in the right position
+ * @apiSuccess (200) {Number=[0, 1]} winner 1 means the left option was picked, 0 means the right option was picked.
+ * @apiSuccess (200) {String} surveyId The ID of the survey that holds these items, and the judge was participating in. 
+ */
+
+/**
+ * @api {get} /api/surveyanswer
+ * @apiName GETAllSurveyanswer
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiUse SuccessGetSurveyAnswerArray
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ */
 router.get("/", auth, async (req, res) => {
     console.log("Get all SurveyAnswers called")
     try{
@@ -23,7 +52,17 @@ router.get("/", auth, async (req, res) => {
     }
 })
 
-//Get one by id
+/**
+ * @api {get} /api/surveyanswer/:id
+ * @apiName GETSurveyanswerById
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The ID of the surveyanswer to get
+ * @apiUse SuccessGetSurveyAnswer
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ */
 router.get("/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
@@ -43,7 +82,17 @@ router.get("/:id", auth, async (req, res) => {
     }
 })
 
-//Get all by judge
+/**
+ * @api {get} /api/surveyanswer/judge/:id
+ * @apiName GETSurveyanswerByJudgeId
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The ID of the surveyanswer to get
+ * @apiUse SuccessGetSurveyAnswerArray
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ */
 router.get("/judge/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
@@ -60,7 +109,18 @@ router.get("/judge/:id", auth, async (req, res) => {
         res.status(404).json({message: "Empty collection"})
     }
 })
-//Get all by survey id
+
+/**
+ * @api {get} /api/surveyanswer/survey/:id
+ * @apiName GETSurveyanswerBySurveyId
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The ID of the surveyanswer to get
+ * @apiUse SuccessGetSurveyAnswerArray
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ */
 router.get("/survey/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
@@ -81,7 +141,16 @@ router.get("/survey/:id", auth, async (req, res) => {
     }
 })
 
-//Insert one
+/**
+ * @api {post} /api/surveyanswer/
+ * @apiName POSTSurveyanswer
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiSuccess (201) {String} loc the location of the newly created document.
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ */
 router.post("/", auth, async (req, res) => {
     console.log("Insert one SurveyAnswer")
     const surveyAnswer = req.body
@@ -103,7 +172,18 @@ router.post("/", auth, async (req, res) => {
     }
 })
 
-//Delete one
+/**
+ * @api {delete} /api/surveyanswer/:id
+ * @apiName DELETESurveyanswer
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The ID of the surveyanswer to delete
+ * @apiSuccess (204) 204 No Content, the document was successfully deleted
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ * @apiError (500) 500 Internal Server Error
+ */
 router.delete("/:id", auth, async (req, res) => {
     console.log("Delete one SurveyAnswer")
     const surveyAnswerDoc = await SurveyAnswer.findOne({_id: req.params.id})

@@ -204,25 +204,25 @@
     </ul>
     {#if currentContentView=="linearRanking"}
         {#if linearRanking != null && linearRanking.length > 0}
-            <Table bind:tableData={linearRanking} tableAttributes={linearRankingHeaders} element={csvDownloadLinearRankingButton}></Table>
+            <Table bind:tableData={linearRanking} bind:userInfo={userInfo} tableAttributes={linearRankingHeaders} element={csvDownloadLinearRankingButton}></Table>
         {:else}
             <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}
     {:else if currentContentView=="rawdata"}
         {#if answerValues != null && answerValues.length > 0}
-            <Table bind:tableData={answerValues} tableAttributes={answerHeaders} element={csvDownloadRawDataButton}></Table>
+            <Table bind:tableData={answerValues} bind:userInfo={userInfo} tableAttributes={answerHeaders} element={csvDownloadRawDataButton}></Table>
         {:else}
             <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}
     {:else if currentContentView=="byJudge"}
         {#if allJudges != null && allJudges.length > 0}
-            <Table bind:tableData={allJudges} tableAttributes={allJudgesHeaders} element={csvDownloadByJudgeButton}></Table>
+            <Table bind:tableData={allJudges} bind:userInfo={userInfo} tableAttributes={allJudgesHeaders} element={csvDownloadByJudgeButton}></Table>
         {:else}
             <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}
     {:else if currentContentView=="byItem"}
         {#if allItems2DArray != null && allItems2DArray.length > 0}
-            <Table bind:tableData={allItems2DArray} tableAttributes={allItemsHeaders} element={csvDownloadByItemButton}></Table>
+            <Table bind:tableData={allItems2DArray} bind:userInfo={userInfo} tableAttributes={allItemsHeaders} element={csvDownloadByItemButton}></Table>
         {:else}
             <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}

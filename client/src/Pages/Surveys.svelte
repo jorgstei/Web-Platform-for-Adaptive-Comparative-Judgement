@@ -73,7 +73,7 @@
     */
 </script>
 {#if data2DArray}
-    <Table tableTitle="Surveys" bind:tableData={data2DArray} tableAttributes={dataHeaders} userRights={userRights} surveyActivityStatus={activeStatus}
+    <Table tableTitle="Surveys" bind:tableData={data2DArray} bind:userInfo={userInfo} tableAttributes={dataHeaders} userRights={userRights} surveyActivityStatus={activeStatus}
     deleteFunc = {async (id)=>{
         await surveyService.deleteSurvey(id);
     }}></Table>

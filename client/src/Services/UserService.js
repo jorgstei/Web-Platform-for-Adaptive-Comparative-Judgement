@@ -57,6 +57,16 @@ export default class UserService extends Service{
         .catch(error => console.log(error))
     }
 
+    logoutJudge(){
+        return axios({
+            method: "get",
+            url: this.path.split("api")[0]+"auth/logout/judge",
+            withCredentials: true
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
     refreshToken(){
         return axios({
             method: "post",

@@ -20,24 +20,43 @@ const auth = (req, res, next) => {
         res.sendStatus(401)
         return
     }
-    const token = req.headers.cookie.split("access-token=")[1].replace(";", "").trim()
-    if(!token){
+    const cookies = req.cookies
+
+    if(!cookies["access-token"] && !cookies["judge-token"]){
         res.sendStatus(401)
         return
     }
-    console.log("Auth, token: ", token)
-    jwt.verify(token, process.env.JWTSecret, (err, decoded) => {
-        if(err){
-            console.log(err)
-            res.sendStatus(401)
-        }
-        else{
-            //Set the potentially required feilds contained in the token to the request
-            req.userid = decoded.userid
-            req.role = decoded.role
-            next()
-        }
-    })
+    if(cookies["judge-token"]){
+        jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, (err, decoded) => {
+            if(err){
+                console.log(err)
+                res.sendStatus(401)
+            }
+            else{
+                //Set the potentially required feilds contained in the token to the request
+                req.userid = decoded.userid
+                req.role = decoded.role
+                next()
+            }
+        })
+    }
+    else if(cookies["access-token"]){
+        jwt.verify(cookies["access-token"], process.env.JWTSecret, (err, decoded) => {
+            if(err){
+                console.log(err)
+                res.sendStatus(401)
+            }
+            else{
+                //Set the potentially required feilds contained in the token to the request
+                req.userid = decoded.userid
+                req.role = decoded.role
+                next()
+            }
+        })
+    }
+    else{
+        res.sendStatus(401)
+    }
 }
 
 router.get("/logout", async (req, res) => {
@@ -46,6 +65,16 @@ router.get("/logout", async (req, res) => {
         "Pragma": "no-cache"
     })
     res.cookie("access-token", {}, {httpOnly: true, maxAge: 0, sameSite: "lax"})
+    res.sendStatus(200)
+    return;
+})
+
+router.get("/logout/judge", async (req, res) => {
+    res.set({
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+    })
+    res.cookie("judge-token", {}, {httpOnly: true, maxAge: 0, sameSite: "lax"})
     res.sendStatus(200)
     return;
 })
@@ -98,12 +127,12 @@ router.post("/refresh-token", async (req, res) => {
         res.sendStatus(401)
         return
     }
-    const token = req.headers.cookie.split("access-token=")[1].replace(";", "").trim()
-    if(!token){
+    const cookies = req.cookies
+    if(!cookies["access-token"]){
         res.sendStatus(401)
         return
     }
-    jwt.verify(token, process.env.JWTSecret, async (err, decoded) => {
+    jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
         if(err){
             console.log(err)
             res.status(401).json({error: "Not authorized."})
@@ -155,14 +184,14 @@ router.post("/login/judge", async (req, res) => {
                         userid: userId, //judge ID, used for SurveyAnswer
                         role: "judge"
                     }, 
-                    process.env.JWTSecret
+                    process.env.JWTJudgeSecret
                 )
                 res.set({
                     "Cache-Control": "no-cache",
                     "Pragma": "no-cache"
                 })
                 let expMillis = exp.getTime()-now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
-                res.cookie("access-token", token, {httpOnly: true, maxAge: expMillis, sameSite: "lax"})
+                res.cookie("judge-token", token, {httpOnly: true, maxAge: expMillis, sameSite: "lax"})
                 res.json({email: null, userid: userId, role: "judge"})
                 return;       
         }

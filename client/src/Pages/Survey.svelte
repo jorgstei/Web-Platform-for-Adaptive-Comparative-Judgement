@@ -4,6 +4,7 @@
     import {surveyService} from "../Services/SurveyService"
     import {surveyAnswerService} from "../Services/SurveyAnswerService"
     import {navigate} from "svelte-routing";
+    import {navigateWithRefreshToken} from "../Utility/naviagte"
     import { onMount } from "svelte";
     
     export let userInfo;
@@ -61,12 +62,16 @@
         if(!completed){
             completed = true
                 setTimeout(async ()=>{
-                userService.logout().then(() => userInfo = null); 
+                userService.logoutJudge().then(() => userInfo = null); 
                 if(navwrap){
                     navwrap.style.display = "initial";
                 }
-                navigate("/")}, 5000)
+                const res = navigateWithRefreshToken("/")
+                console.log("nav with refreshtoken res:",res)
+                res.then(data => userInfo = data)
             }
+            , 5000)
+        }
     }
 
     onMount(() => {

@@ -9,6 +9,7 @@ const server = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
+var cookieParser = require('cookie-parser')
 const { hash } = require('./Utility/hashing')
 const User = require('./models/User')
  
@@ -48,6 +49,8 @@ server.use(cors({
     credentials: true
 }))
 server.use(bodyParser.json())
+
+server.use(cookieParser())
 
 const auth = require("./routes/authentication")
 server.use("/auth", auth.router)

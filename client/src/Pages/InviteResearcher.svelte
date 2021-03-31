@@ -2,6 +2,7 @@
     import { userService } from "../Services/UserService";
     import swal from 'sweetalert';
     import {navigate} from "svelte-routing"
+import { navigateWithRefreshToken } from "../Utility/naviagte";
     let showErrorField = false;
     export let userInfo;
 
@@ -21,7 +22,7 @@
             console.log("Form was valid. Attempting to invite user with user object: ", userObj)
             userService.sendInviteLink(userObj)
                 .then(()=>{
-                    swal("You have successfully made an account for '" + email + "''.").then(navigate("/admin_board/researchers"));
+                    swal("You have successfully made an account for '" + email + "''.").then(navigateWithRefreshToken("/admin_board/researchers").then(data => userInfo = data));
                 })
                 .catch(err => {
                     console.log("Could not create account for " + email + ". Error:\n", err)

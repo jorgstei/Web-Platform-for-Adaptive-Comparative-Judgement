@@ -8,6 +8,7 @@
     import queryString from "query-string";
     import { onMount } from "svelte";
     import { userService } from "../Services/UserService";
+import { navigateWithRefreshToken } from "../Utility/naviagte";
     export let purpose = "research";
     export let surveyMediaType = "text";
     export let accessibility = "open";
@@ -176,7 +177,7 @@
                                         "\n It has been copied to your clipboard for you!",
                                     "success"
                                 );
-                                navigate("/admin_board/surveys");
+                                navigateWithRefreshToken("/admin_board/surveys").then(data => userInfo = data);
                             })
                             .catch((err) => {});
                     })
@@ -205,7 +206,7 @@
                                     "\n It has been copied to your clipboard for you!",
                                 "success"
                             );
-                            navigate("/admin_board/surveys");
+                            navigateWithRefreshToken("/admin_board/surveys").then(data => userInfo = data);
                         });
                     })
                     .catch((err) => {

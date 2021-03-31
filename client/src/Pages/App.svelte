@@ -6,7 +6,7 @@
 	import Footer from "../Components/Footer.svelte";
 	import Navbar from "../Components/Navbar.svelte";
 	import Survey from "./Survey.svelte";
-	import { Router, Route, navigate } from "svelte-routing";
+	import { Router, Route } from "svelte-routing";
 	import LoginPage from "./LoginPage.svelte"
 	import LandingPage from "./Landing_page.svelte";
 	import AboutProject from "./AboutProject.svelte";
@@ -16,6 +16,7 @@
 	import RegisterAccount from "./RegisterAccount.svelte";
 	import ForgottenPassword from "./ForgottenPassword.svelte";
 	import IntroductionToSurvey from "./IntroductionToSurvey.svelte";
+	import { navigateWithRefreshToken } from "../Utility/naviagte";
 
 	export let url="";
 	let userInfo = null;
@@ -28,7 +29,7 @@
 				console.log("Get survey Token data: ", data)
 					if(data.role === "judge"){
 						userInfo = data
-						navigate("/survey?surveyID="+params.surveyID)
+						navigateWithRefreshToken("/survey?surveyID="+params.surveyID).then(data => userInfo = data)
 					}
 				}
 			)

@@ -23,7 +23,7 @@
 
 
 {#if data2DArray}
-    <Table tableTitle="Researchers" bind:tableData={data2DArray} tableAttributes={["full name", "email", "joined on", "id", "delete"]} 
+    <Table tableTitle="Researchers" bind:userInfo={userInfo} bind:tableData={data2DArray} tableAttributes={["full name", "email", "joined on", "id", "delete"]} 
     deleteFunc={async (id)=>{
         await userService.deleteUserByID(id)
     }

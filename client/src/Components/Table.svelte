@@ -2,7 +2,7 @@
     import swal from "sweetalert";
     import {onMount} from 'svelte'
     import { toast } from "@zerodevx/svelte-toast";
-    import { navigate, Link } from "svelte-routing";
+    import { Link } from "svelte-routing";
     export let tableTitle = undefined;
     export let tableAttributes = ["full name", "email", "joined on", "id", "share", "delete"];
     export let tableData = undefined;
@@ -11,6 +11,7 @@
     export let element = document.createElement("p");
     export let userRights = undefined;
     export let surveyActivityStatus = undefined;
+    export let userInfo = undefined
     console.log("in table",tableData)
     
     $: tableData
@@ -37,14 +38,14 @@
                         <td class="col">{datapoint}</td>
                     {/each}
                     {#if tableAttributes.indexOf('data') != -1}
-                        {#if userRights[tableData.findIndex(e=>e==row)].viewResults}
+                        {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].viewResults}
                         <td class="col"><Link to={"survey_data/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://png.pngtree.com/element_our/20190601/ourlarge/pngtree-file-download-icon-image_1344466.jpg" alt="Survey data link"></Link></td>
                         {:else}
                         <td class="col disabledLink"><img class="small_icon" src="../img/disabled_download.jpg" alt="You cant access survey data image"></td>
                         {/if}
                     {/if}
                     {#if tableAttributes.indexOf('edit') != -1}
-                        {#if userRights[tableData.findIndex(e=>e==row)].editSurvey}
+                        {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].editSurvey}
                         <td class="col"><Link to={"edit_survey/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://p.kindpng.com/picc/s/154-1541056_edit-edit-icon-svg-hd-png-download.png" alt="Edit survey button"></Link></td>
                         {:else}
                         <td class="col disabledLink"><img class="small_icon" src="../img/disabled_edit.jpg" alt="You cant edit survey image"></td>
@@ -65,12 +66,35 @@
                     {/if}
                     
                     {#if tableAttributes.indexOf('delete') != -1}
-                        {#if userRights[tableData.findIndex(e=>e==row)].editSurvey}
+                        {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].editSurvey}
                             <td class="col"><img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
                             on:click={()=>{
                                 let content_id = row[tableAttributes.indexOf("id")];
                                 
                                 
+                                swal({
+                                title: "Are you sure?",
+                                text: "Are you sure you want to delete this " + tableTitle.toLowerCase().substring(0,tableTitle.length-1) + " ?",
+                                icon: "warning",
+                                dangerMode: true,
+                                buttons: ["Cancel", "Delete"]
+                                })
+                                .then(async willDelete => {
+                                    if (willDelete) {
+                                        await deleteFunc(content_id).then(()=> {
+                                            swal("Deleted!", tableTitle.substring(0,tableTitle.length-1) + " has been deleted!", "success");
+                                                tableData = tableData.filter(e => e[tableAttributes.indexOf("id")] != content_id);
+                                        }).catch((err)=>{
+                                            swal("Could not delete", "Due to error: " + err, "error");
+                                        })
+                                    }
+                                });
+                            }
+                            }></td>
+                        {:else if userInfo.role === "admin"}
+                        <td class="col"><img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
+                            on:click={()=>{
+                                let content_id = row[tableAttributes.indexOf("id")];
                                 swal({
                                 title: "Are you sure?",
                                 text: "Are you sure you want to delete this " + tableTitle.toLowerCase().substring(0,tableTitle.length-1) + " ?",

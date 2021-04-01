@@ -88,6 +88,34 @@ export default class UserService extends Service{
         .catch(error => console.log(error))
     }
 
+    getCount(){
+        return axios({
+            method: "get",
+            url: this.path + "/user/function/count",
+            withCredentials: true,
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
+    getSorted(field, skip, limit, direction){
+        if(field == undefined || field == "") {
+            return
+        }
+        return axios({
+            method: "get",
+            url: this.path+`/user/function/sort/?field=${field}&skip=${skip}&limit=${limit}&direction=${direction}`,
+            data:{
+                field:field,
+                skip:skip,
+                limit:limit,
+                direction:direction
+            }
+        })        
+        .then(response => response)
+        .catch(error => console.log(error))
+    }
+
     search(term){
         return axios({
             method: "get",

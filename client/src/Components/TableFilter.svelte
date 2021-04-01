@@ -2,11 +2,13 @@
 import { onMount } from "svelte";
 import { surveyService } from "../Services/SurveyService";
 import { toast } from "@zerodevx/svelte-toast";
+import {userService} from "../Services/UserService";
 
-
+    export let userInfo = undefined;
     export let limit = 5;
     export let currentPage = 0;
     export let filterBy = "";
+    let oldFilterBy = "";
     export let filterFunction = undefined;
     export let countFunction = undefined;
     export let count = 0;
@@ -19,8 +21,9 @@ import { toast } from "@zerodevx/svelte-toast";
     })
 
     function filter(){
-        filterFunction(filterBy, currentPage*limit, limit, direction).then(res => 
+        filterFunction(filterBy.filterName, currentPage*limit, limit, direction).then(res => 
         {
+            if(res == undefined) return;
             if(res.status === 200){
                 console.log(res.data)
                 data = res.data;
@@ -28,8 +31,22 @@ import { toast } from "@zerodevx/svelte-toast";
             else{
                 toast.push("Something went wrong during filtering, please try to refresh.", {duration: 4000});
             }
+            data = data
         })
+        userService.refreshToken().then(data => userInfo = data)
+        console.trace()
     }
+
+    function updatedFilterBy(){
+        console.log("BEFORE filter: oldFilter:",oldFilterBy,", newFilter:", filterBy, ", direction:", direction)
+        if(oldFilterBy.filterName === filterBy.filterName){
+            direction = (direction == 1) ? -1 : 1
+        }
+        oldFilterBy = filterBy;
+        console.log("AFTER filter: oldFilter:",oldFilterBy,", newFilter:", filterBy, ", direction:", direction)
+        filter()
+    }
+
     function setLimit(e){
         limit = e.target.value;
         console.log(limit);
@@ -87,12 +104,16 @@ import { toast } from "@zerodevx/svelte-toast";
             e.target.value = ""
         }
     }
+
+    $:filterBy && updatedFilterBy()
 </script>
 
 <div class="table-filter-container">
     <ul>
         <li>
             <label class="label-hori" for="dropdown-limit">Limit:</label>
+        </li>
+        <li>
             <select name="limit" id="dropdown-limit" on:change={setLimit}>
                 <option value="5">5</option>
                 <option value="10">10</option>
@@ -122,7 +143,6 @@ import { toast } from "@zerodevx/svelte-toast";
 .table-filter-container{
     border:black;
     border-style: solid;
-    padding: 10px;
     justify-content: center;
     justify-items: center;
     flex-direction: column;
@@ -132,9 +152,6 @@ import { toast } from "@zerodevx/svelte-toast";
 }
 .label-hori{
     float:left;
-    justify-self: center;
-    align-self: center;
-    text-align: center;
 }
 .navigate-image{
     display:block;
@@ -150,9 +167,11 @@ li{
 ul{
     overflow:auto;
     list-style-type: none;
+    flex-direction: column;
     margin: 0;
     padding: 0;
     justify-content: center;
     justify-items: center;
+    align-items: baseline;
 }
 </style>

@@ -2,14 +2,51 @@
     import {userService} from "../Services/UserService"
     import { onMount } from 'svelte';
     import Table from "../Components/Table.svelte"
+    import TableFilter from "../Components/TableFilter.svelte";
     export let userInfo;
     
     console.log("in researchers")
+    const tableFilterParams =
+    {
+        countFunction: () => userService.getCount(),
+        direction: -1,
+        filterFunction: (a, b, c, d) => userService.getSorted(a, b, c, d),
+    }
+    let filterBy = {
+        filterName: "_id",
+        counter: 0
+    }
+    let tableAttributes = 
+    [
+        {
+            fieldName: "fullName",
+            viewName: "full name"
+        },
+        {
+            fieldName: "email",
+            viewName: "email"
+        },
+        {
+            fieldName: "createdAt",
+            viewName: "joined on",
+        },
+        {
+            fieldName: "_id",
+            viewName: "id"
+        },
+        {
+            fieldName: "",
+            viewName: "delete"
+        }
+    ]
     let data2DArray;
+    let data = [];
 	onMount(async () => {
-        let data = await userService.getAllUsers().catch(err => console.log("Could not get all users\n", err));
         console.log("Researchers data: ", data);
-        
+        generateTable();
+	});
+
+    async function generateTable(){
         data2DArray = [];
         for (let i = 0; i < data.length; i++) {
             // add data according to tableAttributes array
@@ -17,17 +54,20 @@
             data2DArray.push(arr);
         }
         console.log("Tranformed researchers data 2D array", data2DArray);
-	});
+    }
+    $: data && generateTable()
+    $: filterBy
 </script>
 
 
 
 {#if data2DArray}
-    <Table tableTitle="Researchers" bind:userInfo={userInfo} bind:tableData={data2DArray} tableAttributes={["full name", "email", "joined on", "id", "delete"]} 
+    <Table bind:filterBy={filterBy} tableTitle="Researchers" bind:userInfo={userInfo} bind:tableData={data2DArray} tableAttributes={tableAttributes} 
     deleteFunc={async (id)=>{
         await userService.deleteUserByID(id)
     }
     }></Table>
+    <TableFilter bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams}/>
 {/if}    
 
     

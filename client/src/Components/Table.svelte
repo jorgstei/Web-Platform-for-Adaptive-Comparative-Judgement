@@ -3,6 +3,7 @@
     import {onMount} from 'svelte'
     import { toast } from "@zerodevx/svelte-toast";
     import { Link } from "svelte-routing";
+    export let filterBy = undefined;
     export let tableTitle = undefined;
     export let tableAttributes = ["full name", "email", "joined on", "id", "share", "delete"];
     export let tableData = undefined;
@@ -13,12 +14,22 @@
     export let surveyActivityStatus = undefined;
     export let userInfo = undefined
     console.log("in table",tableData)
+
+    async function updateFilterBy(e, attr){
+        console.log("filter before counter:",filterBy)
+        filterBy = {
+            filterName: attr,
+            counter: (filterBy.counter+1)
+        }
+        console.log("filter after counter:",filterBy)
+    }
     
     $: tableData
+    $: tableAttributes
     $: deleteFunc
     onMount(()=>{
         document.getElementsByClassName("container")[0].insertBefore(element, document.getElementsByClassName("main_table")[0]);
-        
+        console.log("onMount Table.svelte")
     })
     
 </script>
@@ -29,7 +40,7 @@
         <table class="main_table">
             <tr id="table_header">
                 {#each tableAttributes as attr}
-                    <th class="col">{attr}</th>
+                    <th class="col" on:click={(e) => updateFilterBy(e, attr.fieldName)}>{attr.viewName}</th>
                 {/each}
             </tr>
             {#each tableData as row}
@@ -37,21 +48,21 @@
                     {#each row as datapoint}
                         <td class="col">{datapoint}</td>
                     {/each}
-                    {#if tableAttributes.indexOf('data') != -1}
+                    {#if tableAttributes.findIndex(e => e.viewName === 'data') != -1}
                         {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].viewResults}
                         <td class="col"><Link to={"survey_data/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://png.pngtree.com/element_our/20190601/ourlarge/pngtree-file-download-icon-image_1344466.jpg" alt="Survey data link"></Link></td>
                         {:else}
                         <td class="col disabledLink"><img class="small_icon" src="../img/disabled_download.jpg" alt="You cant access survey data image"></td>
                         {/if}
                     {/if}
-                    {#if tableAttributes.indexOf('edit') != -1}
+                    {#if tableAttributes.findIndex(e => e.viewName === 'edit') != -1}
                         {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].editSurvey}
                         <td class="col"><Link to={"edit_survey/?id=" + row[tableAttributes.indexOf("id")]}><img class="small_icon" src="https://p.kindpng.com/picc/s/154-1541056_edit-edit-icon-svg-hd-png-download.png" alt="Edit survey button"></Link></td>
                         {:else}
                         <td class="col disabledLink"><img class="small_icon" src="../img/disabled_edit.jpg" alt="You cant edit survey image"></td>
                         {/if}
                     {/if}
-                    {#if tableAttributes.indexOf('share') != -1}
+                    {#if tableAttributes.findIndex(e => e.viewName === 'share') != -1}
                         {#if surveyActivityStatus[tableData.findIndex(e=>e==row)] === true}
                             <td class="col"><img class="small_icon" src="https://w7.pngwing.com/pngs/592/864/png-transparent-computer-icons-icon-design-cut-copy-and-paste-taobao-clothing-promotional-copy-text-rectangle-emoticon-thumbnail.png" alt="Share link button" 
                             on:click={()=>{
@@ -65,7 +76,7 @@
                         {/if}
                     {/if}
                     
-                    {#if tableAttributes.indexOf('delete') != -1}
+                    {#if tableAttributes.findIndex(e => e.viewName === 'delete') != -1}
                         {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].editSurvey}
                             <td class="col"><img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
                             on:click={()=>{

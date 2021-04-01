@@ -25,7 +25,7 @@ import { navigate } from "svelte-routing";
             textarea.innerHTML = survey.judgeInstructions;
             textarea.style.height = (textarea.scrollHeight > textarea.clientHeight) ? (textarea.scrollHeight+5)+"px" : "20vh";
             let text2 = document.getElementById("generalInfoTextArea");
-            text2.innerHTML = "You will be presented with several pairs of items to compare.\nThese items will be answers to the question above, and you should choose the one which best fits your preference. An item can be a text field, pdf, image, etc. To choose an item you can click the button beneath it, or use the arrow keys.\nThere are "+ surveyData.items.length + " different items in this survey. You will be asked to answer 10 comparisons!\n\nGood luck!";
+            text2.innerHTML = "You will be presented with several pairs of items to compare.\nThese items will be answers to the question above, and you should choose the one which best fits your preference. An item can be a text field, pdf, image, etc. To choose an item you can click the button beneath it, or use the arrow keys.\nYou will be asked to answer 10 comparisons!\n\nGood luck!";
             text2.style.height = (text2.scrollHeight > text2.clientHeight) ? (text2.scrollHeight+5)+"px" : "20vh";
         })
         .catch((err)=>{

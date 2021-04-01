@@ -9,6 +9,7 @@
     
     export let userInfo;
     export let surveyID;
+    let question = "";
     let completed = false
     console.log("SurveyID from Survey.svelte: ", surveyID)
     console.log("judgeID: ", userInfo.userid)
@@ -75,6 +76,8 @@
     }
 
     onMount(() => {
+        surveyService.getSurveyByIdAsJudge(surveyID)
+        .then(data=>question=data.surveyQuestion);
         let main = document.getElementById("surveyWrapper");
         main.focus();
         let arrowHandler = (e) => {
@@ -113,6 +116,7 @@
     {#if counter < maxCounter}
     {#key counter}
     
+    <h1>{question}</h1>
     <div id="container">
         {#if randomPair != null}
             <Card className="left" buttonText="Choose left" mediaType="text" text={randomPair[0].data} onClickFunc = {leftChoiceClicked} width=100 height=90  transition_x={-transition_distance} img="https://i.pinimg.com/736x/04/f5/8a/04f58afd7424a02a826eb74eddf98d91.jpg"></Card>
@@ -137,17 +141,17 @@
         margin:auto;
         margin-top: 0;
         width: 100vw;
+        max-width: 100%;
         height: 100vh;
     }
     #container {
         margin: auto;
-        padding-top: 10%;
+        padding-top: 5vh;
         width: 80%;
         height: 80%;
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-column-gap: 10%;
-        
     }
     #thank_you_message {
         margin: auto;
@@ -156,5 +160,8 @@
         height: 60%;
         text-align: center;
     }
-
+    h1{
+        padding-top: 5vh;
+        text-align: center;
+    }
 </style>

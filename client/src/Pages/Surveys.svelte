@@ -6,7 +6,7 @@
     export let userInfo;
 
     console.log("in surveys")
-    let dataHeaders = ["title", "researcher", "created", "items", "active", "id", "data", "edit", "share", "delete"];
+    let dataHeaders = ["title", "researcher", "created", "items", "id", "data", "edit", "share", "delete"];
     let data2DArray;
     let userRights = [];
     let activeStatus = [];
@@ -47,7 +47,7 @@
             const YYYY_MM_DD_Date = data[i].dateCreated.split("T")[0];
             const DD_MM_YYYY_Date = YYYY_MM_DD_Date.split('-').reverse().join('.');
             //console.log(YYYY_MM_DD_Date, " -> ", DD_MM_YYYY_Date);
-            const arr = [data[i].title, email, DD_MM_YYYY_Date, data[i].items.length, data[i].active, data[i]._id]
+            const arr = [data[i].title, email, DD_MM_YYYY_Date, data[i].items.length, data[i]._id]
             data2DArray.push(arr);
         }
         data2DArray = data2DArray;

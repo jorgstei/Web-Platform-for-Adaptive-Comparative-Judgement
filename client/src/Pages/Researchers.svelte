@@ -9,6 +9,7 @@
     const tableFilterParams =
     {
         countFunction: () => userService.getCount(),
+        limit: 5,
         direction: -1,
         filterFunction: (a, b, c, d) => userService.getSorted(a, b, c, d),
     }
@@ -43,7 +44,6 @@
     let data = [];
 	onMount(async () => {
         console.log("Researchers data: ", data);
-        generateTable();
 	});
 
     async function generateTable(){
@@ -56,7 +56,6 @@
         console.log("Tranformed researchers data 2D array", data2DArray);
     }
     $: data && generateTable()
-    $: filterBy
 </script>
 
 

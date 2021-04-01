@@ -11,7 +11,7 @@
 import { navigateWithRefreshToken } from "../Utility/naviagte";
     export let purpose = "research";
     export let surveyMediaType = "text";
-    export let accessibility = "open";
+    export let accessibility = "link";
     export let optionsData = [];
     export let userInfo;
     export let editing = false;
@@ -357,30 +357,34 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                 type="text"
                 class="text_input"
                 id="survey_title"
-                placeholder="Survey title e.g. 'Preference of snacks'"
-            />
+                placeholder="Survey title"
+                title="A title for what you're researching. Will not be shown to the judges. e.g. 'Preference of snacks'"
+                />
             <input
                 type="text"
                 class="text_input"
                 id="survey_question"
-                placeholder="Survey question e.g. 'Which snack do you prefer?'"
+                placeholder="Survey question"
+                title="The question the judges will answer. Will be shown to judges. e.g. 'Which snack do you prefer?'"
             />
             <textarea
                 on:keydown={textAreaAdjust}
                 class="text_input textareas"
                 id="judge_instructions"
                 placeholder="Judge instructions"
+                title="A field for extra info you want to give the judge before they answer your survey."
             />
             <textarea
                 on:keydown={textAreaAdjust}
                 class="text_input textareas"
                 id="survey_description"
                 placeholder="Survey description"
+                title="An internal description of the survey. Will not be shown to judges."
             />
             <div id="dropdownsAndCheckboxesWrapper">
                 <div id="purposeWrapper" class="dropdownWrappers">
                     <label for="purpose">Purpose</label>
-                    <select name="purpose" id="purposeDropdown" value={purpose}>
+                    <select name="purpose" id="purposeDropdown" value={purpose} title="The purpose of this survey. Will not be shown to judges.">
                         <option value="research">Research</option>
                         <option value="grading">Grading</option>
                         <option value="fun">For fun</option>
@@ -405,8 +409,7 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                 </div>
                 <div class="dropdownWrappers">
                     <label for="accessibility">Accessibility</label>
-                    <select name="accessibility" id="accessibilityDropdown">
-                        <option value="open">Open</option>
+                    <select name="accessibility" id="accessibilityDropdown" title="How you want judges to access your survey. Either share a full link or a 6-digit code.">
                         <option value="link">Link</option>
                         <option value="code">Code</option>
                     </select>
@@ -418,6 +421,7 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                         id="activeCheckbox"
                         name="activeCheckbox"
                         value="active"
+                        title="Whether the survey should be active (answerable by judges). Can be changed at any time."
                     />
                 </div>
             </div>

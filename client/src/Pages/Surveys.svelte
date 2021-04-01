@@ -13,8 +13,8 @@
         filterFunction: (a, b, c, d) => surveyService.getSorted(a, b, c, d),
     };
     let filterBy = {
-        counter: 0,
-        filterName:"dateCreated"
+        filterName:"dateCreated",
+        counter: 0
     }
     console.log("in surveys");
     let dataHeaders = [
@@ -23,7 +23,7 @@
             viewName: "title",
         },
         {
-            fieldName: "users.$.fullName",
+            fieldName: "users.fullName",
             viewName: "researcher",
         },
         {
@@ -62,14 +62,13 @@
     let data2DArray;
     let userRights = [];
     let activeStatus = [];
-    export let data = [];
+    let data = [];
     onMount(async () => {
         if (userInfo == null) {
             return;
         } else {
             console.log("userinfo in surveys", userInfo);
         }
-        generateTable();
     });
 
     async function generateTable() {
@@ -88,9 +87,7 @@
                 });
             }
             activeStatus.push(data[i].active);
-            // add data according to tableAttributes array
             let email = "No owner";
-            //console.log("Owners:", data[i].owners)
             if (
                 data[i].owners != undefined &&
                 data[i].owners.length > 0 &&
@@ -131,7 +128,6 @@
     }
 
     $: data && generateTable();
-    $: filterBy
     /*
     //Chronbachs alpha test
     //https://www.researchgate.net/post/How_do_I_compute_the_internal_consistency_of_a_scale_which_is_made_up_of_binary_coded_yes1_no0_answers
@@ -157,7 +153,7 @@
             tableTitle="Surveys"
             bind:tableData={data2DArray}
             bind:userInfo
-            bind:tableAttributes={dataHeaders}
+            tableAttributes={dataHeaders}
             {userRights}
             surveyActivityStatus={activeStatus}
             deleteFunc={async (id) => {
@@ -166,8 +162,8 @@
         />
         <TableFilter
             bind:filterBy={filterBy}
-            bind:data
-            bind:userInfo
+            bind:data={data}
+            bind:userInfo={userInfo}
             {...tableFilterParams}
         />
     {/if}

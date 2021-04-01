@@ -7,8 +7,8 @@ import {userService} from "../Services/UserService";
     export let userInfo = undefined;
     export let limit = 5;
     export let currentPage = 0;
-    export let filterBy = "";
-    let oldFilterBy = "";
+    export let filterBy = {filterName: "", counter: 0};
+    let oldFilterBy = {filterName: "", counter: 0};
     export let filterFunction = undefined;
     export let countFunction = undefined;
     export let count = 0;
@@ -16,11 +16,11 @@ import {userService} from "../Services/UserService";
     export let data = undefined;
 
     onMount(() => {
-        countFunction().then(data => count = data)
-        filter()
+        countFunction().then(res => count = res)
     })
 
     function filter(){
+        data = []
         filterFunction(filterBy.filterName, currentPage*limit, limit, direction).then(res => 
         {
             if(res == undefined) return;
@@ -33,17 +33,16 @@ import {userService} from "../Services/UserService";
             }
             data = data
         })
-        userService.refreshToken().then(data => userInfo = data)
+        userService.refreshToken().then(res => userInfo = res)
         console.trace()
     }
 
     function updatedFilterBy(){
-        console.log("BEFORE filter: oldFilter:",oldFilterBy,", newFilter:", filterBy, ", direction:", direction)
         if(oldFilterBy.filterName === filterBy.filterName){
             direction = (direction == 1) ? -1 : 1
         }
-        oldFilterBy = filterBy;
-        console.log("AFTER filter: oldFilter:",oldFilterBy,", newFilter:", filterBy, ", direction:", direction)
+        oldFilterBy.filterName = filterBy.filterName;
+        oldFilterBy.counter = filterBy.counter;
         filter()
     }
 

@@ -90,8 +90,7 @@ router.get("/", auth, async (req, res) => {
  * @apiUse SuccessGetFullSurveyArray
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
- * @apiError (403) 403 Forbidden
- * @apiError (404) 500 Internal Server Error
+ * @apiError (404) 404 Not found, empty collection
  */
 router.get("/user/:id", auth, async (req, res) => {
     console.log("Called get all surveys for user")
@@ -109,6 +108,37 @@ router.get("/user/:id", auth, async (req, res) => {
     } catch (error) {
         console.log("Error get all surveys: ", error)
         res.sendStatus(404)
+    }
+})
+
+/**
+ * @api {get} /api/survey/function/count
+ * @apiName GETSurveyCountForUser
+ * @apiGroup Survey
+ * @apiVersion 0.1.0
+ * @apiSuccess (200) {Number} count Number of surveys this user has access to.
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (500) 500 Internal Server Error
+ */
+router.get("/function/count", auth, async (req, res) => {
+    console.log("Get count of surveys")
+    try{
+        if (req.role !== "admin" && req.role !== "researcher") {
+            res.sendStatus(403)
+            return
+        }
+        const me_userid = me(req.userid)
+        if(req.role === "admin"){
+            Survey.countDocuments().then(count => res.json(count))
+            return;
+        }
+        else{
+            Survey.countDocuments({"owners.ownerId": me_userid}).then(count => res.json(count))
+        }
+    } catch(error){
+        console.log("survey/function/count error:",error)
+        res.sendStatus(500)
     }
 })
 
@@ -473,7 +503,7 @@ router.get("/function/sort", auth, async (req, res) => {
     const me_limit = Number(me(limit))
     const me_direction = Number(me(direction))
 
-    if (me_field === undefined || me_skip === undefined || me_limit === undefined || me_direction === undefined) {
+    if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
         res.sendStatus(400)
         return
     }

@@ -46,7 +46,7 @@
 		console.log("userInfo: ", userInfo)
 	}
 
-
+	$: userInfo
 </script>
 
 <Router url={url}>

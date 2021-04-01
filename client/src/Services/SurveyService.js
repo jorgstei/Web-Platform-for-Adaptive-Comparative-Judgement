@@ -87,6 +87,16 @@ export default class SurveyService extends Service{
         .catch(error => console.log(error))
     }
 
+    getCount(){
+        return axios({
+            method: "get",
+            url: this.path + "/survey/function/count",
+            withCredentials: true,
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
     getSurveyToken(surveyID, passphrase){
         return axios({
             method: "post",
@@ -103,7 +113,7 @@ export default class SurveyService extends Service{
     getSorted(field, skip, limit, direction){
         return axios({
             method: "get",
-            url: this.path+"/survey/function/sort",
+            url: this.path+`/survey/function/sort/?field=${field}&skip=${skip}&limit=${limit}&direction=${direction}`,
             data:{
                 field:field,
                 skip:skip,

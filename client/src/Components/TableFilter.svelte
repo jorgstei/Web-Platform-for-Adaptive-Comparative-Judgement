@@ -20,7 +20,6 @@ import {userService} from "../Services/UserService";
     })
 
     function filter(){
-        data = []
         filterFunction(filterBy.filterName, currentPage*limit, limit, direction).then(res => 
         {
             if(res == undefined) return;
@@ -31,7 +30,7 @@ import {userService} from "../Services/UserService";
             else{
                 toast.push("Something went wrong during filtering, please try to refresh.", {duration: 4000});
             }
-            data = data
+            //data = data
         })
         userService.refreshToken().then(res => userInfo = res)
         console.trace()
@@ -117,6 +116,8 @@ import {userService} from "../Services/UserService";
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
             </select>
         </li>
         <li>

@@ -110,7 +110,8 @@ export default class UserService extends Service{
                 skip:skip,
                 limit:limit,
                 direction:direction
-            }
+            },
+            withCredentials: true
         })        
         .then(response => response)
         .catch(error => console.log(error))

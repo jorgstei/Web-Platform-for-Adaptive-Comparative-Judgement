@@ -143,7 +143,7 @@ router.get("/function/count", auth, async (req, res) => {
 })
 
 //Get random item pair from survey by id
-router.get("/item/:id", auth, async (req, res) => {
+router.get("/item/:id", async (req, res) => {
     console.log("called get random pair from survey by id for item")
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id })
@@ -496,6 +496,7 @@ router.get("/function/sort", auth, async (req, res) => {
         limit: How many documents you want to retrieve, f.ex. 10 as in the case above
         direction: 1 ascending, -1 descending
     */
+   console.log("survey/function/sort called")
     const { field, skip, limit, direction } = req.query
     console.log(req.query)
     const me_field = me(field)

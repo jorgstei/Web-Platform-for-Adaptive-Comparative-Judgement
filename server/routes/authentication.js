@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken")
 const User = require('../models/User')
-const {compareHash} = require("../Utility/hashing")
+const { compareHash } = require("../Utility/hashing")
 const mongoose = require('mongoose')
-const {Router} = require('express')
+const { Router } = require('express')
 const router = Router()
 /*
     Expected fields in token:
@@ -16,23 +16,26 @@ const router = Router()
  * @apiError (403) 403 Forbidden, you are authenticated but lack authorization to access this resource
  */
 const auth = (req, res, next) => {
-    if(!req.headers.cookie){
+    if (!req.headers.cookie) {
+        console.log("auth, no req.headers.cookie")
         res.sendStatus(401)
         return
     }
     const cookies = req.cookies
 
-    if(!cookies["access-token"] && !cookies["judge-token"]){
+    if (!cookies["access-token"] && !cookies["judge-token"]) {
+        console.log("cookies", cookies)
         res.sendStatus(401)
         return
     }
-    if(cookies["judge-token"]){
+    if (cookies["judge-token"]) {
+        console.log("secret:", cookies["judge-token"], typeof cookies["judge-token"])
         jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, (err, decoded) => {
-            if(err){
-                console.log(err)
+            if (err) {
+                console.log("Judge verify error in auth:",err)
                 res.sendStatus(401)
             }
-            else{
+            else {
                 //Set the potentially required feilds contained in the token to the request
                 req.userid = decoded.userid
                 req.role = decoded.role
@@ -40,13 +43,13 @@ const auth = (req, res, next) => {
             }
         })
     }
-    else if(cookies["access-token"]){
+    else if (cookies["access-token"]) {
         jwt.verify(cookies["access-token"], process.env.JWTSecret, (err, decoded) => {
-            if(err){
+            if (err) {
                 console.log(err)
                 res.sendStatus(401)
             }
-            else{
+            else {
                 //Set the potentially required feilds contained in the token to the request
                 req.userid = decoded.userid
                 req.role = decoded.role
@@ -54,7 +57,7 @@ const auth = (req, res, next) => {
             }
         })
     }
-    else{
+    else {
         res.sendStatus(401)
     }
 }
@@ -64,7 +67,7 @@ router.get("/logout", async (req, res) => {
         "Cache-Control": "no-cache",
         "Pragma": "no-cache"
     })
-    res.cookie("access-token", {}, {httpOnly: true, maxAge: 0, sameSite: "lax"})
+    res.cookie("access-token", {}, { httpOnly: true, maxAge: 0, sameSite: "lax" })
     res.sendStatus(200)
     return;
 })
@@ -74,7 +77,7 @@ router.get("/logout/judge", async (req, res) => {
         "Cache-Control": "no-cache",
         "Pragma": "no-cache"
     })
-    res.cookie("judge-token", {}, {httpOnly: true, maxAge: 0, sameSite: "lax"})
+    res.cookie("judge-token", {}, { httpOnly: true, maxAge: 0, sameSite: "lax" })
     res.sendStatus(200)
     return;
 })
@@ -82,34 +85,34 @@ router.get("/logout/judge", async (req, res) => {
 router.post("/login", async (req, res) => {
     console.log("Called get /login")
     console.log("login body: ", req.body)
-    const {email, password} = req.body
+    const { email, password } = req.body
     try {
-        if(email && password){
-            const userDoc = await User.findOne({email: email})
-            if(userDoc){
+        if (email && password) {
+            const userDoc = await User.findOne({ email: email })
+            if (userDoc) {
                 console.log("Found user with email: ", email)
-                if(compareHash(userDoc.hashed, password, userDoc.salt)){
+                if (compareHash(userDoc.hashed, password, userDoc.salt)) {
                     console.log("authenticated successfully")
                     const now = new Date(Date.now())
                     const exp = new Date(now)
-                    exp.setMinutes(exp.getMinutes()+30)
-                    const expSeconds = exp.getTime()/1000
+                    exp.setMinutes(exp.getMinutes() + 30)
+                    const expSeconds = exp.getTime() / 1000
                     console.log("JWT Expires in seconds: ", expSeconds)
                     const token = jwt.sign(
                         {
-                            exp: expSeconds, 
-                            userid: userDoc._id, 
+                            exp: expSeconds,
+                            userid: userDoc._id,
                             role: userDoc.role
-                        }, 
+                        },
                         process.env.JWTSecret
                     )
                     res.set({
                         "Cache-Control": "no-cache",
                         "Pragma": "no-cache"
                     })
-                    let expMillis = exp.getTime()-now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
-                    res.cookie("access-token", token, {httpOnly: true, maxAge: expMillis, sameSite: "lax"})
-                    res.status(200).json({email: email, userid: userDoc._id, role: userDoc.role})
+                    let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
+                    res.cookie("access-token", token, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
+                    res.status(200).json({ email: email, userid: userDoc._id, role: userDoc.role })
                     return;
                 }
             }
@@ -123,77 +126,112 @@ router.post("/login", async (req, res) => {
 
 router.post("/refresh-token", async (req, res) => {
     console.log("Called post /refresh-token")
-    if(!req.headers.cookie){
+    if (!req.headers.cookie) {
+        console.log("no cookies")
         res.sendStatus(401)
         return
     }
     const cookies = req.cookies
-    if(!cookies["access-token"]){
+    if (!cookies["access-token"] && !cookies["judge-token"]) {
+        console.log("no cookies")
         res.sendStatus(401)
         return
     }
-    jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
-        if(err){
-            console.log(err)
-            res.status(401).json({error: "Not authorized."})
-            return
-        }
-        else{
-            const userDoc = await User.findOne({_id: decoded.userid})
-            if(!userDoc){
-                res.sendStatus(401)
+    if (cookies["judge-token"]) {
+        console.log("Judge token found")
+        jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, async (err, decoded) => {
+            if (err) {
+                console.log(err)
+                res.status(401).json({ error: "Not authorized." })
                 return
             }
-            const now = new Date(Date.now())
-            const exp = new Date(now)
-            exp.setMinutes(exp.getMinutes()+30)
-            const expSeconds = exp.getTime()/1000
-            const newToken = jwt.sign(
-                {
-                    exp: expSeconds,
-                    userid: decoded.userid,
-                    role: decoded.role
-                },
-                process.env.JWTSecret
-            )
-            res.set({
-                "Cache-Control": "no-cache",
-                "Pragma": "no-cache"
-            })
-            let expMillis = exp.getTime()-now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
-            res.cookie("access-token", newToken, {httpOnly: true, maxAge: expMillis, sameSite: "lax"})
-            res.status(200).json({email: userDoc.email, userid: decoded.userid, role: decoded.role})
-        }
-    })
-})
-
-router.post("/login/judge", async (req, res) => {
-    console.log("Called get /login/judge")
-    const {requestedSurveyID, passphrase} = req.body
-    try {
-        if(requestedSurveyID){
+            else {
                 const now = new Date(Date.now())
                 const exp = new Date(now)
-                exp.setMinutes(exp.getMinutes()+30)
-                const expSeconds = exp.getTime()/1000
-                console.log("JWT Expires in seconds: ", expSeconds)
-                const userId = new mongoose.mongo.ObjectId()
-                const token = jwt.sign(
+                exp.setMinutes(exp.getMinutes() + 30)
+                const expSeconds = exp.getTime() / 1000
+                const newToken = jwt.sign(
                     {
-                        exp: expSeconds, 
-                        userid: userId, //judge ID, used for SurveyAnswer
-                        role: "judge"
-                    }, 
-                    process.env.JWTJudgeSecret
+                        exp: expSeconds,
+                        userid: decoded.userid,
+                        role: decoded.role
+                    },
+                    process.env.JWTSecret
                 )
                 res.set({
                     "Cache-Control": "no-cache",
                     "Pragma": "no-cache"
                 })
-                let expMillis = exp.getTime()-now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
-                res.cookie("judge-token", token, {httpOnly: true, maxAge: expMillis, sameSite: "lax"})
-                res.json({email: null, userid: userId, role: "judge"})
-                return;       
+                let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
+                res.cookie("judge-token", newToken, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
+                res.status(200).json({ email: decoded.email, userid: decoded.userid, role: decoded.role })
+            }
+        })
+    }
+    else {
+        jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
+            if (err) {
+                console.log(err)
+                res.status(401).json({ error: "Not authorized." })
+                return
+            }
+            else {
+                const userDoc = await User.findOne({ _id: decoded.userid })
+                if (!userDoc) {
+                    res.sendStatus(401)
+                    return
+                }
+                const now = new Date(Date.now())
+                const exp = new Date(now)
+                exp.setMinutes(exp.getMinutes() + 30)
+                const expSeconds = exp.getTime() / 1000
+                const newToken = jwt.sign(
+                    {
+                        exp: expSeconds,
+                        userid: decoded.userid,
+                        role: decoded.role
+                    },
+                    process.env.JWTSecret
+                )
+                res.set({
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache"
+                })
+                let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
+                res.cookie("access-token", newToken, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
+                res.status(200).json({ email: userDoc.email, userid: decoded.userid, role: decoded.role })
+            }
+        })
+    }
+})
+
+router.post("/login/judge", async (req, res) => {
+    console.log("Called get /login/judge")
+    const { requestedSurveyID, passphrase } = req.body
+    try {
+        if (requestedSurveyID) {
+            const now = new Date(Date.now())
+            const exp = new Date(now)
+            exp.setMinutes(exp.getMinutes() + 30)
+            const expSeconds = exp.getTime() / 1000
+            console.log("JWT Expires in seconds: ", expSeconds)
+            const userId = new mongoose.mongo.ObjectId()
+            const token = jwt.sign(
+                {
+                    exp: expSeconds,
+                    userid: userId, //judge ID, used for SurveyAnswer
+                    role: "judge"
+                },
+                process.env.JWTJudgeSecret
+            )
+            res.set({
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache"
+            })
+            let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
+            res.cookie("judge-token", token, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
+            res.json({ email: null, userid: userId, role: "judge" })
+            return;
         }
         throw new Error("Email or password not provided.")
     } catch (error) {
@@ -201,4 +239,4 @@ router.post("/login/judge", async (req, res) => {
         res.sendStatus(401)
     }
 })
-module.exports = {router, auth}
+module.exports = { router, auth }

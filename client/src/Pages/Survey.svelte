@@ -11,8 +11,7 @@
     export let surveyID;
     let question = "";
     let completed = false
-    console.log("SurveyID from Survey.svelte: ", surveyID)
-    console.log("judgeID: ", userInfo.userid)
+
     let navwrap = document.getElementById("navWrapper");
     if(navwrap){
         navwrap.style.display = "none";

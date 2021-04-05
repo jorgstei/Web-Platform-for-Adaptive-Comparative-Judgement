@@ -24,8 +24,10 @@
         }
         console.log("filter after counter:",filterBy)
     }
-    
-    $: tableData
+    function printTableData(){
+        console.log("tableData in Table:",tableData)
+    }
+    $: tableData && printTableData()
     $: tableAttributes
     $: deleteFunc
     onMount(()=>{

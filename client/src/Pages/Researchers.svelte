@@ -1,6 +1,7 @@
 <script>
   import { userService } from "../Services/UserService";
   import { onMount } from "svelte";
+  import {dateFromObjectId} from "../Utility/dateFromObjectId"
   import Table from "../Components/Table.svelte";
   import TableFilter from "../Components/TableFilter.svelte";
   export let userInfo;
@@ -26,7 +27,7 @@
       viewName: "email",
     },
     {
-      fieldName: "createdAt",
+      fieldName: "_id",
       viewName: "joined on",
     },
     {
@@ -53,7 +54,7 @@
           ? data[i].firstName + " " + data[i].lastName
           : data[i].email.split("@")[0],
         data[i].email,
-        "18.02.2021",
+        dateFromObjectId(data[i]._id).toLocaleString("en-UK").split(',')[0],
         data[i]._id,
       ];
       data2DArray.push(arr);

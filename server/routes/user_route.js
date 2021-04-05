@@ -135,7 +135,7 @@ router.get("/function/count", auth, async (req, res) => {
  * @apiSuccess (200) {String} users.lastName The users last name
  * @apiSuccess (200) {String=["admin", "researcher"]} users.role The users role
  * @apiSuccess (200) {String} users._id The users ID in the database.
- * @apiPermission AdminOrOwner
+ * @apiPermission Admin
  * @apiUse AuthMiddleware
  * @apiError (500) 500 Internal Server Error
  */
@@ -171,10 +171,27 @@ router.get("/function/sort", auth, async (req, res) => {
                 {
                     $match: { _id: { $exists: true } }
                 }, //Admin should find all, but aggregate requires a pipeline
+                {
+                    $set: {
+                        'fullName': {
+                            $concat: ["$firstName"," ", "$lastName"]
+                        }
+                    }
+                },
+                {
+                    $unset: [
+                        'hashed', 'salt'
+                    ]
+                },
                 { $sort: { [me_field]: me_direction } },
                 { $skip: me_skip },
                 { $limit: me_limit },
             ]
+        ).collation(                
+            { 
+                locale: "en_US",
+                numericOrdering: true
+            }
         ).then(result => res.json(result))
     } catch (error) {
         console.log("Error sorting users:", error)

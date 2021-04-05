@@ -23,7 +23,7 @@
             viewName: "title",
         },
         {
-            fieldName: "users.fullName",
+            fieldName: "users.email",
             viewName: "researcher",
         },
         {
@@ -31,7 +31,7 @@
             viewName: "created",
         },
         {
-            fieldName: "items.data",
+            fieldName: "itemsCount",
             viewName: "items",
         },
         {
@@ -92,7 +92,7 @@
             if (
                 data[i].users != undefined &&
                 data[i].users.length > 0 &&
-                data[i].users[0].ownerId != null
+                data[i].users[0].email != null
             ) {
                 email = data[i].users[0].email;
             }

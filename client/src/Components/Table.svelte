@@ -3,6 +3,7 @@
     import {onMount} from 'svelte'
     import { toast } from "@zerodevx/svelte-toast";
     import { Link } from "svelte-routing";
+import { attr } from "svelte/internal";
     export let filterBy = undefined;
     export let tableTitle = undefined;
     // The attributes "data", "edit", "share", "delete" have predefined behaviors. Please be careful with how you use these.
@@ -43,7 +44,7 @@
     <table class="main_table">
         <tr id="table_header">
             {#each tableAttributes as attr}
-                <th class="col" on:click={(e) => updateFilterBy(e, attr.fieldName)}>{attr.viewName}</th>
+                <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr.fieldName)}>{attr.viewName}</th>
             {/each}
         </tr>
         {#each tableData as row}
@@ -153,6 +154,11 @@
 }
 td, th {
     padding: 0.5vh 0.5vw 0.5vh 0.5vw;
+}
+
+.col-sortable{
+    cursor: pointer;
+    title: "Sort by";
 }
 
 

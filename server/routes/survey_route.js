@@ -483,6 +483,11 @@ router.delete("/:id", auth, async (req, res) => {
  * @apiSuccess (200) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiSuccess (200) {String} surveys.dateCreated The datetime when this survey was made
  * @apiSuccess (200) {String} surveys.lastEdited The datetime when this survey was last edited
+ * @apiSuccess (200) {Number} surveys.itemsCount The number of items
+ * @apiSuccess (200) {Object[]} surveys.users An array of stripped down user objects that correspond to surveys.owners.ownerId
+ * @apiSuccess (200) {String} surveys.users.fullName Concatination of user.firstName and user.lastName
+ * @apiSuccess (200) {String} surveys.users.email The users email
+ * @apiSuccess (200) {String} surveys.users._id The users id
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
  * @apiError (400) 400 Bad Request, Missing query parameters
@@ -498,11 +503,11 @@ router.get("/function/sort", auth, async (req, res) => {
     */
    console.log("survey/function/sort called")
     const { field, skip, limit, direction } = req.query
-    console.log(req.query)
-    const me_field = me(field)
+    const me_field = field.replace("$", "")
     const me_skip = Number(me(skip))
     const me_limit = Number(me(limit))
     const me_direction = Number(me(direction))
+    console.log(me_field)
 
     if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
         res.sendStatus(400)
@@ -561,8 +566,14 @@ router.get("/function/sort", auth, async (req, res) => {
                                 'in': {
                                     'fullName': {'$concat': ['$$this.firstName', ' ', '$$this.lastName']},
                                     '_id': '$$this._id',
+                                    'email': '$$this.email'
                                 }
                             }
+                        }
+                    },
+                    $addFields: {
+                        'itemsCount' : {
+                            $size: "$items"
                         }
                     }
                 },

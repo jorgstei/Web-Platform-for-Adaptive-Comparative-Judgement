@@ -2,11 +2,13 @@
 import { onMount } from "svelte";
 import { surveyService } from "../Services/SurveyService";
 import { toast } from "@zerodevx/svelte-toast";
+import {userService} from "../Services/UserService";
 
-
+    export let userInfo = undefined;
     export let limit = 5;
     export let currentPage = 0;
-    export let filterBy = "";
+    export let filterBy = {filterName: "", counter: 0};
+    let oldFilterBy = {filterName: "", counter: 0};
     export let filterFunction = undefined;
     export let countFunction = undefined;
     export let count = 0;
@@ -14,13 +16,13 @@ import { toast } from "@zerodevx/svelte-toast";
     export let data = undefined;
 
     onMount(() => {
-        countFunction().then(data => count = data)
-        filter()
+        countFunction().then(res => count = res)
     })
 
     function filter(){
-        filterFunction(filterBy, currentPage*limit, limit, direction).then(res => 
+        filterFunction(filterBy.filterName, currentPage*limit, limit, direction).then(res => 
         {
+            if(res == undefined) return;
             if(res.status === 200){
                 console.log(res.data)
                 data = res.data;
@@ -28,8 +30,21 @@ import { toast } from "@zerodevx/svelte-toast";
             else{
                 toast.push("Something went wrong during filtering, please try to refresh.", {duration: 4000});
             }
+            //data = data
         })
+        userService.refreshToken().then(res => userInfo = res)
+        console.trace()
     }
+
+    function updatedFilterBy(){
+        if(oldFilterBy.filterName === filterBy.filterName){
+            direction = (direction == 1) ? -1 : 1
+        }
+        oldFilterBy.filterName = filterBy.filterName;
+        oldFilterBy.counter = filterBy.counter;
+        filter()
+    }
+
     function setLimit(e){
         limit = e.target.value;
         console.log(limit);
@@ -87,16 +102,22 @@ import { toast } from "@zerodevx/svelte-toast";
             e.target.value = ""
         }
     }
+
+    $:filterBy && updatedFilterBy()
 </script>
 
 <div class="table-filter-container">
     <ul>
         <li>
             <label class="label-hori" for="dropdown-limit">Limit:</label>
+        </li>
+        <li>
             <select name="limit" id="dropdown-limit" on:change={setLimit}>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
             </select>
         </li>
         <li>
@@ -122,37 +143,29 @@ import { toast } from "@zerodevx/svelte-toast";
 .table-filter-container{
     border:black;
     border-style: solid;
-    padding: 10px;
     justify-content: center;
     justify-items: center;
     flex-direction: column;
 }
 .goto-page-input{
-    max-width: 3vh;
+    min-width: 1vw;
+    max-width: 2vw;
 }
 .label-hori{
     float:left;
-    justify-self: center;
-    align-self: center;
-    text-align: center;
 }
 .navigate-image{
-    display:block;
-    width: 1vh;
-    height: 1vh;
+    width: 1.5vw;
+    height: 1.5vw;
     cursor: pointer;
 }
 li{
-    float: left;
-    display: block;
-    margin: 1vh
+    display: inline-block;
+    margin-right: 1vw;
 }
 ul{
-    overflow:auto;
     list-style-type: none;
-    margin: 0;
-    padding: 0;
-    justify-content: center;
-    justify-items: center;
+    text-align: center;
+    padding: 0;    
 }
 </style>

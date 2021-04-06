@@ -111,6 +111,9 @@ export default class SurveyService extends Service{
     }
 
     getSorted(field, skip, limit, direction){
+        if(field == undefined || field == "") {
+            return Promise.resolve(undefined)
+        }
         return axios({
             method: "get",
             url: this.path+`/survey/function/sort/?field=${field}&skip=${skip}&limit=${limit}&direction=${direction}`,
@@ -119,7 +122,8 @@ export default class SurveyService extends Service{
                 skip:skip,
                 limit:limit,
                 direction:direction
-            }
+            },
+            withCredentials: true
         })        
         .then(response => response)
         .catch(error => console.log(error))

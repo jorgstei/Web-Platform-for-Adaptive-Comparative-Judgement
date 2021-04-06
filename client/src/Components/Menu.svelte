@@ -23,7 +23,7 @@
 <div id="menu">
     <ul>
         <b><li id="menu_title">Menu</li></b>
-        <Link to="admin_board"><li class="menu_option" on:click={onclickHandler}>Profile</li></Link>
+        <Link to="profile"><li class="menu_option" on:click={onclickHandler}>Profile</li></Link>
         {#if userInfo.role == "admin"}
             <Link to="researchers"><li class="menu_option" on:click={onclickHandler}>Researchers</li></Link>
             <Link to="invite_researcher"><li class="menu_option" on:click={onclickHandler}>Invite researcher</li></Link>

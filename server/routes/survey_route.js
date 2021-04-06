@@ -32,27 +32,27 @@ const router = Router()
  * @apiSuccess (200) {String} surveys.lastEdited The datetime when this survey was last edited
  */
 
- /**
- * @apiDefine SuccessGetFullSurvey
- * @apiSuccess (200) {Object[]} owners An array of objects defining who has access to this survey
- * @apiSuccess (200) {String} owners.ownerId The ID identifying a user with rights to this survey
- * @apiSuccess (200) {Object} owners.rights An object with booleans showing which rights the owner has on this survey
- * @apiSuccess (200) {Boolean} owners.rights.manageMembers If this user can add/remove owners of the survey, or change their access
- * @apiSuccess (200) {Boolean} owners.rights.editSurvey If this user can edit the survey (Change fields, add new fields, remove fields etc.)
- * @apiSuccess (200) {Boolean} owners.rights.viewResults If this user can view the judges selections, analysis and statistics.
- * @apiSuccess (200) {Object[]} items An array of Item objects, these are the options judges choose between
- * @apiSuccess (200) {String} items.type A string defining what type of item this item is (f.ex. text, pdf, latex)
- * @apiSuccess (200) {String} items.data For raw text, this will be the text to display. For other <code>items.type</code> it will be a URL to the resource.
- * @apiSuccess (200) {String} title The title of the survey
- * @apiSuccess (200) {String} internalDescription The internal description of this survey
- * @apiSuccess (200) {String} judgeInstructions The instructions that are shown to judges when they take the survey
- * @apiSuccess (200) {String} surveyQuestion The overarching question the survey is attempting to answer
- * @apiSuccess (200) {String} purpose TODO: Is this redundant?
- * @apiSuccess (200) {String} mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
- * @apiSuccess (200) {String} accessibility How the survey can be accessed by judges. (code, or link)
- * @apiSuccess (200) {String} dateCreated The datetime when this survey was made
- * @apiSuccess (200) {String} lastEdited The datetime when this survey was last edited
- */
+/**
+* @apiDefine SuccessGetFullSurvey
+* @apiSuccess (200) {Object[]} owners An array of objects defining who has access to this survey
+* @apiSuccess (200) {String} owners.ownerId The ID identifying a user with rights to this survey
+* @apiSuccess (200) {Object} owners.rights An object with booleans showing which rights the owner has on this survey
+* @apiSuccess (200) {Boolean} owners.rights.manageMembers If this user can add/remove owners of the survey, or change their access
+* @apiSuccess (200) {Boolean} owners.rights.editSurvey If this user can edit the survey (Change fields, add new fields, remove fields etc.)
+* @apiSuccess (200) {Boolean} owners.rights.viewResults If this user can view the judges selections, analysis and statistics.
+* @apiSuccess (200) {Object[]} items An array of Item objects, these are the options judges choose between
+* @apiSuccess (200) {String} items.type A string defining what type of item this item is (f.ex. text, pdf, latex)
+* @apiSuccess (200) {String} items.data For raw text, this will be the text to display. For other <code>items.type</code> it will be a URL to the resource.
+* @apiSuccess (200) {String} title The title of the survey
+* @apiSuccess (200) {String} internalDescription The internal description of this survey
+* @apiSuccess (200) {String} judgeInstructions The instructions that are shown to judges when they take the survey
+* @apiSuccess (200) {String} surveyQuestion The overarching question the survey is attempting to answer
+* @apiSuccess (200) {String} purpose TODO: Is this redundant?
+* @apiSuccess (200) {String} mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
+* @apiSuccess (200) {String} accessibility How the survey can be accessed by judges. (code, or link)
+* @apiSuccess (200) {String} dateCreated The datetime when this survey was made
+* @apiSuccess (200) {String} lastEdited The datetime when this survey was last edited
+*/
 
 /**
  * @api {get} /api/survey
@@ -123,27 +123,27 @@ router.get("/user/:id", auth, async (req, res) => {
  */
 router.get("/function/count", auth, async (req, res) => {
     console.log("Get count of surveys")
-    try{
+    try {
         if (req.role !== "admin" && req.role !== "researcher") {
             res.sendStatus(403)
             return
         }
         const me_userid = me(req.userid)
-        if(req.role === "admin"){
+        if (req.role === "admin") {
             Survey.countDocuments().then(count => res.json(count))
             return;
         }
-        else{
-            Survey.countDocuments({"owners.ownerId": me_userid}).then(count => res.json(count))
+        else {
+            Survey.countDocuments({ "owners.ownerId": me_userid }).then(count => res.json(count))
         }
-    } catch(error){
-        console.log("survey/function/count error:",error)
+    } catch (error) {
+        console.log("survey/function/count error:", error)
         res.sendStatus(500)
     }
 })
 
 //Get random item pair from survey by id
-router.get("/item/:id", auth, async (req, res) => {
+router.get("/item/:id", async (req, res) => {
     console.log("called get random pair from survey by id for item")
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id })
@@ -483,6 +483,11 @@ router.delete("/:id", auth, async (req, res) => {
  * @apiSuccess (200) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiSuccess (200) {String} surveys.dateCreated The datetime when this survey was made
  * @apiSuccess (200) {String} surveys.lastEdited The datetime when this survey was last edited
+ * @apiSuccess (200) {Number} surveys.itemsCount The number of items
+ * @apiSuccess (200) {Object[]} surveys.users An array of stripped down user objects that correspond to surveys.owners.ownerId
+ * @apiSuccess (200) {String} surveys.users.fullName Concatination of user.firstName and user.lastName
+ * @apiSuccess (200) {String} surveys.users.email The users email
+ * @apiSuccess (200) {String} surveys.users._id The users id
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
  * @apiError (400) 400 Bad Request, Missing query parameters
@@ -496,12 +501,13 @@ router.get("/function/sort", auth, async (req, res) => {
         limit: How many documents you want to retrieve, f.ex. 10 as in the case above
         direction: 1 ascending, -1 descending
     */
+   console.log("survey/function/sort called")
     const { field, skip, limit, direction } = req.query
-    console.log(req.query)
-    const me_field = me(field)
+    const me_field = field.replace("$", "")
     const me_skip = Number(me(skip))
     const me_limit = Number(me(limit))
     const me_direction = Number(me(direction))
+    console.log(me_field)
 
     if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
         res.sendStatus(400)
@@ -525,6 +531,53 @@ router.get("/function/sort", auth, async (req, res) => {
                             "owners.ownerId": req.userid
                         }
                     }, //Find surveys where this user has access
+                {
+                    $addFields: {
+                        'owners': {
+                            $map: {
+                                'input': '$owners',
+                                'in': {
+                                    'ownerId': {
+                                        '$toObjectId': '$$this.ownerId'
+                                    },
+                                    '_id': '$$this._id',
+                                    'rights': '$$this.rights'
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    $lookup: {
+                        'from': 'users',
+                        'localField': 'owners.ownerId',
+                        'foreignField': '_id',
+                        'as': 'users'
+                    }
+                }, {
+                    $unset: [
+                        'users.hashed', 'users.salt'
+                    ]
+                },
+                {
+                    $addFields: {
+                        'users': {
+                            $map: {
+                                'input': '$users',
+                                'in': {
+                                    'fullName': {'$concat': ['$$this.firstName', ' ', '$$this.lastName']},
+                                    '_id': '$$this._id',
+                                    'email': '$$this.email'
+                                }
+                            }
+                        }
+                    },
+                    $addFields: {
+                        'itemsCount' : {
+                            $size: "$items"
+                        }
+                    }
+                },
+
                 { $sort: { [me_field]: me_direction } },
                 { $skip: me_skip },
                 { $limit: me_limit },

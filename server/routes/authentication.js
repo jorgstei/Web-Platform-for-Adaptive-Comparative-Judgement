@@ -156,7 +156,7 @@ router.post("/refresh-token", async (req, res) => {
                         userid: decoded.userid,
                         role: decoded.role
                     },
-                    process.env.JWTSecret
+                    process.env.JWTJudgeSecret
                 )
                 res.set({
                     "Cache-Control": "no-cache",

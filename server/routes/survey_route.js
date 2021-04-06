@@ -155,25 +155,49 @@ router.get("/item/:id", async (req, res) => {
                 //TODO: Check that the passphrase from cookie is valid for this survey
             }
         }
+        const expectedComparisons = surveyDoc.expectedComparisons;
         const count = surveyDoc.items.length
+        //Find amounts of comparisons
+        let amountOfUniqueComparisons = 0;
+        let toAdd = 1;
+        while(toAdd < count){
+            amountOfUniqueComparisons += toAdd;
+            toAdd++;
+        }
+        console.log("Length of survey items is " + count + ". It has " + amountOfUniqueComparisons + " unique comparisons");
         if (count < 2) {
             throw new Error("Too few elements in collection.")
         }
-        const random_skip = Math.floor(Math.random() * count)
-        const comparisonObject1 = surveyDoc.items[random_skip]
-        let comparisonObject2 = null
-        while (true) {
-            const random_skip2 = Math.floor(Math.random() * count);
-            comparisonObject2 = surveyDoc.items[random_skip2]
-            if (comparisonObject2 != null) {
-                if (comparisonObject1._id != comparisonObject2._id) {
-                    break
-                }
+        else if(expectedComparisons > amountOfUniqueComparisons){
+            throw new Error("Expected amount of comparisons: " + expectedComparisons + " is greater than amount of unique comparisons: " + amountOfUniqueComparisons);
+        }
+        // Add all possible unique comparisons to array
+        let allUniqueComparisons = [];
+        for (let i = 0; i < count-1; i++) {
+            for (let j = i+1; j < count; j++) {
+                allUniqueComparisons.push({left: surveyDoc.items[i], right: surveyDoc.items[j]});
             }
         }
-        res.status(200).json({ data: [comparisonObject1, comparisonObject2] })
+        //console.log("All unique comparisons:\n", allUniqueComparisons);
+        // Random indeces to be picked out of allUniqueComparisons
+        let randomComparisonIndeces = [];
+        let addedIndeces = 0;
+        while(addedIndeces < expectedComparisons){
+            const randomIndex = Math.floor(Math.random() * count);
+            //Check that comparison hasn't already been chosen
+            if(randomComparisonIndeces.find(e=>e===randomIndex) === undefined){
+                //Add index to array
+                randomComparisonIndeces.push(randomIndex);
+                addedIndeces++;
+            }
+        }
+        let comparisons = [];
+        randomComparisonIndeces.forEach(index=>comparisons.push(allUniqueComparisons[index]));
+        
+        res.status(200).json({data: comparisons})
     } catch (error) {
-        res.status(404).json({ message: "Unable to get two random ComparisonObjects for this survey" })
+        res.status(404).json({ message: "Unable to get random ComparisonObjects for this survey" })
+        console.log("Error in getRandomComparisonObjects\n" + error);
     }
 })
 

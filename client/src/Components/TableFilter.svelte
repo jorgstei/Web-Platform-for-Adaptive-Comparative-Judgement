@@ -1,8 +1,8 @@
 <script>
-import { onMount } from "svelte";
-import { surveyService } from "../Services/SurveyService";
-import { toast } from "@zerodevx/svelte-toast";
-import {userService} from "../Services/UserService";
+    import { onMount } from "svelte";
+    import { surveyService } from "../Services/SurveyService";
+    import { toast } from "@zerodevx/svelte-toast";
+    import {userService} from "../Services/UserService";
 
     export let userInfo = undefined;
     export let limit = 5;
@@ -17,6 +17,10 @@ import {userService} from "../Services/UserService";
 
     onMount(() => {
         countFunction().then(res => count = res)
+        let table = document.getElementsByClassName("main_table")[0];
+        if(table){
+            console.log("Table width: ", table.style);
+        }
     })
 
     function filter(){
@@ -141,31 +145,34 @@ import {userService} from "../Services/UserService";
 
 <style>
 .table-filter-container{
-    border:black;
-    border-style: solid;
-    justify-content: center;
-    justify-items: center;
-    flex-direction: column;
+    /*border:2px solid #95A5A6 ;*/
+    margin-left: 2vw;
+    padding: 0;
+    max-width: 60vw;
 }
 .goto-page-input{
-    min-width: 1vw;
-    max-width: 2vw;
-}
-.label-hori{
-    float:left;
+    max-width: 2rem;
+    margin-top:0;
+    padding-top:0;
+    text-align: center;
 }
 .navigate-image{
     width: 1.5vw;
-    height: 1.5vw;
+    height: 3vh;
     cursor: pointer;
 }
 li{
     display: inline-block;
     margin-right: 1vw;
+    height: 5vh;
+    vertical-align: middle;
+}
+li > select {
+    vertical-align: top;
 }
 ul{
     list-style-type: none;
-    text-align: center;
-    padding: 0;    
+    padding: 0;   
 }
+
 </style>

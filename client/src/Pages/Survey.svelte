@@ -18,9 +18,14 @@
 
 
     let randomPair = null;
-    surveyService.getRandomPairForSurveyByID(surveyID).then(data => randomPair = data.data);
+    
     let counter = 0;
-    const maxCounter = 10;
+    let maxCounter = 10;
+    surveyService.getRandomPairForSurveyByID(surveyID).then((data) => {
+        console.log("Data from randomPair: ", data.data);
+        randomPair = data.data;
+        maxCounter = data.data.length;
+    });
     const transition_distance = 300;
 
     let leftChoiceClicked = () => {
@@ -28,15 +33,14 @@
         {
             judgeId: userInfo.userid,
             surveyId: surveyID,
-            leftOption: randomPair[0]._id,
-            rightOption: randomPair[1]._id,
+            leftOption: randomPair[counter].left._id,
+            rightOption: randomPair[counter].right._id,
             winner: 1,
         }
-        surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res))
+        console.log("Sending left answer: ", answer);
+        surveyAnswerService.post(answer).then(res => console.log("Posted answer, leftChoiceClicked, Response: ", res))
         if(counter < maxCounter){
-            surveyService.getRandomPairForSurveyByID(surveyID).then(data => randomPair = data.data);
             counter++;
-            randomPair = randomPair;
         }
     }
 
@@ -45,15 +49,13 @@
         {
             judgeId: userInfo.userid,
             surveyId: surveyID,
-            leftOption: randomPair[0]._id,
-            rightOption: randomPair[1]._id,
+            leftOption: randomPair[counter].left._id,
+            rightOption: randomPair[counter].right._id,
             winner: 0,
         }
         surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res))
         if(counter < maxCounter){
-            surveyService.getRandomPairForSurveyByID(surveyID).then(data => randomPair = data.data);
             counter++;
-            randomPair = randomPair;
         }
     }
 
@@ -109,6 +111,7 @@
     //img="https://i.pinimg.com/736x/04/f5/8a/04f58afd7424a02a826eb74eddf98d91.jpg" https://wwwremaprodstorage.blob.core.windows.net/sys-master-hyb-prod/he6/h4c/8796881485854
     //img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Neckertal_20150527-6384.jpg/1920px-Neckertal_20150527-6384.jpg" https://thestayathomechef.com/wp-content/uploads/2017/08/Most-Amazing-Lasagna-2-e1574792735811.jpg
     //<h1>{surveyTitle}</h1>
+    
 </script>
 <main id="surveyWrapper" tabindex="0">
     {#if counter < maxCounter}
@@ -117,8 +120,8 @@
     <h1>{question}</h1>
     <div id="container">
         {#if randomPair != null}
-            <Card className="left" buttonText="Choose left" mediaType="text" text={randomPair[0].data} onClickFunc = {leftChoiceClicked} width=100 height=90  transition_x={-transition_distance} img="https://i.pinimg.com/736x/04/f5/8a/04f58afd7424a02a826eb74eddf98d91.jpg"></Card>
-            <Card className="right" buttonText="Choose right" mediaType="text" text={randomPair[1].data} onClickFunc = {rightChoiceClicked} width=100 height=90  transition_x={transition_distance} img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Neckertal_20150527-6384.jpg/1920px-Neckertal_20150527-6384.jpg"></Card>
+            <Card className="left" buttonText="Choose left" mediaType="text" text={randomPair[counter].left.data} onClickFunc = {leftChoiceClicked} width=100 height=90  transition_x={-transition_distance} img="https://i.pinimg.com/736x/04/f5/8a/04f58afd7424a02a826eb74eddf98d91.jpg"></Card>
+            <Card className="right" buttonText="Choose right" mediaType="text" text={randomPair[counter].right.data} onClickFunc = {rightChoiceClicked} width=100 height=90  transition_x={transition_distance} img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Neckertal_20150527-6384.jpg/1920px-Neckertal_20150527-6384.jpg"></Card>
         {/if}
     </div>
     {/key}

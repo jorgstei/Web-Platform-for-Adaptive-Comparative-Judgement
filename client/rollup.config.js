@@ -42,7 +42,7 @@ export default {
 		replace({
 			processs: JSON.stringify({
 				envv: {
-					apiBasePath: production ? "http://compair.it.ntnu.no:3000/api" : "http://localhost:3000/api"
+					apiBasePath: production ? "https://compair.it.ntnu.no:3000/api" : "http://localhost:3000/api"
 				}
 			})
 		}),

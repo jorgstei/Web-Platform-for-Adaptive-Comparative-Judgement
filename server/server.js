@@ -68,12 +68,19 @@ server.use("/api/surveyanswer", surveyAnswerRoute)
 const userRoute = require('./routes/user_route')
 server.use("/api/user", userRoute)
 
-if(process.env.privateKeyPath != undefined && process.env.certPath != undefined){
+if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){
 
     const privateKey = fs.readFileSync(process.env.privateKeyPath)
-    const selfSignedCert = fs.readFileSync(process.env.certPath)
+    const cert = fs.readFileSync(process.env.certPath)
+    const ca = fs.readFileSync(process.env.caPath)
+    const credentials = 
+    {
+        key: privateKey,
+        cert: cert,
+        ca: ca
+    }
     
-    const httpsServer = https.createServer({key: privateKey, cert: selfSignedCert}, server)
+    const httpsServer = https.createServer(credentials, server)
     httpsServer.listen(443);
 }
 else{

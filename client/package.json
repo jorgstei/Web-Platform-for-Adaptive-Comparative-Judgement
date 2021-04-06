@@ -4,7 +4,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --host --single"
+    "start": "sirv public --host --single --http2 --cert /project/certs/compair.it.ntnu.no/cert.pem --key /project/certs/compair.it.ntnu.no/privkey.pem" 
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",

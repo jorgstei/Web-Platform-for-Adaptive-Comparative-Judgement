@@ -490,7 +490,7 @@ router.post("/", async (req, res) => {
     console.log(req.body)
     const [real, role] = await verifyUserRegistration(token, email)
     console.log("New user role:", role)
-    if(!acceptablePassword(newPassword, role)){
+    if(!acceptablePassword(password, role)){
         res.sendStatus(422)
         return
     }

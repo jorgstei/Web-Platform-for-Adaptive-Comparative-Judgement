@@ -12,6 +12,27 @@ const escapeStringRegexp = require('escape-string-regexp')
 
 const router = Router()
 
+function acceptablePassword(password, role){
+    //8 chars, one letter and one number
+    const pwResearcherRegex = /(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)/;
+    //10 chars, 1 upper letter, 1 lower letter, one number
+    const pwAdminRegex = /(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10,}$)/;
+    if(role === "admin"){
+        if(pwAdminRegex.test(password)){
+            return true
+        }
+        return false
+    }
+    if(role === "researcher"){
+        if(pwResearcherRegex.test(password)){
+            return true
+        }
+        return false
+    }
+    console.log("acceptablePassword unknown role.")
+    return false;
+}
+
 /*
     Only for use with non-critical information such as email
 */
@@ -317,6 +338,10 @@ router.patch("/forgotten_password", async (req, res) => {
             res.sendStatus(403)
             return
         }
+        if(!acceptablePassword(newPassword, userDoc.role)){
+            res.sendStatus(422)
+            return
+        }
         //TODO: If the last edited time for the users password falls within the issuedAt time and the exp time, early return
 
         const result = hash(newPassword)
@@ -356,7 +381,7 @@ router.post("/invite_link", auth, async (req, res) => {
         res.status(422).json({ message: "User with that email already exists." })
         return
     }
-    const link = process.env.CLIENT_BASE_URL + "/register_account/?token=" + createUserRegisterToken(hashNoSalt(email), role)
+    const link = process.env.CLIENT_BASE_URL + "/register_account/?role="+role+"&token=" + createUserRegisterToken(hashNoSalt(email), role)
     const body_intro = "<html><div>You have been invited to join ACJ.<br>"
     const body_invite_link = "<p>Please us this link to create your account. You must enter the email address you received this mail from in order to create the account.</p>"
         + "<a href=" + link + ">" + link + "</a>"
@@ -465,6 +490,10 @@ router.post("/", async (req, res) => {
     console.log(req.body)
     const [real, role] = await verifyUserRegistration(token, email)
     console.log("New user role:", role)
+    if(!acceptablePassword(newPassword, role)){
+        res.sendStatus(422)
+        return
+    }
     const userDoc = await User.findOne({ email: email })
     if (userDoc != null && userDoc._id != null) {
         res.status(409).json({ Error: "This registration link has already been used." })

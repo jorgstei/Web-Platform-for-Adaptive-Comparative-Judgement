@@ -138,7 +138,7 @@
             await surveyService.deleteSurvey(id);
         }}
     />
-    <TableFilter bind:filterBy bind:data bind:userInfo {...tableFilterParams} />
+    <TableFilter bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
 {/if}
 
 <style>

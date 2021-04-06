@@ -22,27 +22,27 @@
       </div>
       <div class="contentWrapper">
         <Route path="researchers">
-          <Researchers {userInfo} />
+          <Researchers bind:userInfo={userInfo} />
         </Route>
 
         <Route path="invite_researcher">
-          <InviteResearcher {userInfo} />
+          <InviteResearcher bind:userInfo={userInfo} />
         </Route>
 
         <Route path="surveys">
-          <Surveys {userInfo} />
+          <Surveys bind:userInfo={userInfo} />
         </Route>
         <Route path="create_survey">
-          <CreateSurvey {userInfo} />
+          <CreateSurvey bind:userInfo={userInfo} />
         </Route>
         <Route path="survey_data">
-          <RawSurveyData {userInfo} />
+          <RawSurveyData bind:userInfo={userInfo} />
         </Route>
         <Route path="edit_survey">
-          <CreateSurvey {userInfo} editing={true} />
+          <CreateSurvey bind:userInfo={userInfo} editing={true} />
         </Route>
         <Route path="change_password">
-          <LoginPage {userInfo} changePassword={true} />
+          <LoginPage bind:userInfo={userInfo} changePassword={true} />
         </Route>
       </div>
     {:else}

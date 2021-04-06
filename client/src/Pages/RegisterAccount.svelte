@@ -51,6 +51,10 @@
 
     // Checks the validity of fields. Optional third parameter for password 2.
     const checkValues = (firstName, lastName, email, pw1, pw2=pw1) => {
+        //8 chars, one letter and one number
+        const pwResearcherRegex = /(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)/;
+        //10 chars, 1 upper letter, 1 lower letter, one number
+        const pwAdminRegex = /(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10,}$)/;
         let valuesAreValid = true;
         let errormsg = "";
         console.log("In checkValues with firstname, lastname, email, pw1, pw2: ", firstName, lastName, email, pw1, pw2);
@@ -71,12 +75,20 @@
             valuesAreValid = false;
             errormsg = "Your email must contain '@' and '.' and can not have whitespaces."
         }
+
         // Checks that the passwords match.
         else if(pw1 !== pw2){
             valuesAreValid = false;
             errormsg = "Passwords need to match."
         }
-        //TODO: Database call to check if email is taken
+        else if(params.role === "admin" && !pwAdminRegex.test(pw1)){
+            valuesAreValid = false;
+            errormsg = "Password must be 10 characters long, include a Uppercase letter, lowercase letter and a number";
+        }
+        else if(params.role === "researcher" && !pwResearcherRegex.test(pw1)){
+            valuesAreValid = false;
+            errormsg = "Password must be 8 characters long, include a character (a-z or A-Z) and a number";
+        }
         return [valuesAreValid, errormsg]
     }
 

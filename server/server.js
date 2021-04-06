@@ -69,19 +69,25 @@ const userRoute = require('./routes/user_route')
 server.use("/api/user", userRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){
-    const privateKey = fs.readFileSync(fs.realpathSync(process.env.privateKeyPath))
-    const cert = fs.readFileSync(fs.realpathSync(process.env.certPath))
-    const ca = fs.readFileSync(fs.realpathSync(process.env.caPath))
-    console.log("Privatekey real path:",fs.realpathSync(process.env.privateKeyPath))
-    const credentials = 
-    {
-        key: privateKey,
-        cert: cert,
-        ca: ca
+    try {
+        
+        const privateKey = fs.readFileSync(fs.realpathSync(process.env.privateKeyPath))
+        const cert = fs.readFileSync(fs.realpathSync(process.env.certPath))
+        const ca = fs.readFileSync(fs.realpathSync(process.env.caPath))
+        console.log("Privatekey real path:",fs.realpathSync(process.env.privateKeyPath))
+        const credentials = 
+        {
+            key: privateKey,
+            cert: cert,
+            ca: ca
+        }
+        
+        const httpsServer = https.createServer(credentials, server)
+        httpsServer.listen(443);
+    } catch (error) {
+        console.error(error)
+        server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000 without HTTPS."))
     }
-    
-    const httpsServer = https.createServer(credentials, server)
-    httpsServer.listen(443);
 }
 else{
     server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000."))

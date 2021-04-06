@@ -8,7 +8,7 @@
     import queryString from "query-string";
     import { onMount } from "svelte";
     import { userService } from "../Services/UserService";
-import { navigateWithRefreshToken } from "../Utility/naviagte";
+    import { navigateWithRefreshToken } from "../Utility/naviagte";
     export let purpose = "research";
     export let surveyMediaType = "text";
     export let accessibility = "link";
@@ -53,6 +53,7 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                 document.getElementById("accessibilityDropdown").value =
                     data.accessibility;
                 document.getElementById("activeCheckbox").checked = data.active;
+                document.getElementById("expected_comparisons").value = data.expectedComparisons != undefined ? data.expectedComparisons : 2
                 textAreaAdjustByElement(
                     document.getElementById("judge_instructions")
                 );
@@ -144,6 +145,7 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
             active: document.getElementById("activeCheckbox").checked,
             items: optionsData,
             owners: surveyResearchers,
+            expectedComparisons: parseInt(document.getElementById("expected_comparisons").value, 10)
         };
 
         console.log("CREATE SURVEY INFO OBJ", info);
@@ -246,6 +248,24 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
         }
         return [true, ""];
     };
+
+    function validateExpectedComparisons(e){
+        const input = e.target.value;
+        const parsed = parseInt(input, 10)
+        if(isNaN(parsed) && input !== ""){
+            console.log("validateExpectedComparisons invalid input:", input)
+            e.target.value = 2
+            return
+        }
+        else if(typeof(parsed) == "number"){
+            if(parsed > 100){
+                document.getElementById("expected_comparisons").value = 100;
+            }
+            else if(parsed < 0){
+                document.getElementById("expected_comparisons").value = 0;
+            }
+        }
+    }
 
     const addResearcher = (researcher) => {
         console.log("researcher in add: ", researcher);
@@ -426,6 +446,11 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                 </div>
             </div>
             <br />
+            <div id="expectedComparisonsWrapper">
+                <label for="expected_comparisons">Expected comparisons per judge</label>
+                <input id="expected_comparisons" type="number" maxlength="3" max="100" on:input={validateExpectedComparisons}>
+            </div>
+            <br />
             <div id="searchWrapper">
                 <label for="researcher_search">Add researchers</label>
                 <SearchDropdown
@@ -434,8 +459,8 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                     {searchResults}
                     onClickFunc={addResearcher}
                 />
-                <br />
-                <br />
+                <br>
+                <br>
                 <h4 id="researchersTitle">
                     Researchers participating in survey
                 </h4>
@@ -443,7 +468,7 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
                     {#each surveyResearchers as researcher}
                         <ResearcherBox
                             {researcher}
-                            deleteFunc={removeResearcher}
+                            deleteFunc={removeResearcher} 
                             {userInfo}
                             onchangeFunc={changeResearcherRights}
                         />

@@ -296,7 +296,7 @@ router.get("/judge/:id", async (req, res) => {
 router.post("/", auth, async (req, res) => {
     console.log("called post one for survey")
     const {
-        owners, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+        owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
         purpose, mediaType, accessibility
     } = req.body
     console.log("req.role: ", req.role)
@@ -306,7 +306,7 @@ router.post("/", auth, async (req, res) => {
     }
     try {
         const survey = await Survey.create({
-            owners, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+            owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
             purpose, mediaType, accessibility
         })
         if (!survey || !survey._id) {

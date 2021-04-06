@@ -53,6 +53,11 @@ const SurveySchema = new Schema(
             type: [childOwnerSchema],
             required: true
         },
+        expectedComparisons:{
+            type: Number,
+            required: true,
+            default: 2
+        },
         items: [Item],
         active: {
             type: Boolean,

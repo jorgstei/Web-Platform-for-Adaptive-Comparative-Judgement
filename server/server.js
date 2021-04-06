@@ -66,7 +66,6 @@ const surveyAnswerRoute = require('./routes/survey_answer_route')
 server.use("/api/surveyanswer", surveyAnswerRoute)
 
 const userRoute = require('./routes/user_route')
-const { env } = require('process')
 server.use("/api/user", userRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined){

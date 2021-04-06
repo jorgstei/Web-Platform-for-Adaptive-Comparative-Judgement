@@ -183,17 +183,27 @@ router.get("/item/:id", async (req, res) => {
         let randomComparisonIndeces = [];
         let addedIndeces = 0;
         while(addedIndeces < expectedComparisons){
-            const randomIndex = Math.floor(Math.random() * count);
-            //Check that comparison hasn't already been chosen
+            const randomIndex = Math.floor(Math.random() * allUniqueComparisons.length);
+            //Check that comparison hasn't already been chosen,
+            console.log("RandomIndex = ", randomIndex, "\nArray = ", randomComparisonIndeces);
             if(randomComparisonIndeces.find(e=>e===randomIndex) === undefined){
                 //Add index to array
                 randomComparisonIndeces.push(randomIndex);
                 addedIndeces++;
+                //console.log("Added index to array!")
             }
+            //console.log("addedindeces: " + addedIndeces);
         }
         let comparisons = [];
         randomComparisonIndeces.forEach(index=>comparisons.push(allUniqueComparisons[index]));
         
+        comparisons.map(e => {
+            if(Math.random() > 0.5){
+                const temp = e.left;
+                e.left = e.right;
+                e.right = temp;
+            }
+        })
         res.status(200).json({data: comparisons})
     } catch (error) {
         res.status(404).json({ message: "Unable to get random ComparisonObjects for this survey" })

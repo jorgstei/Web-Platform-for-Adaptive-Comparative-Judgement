@@ -250,8 +250,12 @@
     };
 
     function validateExpectedComparisons(e){
+        if(e.target.value === ""){
+            e.target.value = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');
+        }
         const input = e.target.value;
         const parsed = parseInt(input, 10)
+        console.log("validating expected comparisons with input", input)
         if(isNaN(parsed) && input !== ""){
             console.log("validateExpectedComparisons invalid input:", input)
             e.target.value = 2
@@ -616,6 +620,13 @@
     #activeCheckbox {
         margin: auto;
         transform: scale(2);
+    }
+    #expectedComparisonsWrapper{
+        margin-left: 2vw;
+        font-size: 1.6rem;
+    }
+    #expected_comparisons{
+        padding: 1vh;
     }
     #searchWrapper {
         margin-left: 2vw;

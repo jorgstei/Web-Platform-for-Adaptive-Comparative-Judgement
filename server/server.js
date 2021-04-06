@@ -66,23 +66,13 @@ const surveyAnswerRoute = require('./routes/survey_answer_route')
 server.use("/api/surveyanswer", surveyAnswerRoute)
 
 const userRoute = require('./routes/user_route')
-const { exec, execSync } = require('child_process')
 server.use("/api/user", userRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){
-
-    console.log("priv path:",process.env.privateKeyPath)
-    console.log("cert path:",process.env.certPath)
-    console.log("ca path:",process.env.caPath)
-    execSync("pwd", (_, out, __) => {
-        console.log(out)
-    })
-    execSync("ls ../../certs", (_, out, __) => {
-        console.log(out)
-    })
-    const privateKey = fs.readFileSync(process.env.privateKeyPath)
-    const cert = fs.readFileSync(process.env.certPath)
-    const ca = fs.readFileSync(process.env.caPath)
+    const privateKey = fs.readFileSync(fs.realpathSync(process.env.privateKeyPath))
+    const cert = fs.readFileSync(fs.realpathSync(process.env.certPath))
+    const ca = fs.readFileSync(fs.realpathSync(process.env.caPath))
+    console.log("Privatekey real path:",fs.realpathSync(process.env.privateKeyPath))
     const credentials = 
     {
         key: privateKey,

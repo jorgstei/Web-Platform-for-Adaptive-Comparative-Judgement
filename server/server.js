@@ -70,6 +70,9 @@ server.use("/api/user", userRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){
 
+    console.log("priv path:",process.env.privateKeyPath)
+    console.log("cert path:",process.env.certPath)
+    console.log("ca path:",process.env.caPath)
     const privateKey = fs.readFileSync(process.env.privateKeyPath)
     const cert = fs.readFileSync(process.env.certPath)
     const ca = fs.readFileSync(process.env.caPath)

@@ -97,9 +97,7 @@
                 email = data[i].users[0].email;
             }
             const YYYY_MM_DD_Date = data[i].dateCreated.split("T")[0];
-            const DD_MM_YYYY_Date = YYYY_MM_DD_Date.split("-")
-                .reverse()
-                .join(".");
+            const DD_MM_YYYY_Date = YYYY_MM_DD_Date.split("-").reverse().join(".");
             //console.log(YYYY_MM_DD_Date, " -> ", DD_MM_YYYY_Date);
             const arr = [
                 data[i].title,

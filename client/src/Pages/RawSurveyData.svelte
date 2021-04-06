@@ -23,11 +23,11 @@
     });
     
 
-    let linearRankingHeaders = ["option", "infit", "outfit", "wins", "theta"];
+    let linearRankingHeaders = [{fieldName:"", viewName:"option"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"}, {fieldName:"", viewName:"wins"}, {fieldName:"", viewName:"theta"}];
     let linearRanking = null;
-    let allJudgesHeaders = ["id", "agree", "infit", "outfit"];
+    let allJudgesHeaders = [{fieldName:"", viewName:"id"}, {fieldName:"", viewName:"agree"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"}];
     let allJudges = null;
-    let allItemsHeaders = ["option", "infit", "outfit", "propscore", "theta", "wins", "losses", "total comparisons", "option number"];
+    let allItemsHeaders = [{fieldName:"", viewName: "option"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"}, {fieldName:"", viewName:"propscore"}, {fieldName:"", viewName:"theta"}, {fieldName:"", viewName:"wins"}, {fieldName:"", viewName:"losses"}, {fieldName:"", viewName:"total comparisons"}, {fieldName:"", viewName:"option number"}];
     let allItems2DArray = null;
     
     let currentContentView = "linearRanking";
@@ -35,7 +35,7 @@
     let surveyStatistics = null;
     
     let answerValues= [];
-    let answerHeaders = ["judge id", "left option", "right option", "result"];
+    let answerHeaders = [{fieldName:"", viewName:"judge id"}, {fieldName:"", viewName:"left option"}, {fieldName:"", viewName:"right option"}, {fieldName:"", viewName:"result"}];
 	let getSurveyAnswers = async ()=>{
         await surveyAnswerService.getBySurveyID(surveyID)
         .then((answers)=>{

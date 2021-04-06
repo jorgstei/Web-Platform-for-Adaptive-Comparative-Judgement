@@ -148,30 +148,24 @@ import {userService} from "../Services/UserService";
     flex-direction: column;
 }
 .goto-page-input{
-    max-width: 3vh;
+    min-width: 1vw;
+    max-width: 2vw;
 }
 .label-hori{
     float:left;
 }
 .navigate-image{
-    display:block;
-    width: 1vh;
-    height: 1vh;
+    width: 1.5vw;
+    height: 1.5vw;
     cursor: pointer;
 }
 li{
-    float: left;
-    display: block;
-    margin: 1vh
+    display: inline-block;
+    margin-right: 1vw;
 }
 ul{
-    overflow:auto;
     list-style-type: none;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    justify-content: center;
-    justify-items: center;
-    align-items: baseline;
+    text-align: center;
+    padding: 0;    
 }
 </style>

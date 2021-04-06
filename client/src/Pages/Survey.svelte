@@ -11,7 +11,6 @@
     export let surveyID;
     let question = "";
     let completed = false
-
     let navwrap = document.getElementById("navWrapper");
     if(navwrap){
         navwrap.style.display = "none";

@@ -33,7 +33,8 @@ import { attr } from "svelte/internal";
     $: deleteFunc
     onMount(()=>{
         document.getElementsByClassName("container")[0].insertBefore(element, document.getElementsByClassName("main_table")[0]);
-        console.log("onMount Table.svelte")
+        console.log("onMount Table.svelte", "tableAttributes: ", tableAttributes)
+
     })
     
 </script>

@@ -74,8 +74,12 @@ if(process.env.privateKeyPath != undefined && process.env.certPath != undefined 
     console.log("priv path:",process.env.privateKeyPath)
     console.log("cert path:",process.env.certPath)
     console.log("ca path:",process.env.caPath)
-    exec("pwd")
-    exec("ls ../../certs")
+    exec("pwd", (_, out, __) => {
+        console.log(out)
+    })
+    exec("ls ../../certs", (_, out, __) => {
+        console.log(out)
+    })
     const privateKey = fs.readFileSync(process.env.privateKeyPath)
     const cert = fs.readFileSync(process.env.certPath)
     const ca = fs.readFileSync(process.env.caPath)

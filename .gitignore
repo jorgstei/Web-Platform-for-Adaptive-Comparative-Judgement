@@ -1,5 +1,7 @@
 *env
 *.env
+*.key
+*.cert
 node_modules/
 apidoc/
 REST-tests/

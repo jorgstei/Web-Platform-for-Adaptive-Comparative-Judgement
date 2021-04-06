@@ -5,6 +5,8 @@ else{
     console.log("NO ENV PROVIDED")
 }
 const express = require('express')
+let fs = require('fs')
+const https = require('https')
 const server = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
@@ -45,7 +47,9 @@ mongoose.connect(mongoConnectionString,
     .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))
 
 server.use(cors({
-    origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000"],
+    origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000", "http://compair.it.ntnu.no"
+    , "https://compair.it.ntnu.no", "https://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:5000"
+    ],
     credentials: true
 }))
 server.use(bodyParser.json())
@@ -62,6 +66,17 @@ const surveyAnswerRoute = require('./routes/survey_answer_route')
 server.use("/api/surveyanswer", surveyAnswerRoute)
 
 const userRoute = require('./routes/user_route')
+const { env } = require('process')
 server.use("/api/user", userRoute)
 
-server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000."))
+if(process.env.privateKeyPath != undefined && process.env.certPath != undefined){
+
+    const privateKey = fs.readFileSync(process.env.privateKeyPath)
+    const selfSignedCert = fs.readFileSync(process.env.certPath)
+    
+    const httpsServer = https.createServer({key: privateKey, cert: selfSignedCert}, server)
+    httpsServer.listen(443);
+}
+else{
+    server.listen(process.env.ExpressServerPort, () => console.log("Server running on port 3000."))
+}

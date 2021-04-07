@@ -175,6 +175,7 @@ router.post("/refresh-token", async (req, res) => {
 })
 
 router.post("/refresh-judge-token", async (req, res) => {
+    const cookies = req.cookies
     if (cookies["judge-token"]) {
         console.log("Judge token found")
         jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, async (err, decoded) => {

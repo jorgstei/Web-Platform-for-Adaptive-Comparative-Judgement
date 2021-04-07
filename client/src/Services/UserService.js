@@ -70,7 +70,17 @@ export default class UserService extends Service{
     refreshToken(){
         return axios({
             method: "post",
-            url: this.path.split("api")[0]+"auth/refresh-token",
+            url: this.path.split("api")[0]+"auth/refresh-judge-token",
+            withCredentials: true
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
+    refreshJudgeToken(){
+        return axios({
+            method: "post",
+            url: this.path.split("api")[0]+"auth/refresh-judge-token",
             withCredentials: true
         })
         .then(response => response.data)

@@ -137,38 +137,7 @@ router.post("/refresh-token", async (req, res) => {
         res.sendStatus(401)
         return
     }
-    if (cookies["judge-token"]) {
-        console.log("Judge token found")
-        jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, async (err, decoded) => {
-            if (err) {
-                console.log(err)
-                res.status(401).json({ error: "Not authorized." })
-                return
-            }
-            else {
-                const now = new Date(Date.now())
-                const exp = new Date(now)
-                exp.setMinutes(exp.getMinutes() + 30)
-                const expSeconds = exp.getTime() / 1000
-                const newToken = jwt.sign(
-                    {
-                        exp: expSeconds,
-                        userid: decoded.userid,
-                        role: decoded.role
-                    },
-                    process.env.JWTJudgeSecret
-                )
-                res.set({
-                    "Cache-Control": "no-cache",
-                    "Pragma": "no-cache"
-                })
-                let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
-                res.cookie("judge-token", newToken, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
-                res.status(200).json({ email: decoded.email, userid: decoded.userid, role: decoded.role })
-            }
-        })
-    }
-    else {
+    if(cookes["access-token"]) {
         jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
             if (err) {
                 console.log(err)
@@ -202,6 +171,43 @@ router.post("/refresh-token", async (req, res) => {
                 res.status(200).json({ email: userDoc.email, userid: decoded.userid, role: decoded.role })
             }
         })
+    }
+})
+
+router.post("/refresh-judge-token", async (req, res) => {
+    if (cookies["judge-token"]) {
+        console.log("Judge token found")
+        jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, async (err, decoded) => {
+            if (err) {
+                console.log(err)
+                res.status(401).json({ error: "Not authorized." })
+                return
+            }
+            else {
+                const now = new Date(Date.now())
+                const exp = new Date(now)
+                exp.setMinutes(exp.getMinutes() + 30)
+                const expSeconds = exp.getTime() / 1000
+                const newToken = jwt.sign(
+                    {
+                        exp: expSeconds,
+                        userid: decoded.userid,
+                        role: decoded.role
+                    },
+                    process.env.JWTJudgeSecret
+                )
+                res.set({
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache"
+                })
+                let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
+                res.cookie("judge-token", newToken, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
+                res.status(200).json({ email: decoded.email, userid: decoded.userid, role: decoded.role })
+            }
+        })
+    }
+    else{
+        res.sendStatus(401);
     }
 })
 

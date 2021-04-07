@@ -9,6 +9,45 @@ const mongoose = require('mongoose')
 
 const router = Router()
 
+//Returns -1 on error, otherwise returns the invite code as a number (must be padded with 0's from the left on client side)
+function generateUniqueHashCode(data){
+    //We use a prime number as mod m because it shares no factors
+    const LARGEST_PRIME_BELOW_1M = 999983;
+    const results = Survey.countDocuments({inviteCode: {$ne: -1}})
+    console.log("Total number of surveys that are active with inviteCode: ", results)
+    //If our fillrate is larger than 75%, the cost to find a open key is too expensive, so we have to stop.
+    if(results >= Math.floor(LARGEST_PRIME_BELOW_1M*0.75)){
+        return -1;
+    }
+    let key = 0;
+    for(let i = 0; i < data.length; i++){
+        key += data.charCodeAt(i);
+    }
+    key = Math.pow(key, 11)
+    let result = key%LARGEST_PRIME_BELOW_1M;
+    const firstResult = result;
+    const haveResetOnce = false;
+    let unique = false;
+    while(!unique){
+        const surveyDoc = Survey.findOne({inviteCode: result})
+        if(surveyDoc == undefined || surveyDoc._id == null){
+            unique = true;
+        }
+        else{
+            console.log("WARNING: Generated non-unique invite code")
+            key++;
+            if(key > LARGEST_PRIME_BELOW_1M){
+                if(haveResetOnce && result == firstResult){
+                    return -1;
+                }
+                key = 0;
+                haveResetOnce = true;
+            }
+        }
+    }
+    return result;
+}
+
 /**
  * @apiDefine SuccessGetFullSurveyArray
  * @apiSuccess (200) {Object[]} surveys An array of survey objects
@@ -335,8 +374,12 @@ router.post("/", auth, async (req, res) => {
         return
     }
     try {
+        let inviteCode = -1;
+        if(active === true){
+            inviteCode = generateUniqueHashCode(new mongoose.Types.ObjectId())
+        }
         const survey = await Survey.create({
-            owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+            owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
             purpose, mediaType, accessibility
         })
         if (!survey || !survey._id) {
@@ -406,9 +449,13 @@ router.put("/:id", auth, async (req, res) => {
             }
         })
         items = _items;
+        let inviteCode = -1;
+        if(active === true){
+            inviteCode = generateUniqueHashCode(new mongoose.Types.ObjectId())
+        }
         const surveyReplaceResult = await Survey.updateOne({ _id: req.params.id },
             {
-                owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+                owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
                 purpose, mediaType, accessibility
             }
         )

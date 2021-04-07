@@ -53,6 +53,9 @@ const SurveySchema = new Schema(
             type: [childOwnerSchema],
             required: true
         },
+        inviteCode: {
+            type: Number
+        },
         expectedComparisons:{
             type: Number,
             required: true,

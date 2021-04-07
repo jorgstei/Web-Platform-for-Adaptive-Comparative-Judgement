@@ -35,8 +35,8 @@ function generateUniqueHashCode(data){
         }
         else{
             console.log("WARNING: Generated non-unique invite code")
-            key++;
-            if(key > LARGEST_PRIME_BELOW_1M){
+            result++;
+            if(result > LARGEST_PRIME_BELOW_1M){
                 if(haveResetOnce && result == firstResult){
                     return -1;
                 }

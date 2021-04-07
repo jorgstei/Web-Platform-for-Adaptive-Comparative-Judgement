@@ -137,7 +137,7 @@ router.post("/refresh-token", async (req, res) => {
         res.sendStatus(401)
         return
     }
-    if(cookes["access-token"]) {
+    if(cookies["access-token"]) {
         jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
             if (err) {
                 console.log(err)

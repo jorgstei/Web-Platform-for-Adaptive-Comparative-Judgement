@@ -277,7 +277,7 @@ router.get("/search/:term", auth, async (req, res) => {
 router.post("/forgotten_my_password", async (req, res) => {
     const { email } = req.body
     console.log("Called forgotten my password with email:", email)
-    const userDoc = await User.findOne({ email: email })
+    const userDoc = await User.findOne({ email: {$eq: email} })
     console.log("Forgotten my password userDoc: ", userDoc)
     if (userDoc._id == null) {
         res.sendStatus(404)
@@ -324,7 +324,6 @@ router.patch("/forgotten_password", async (req, res) => {
     console.log("User PATCH (forgotten) password")
     try {
         const { email, newPassword, token } = req.body
-        console.log("email:", email, ", newPassword:", newPassword, "\ntoken:", token)
         const [real, issuedAt] = await verifyForgottenPassword(token, email)
         console.log("Real:", real, ", issuedAt:", issuedAt)
         //If the user supplied email address doesn't match with the one stored in the token, HTTP 422 and early return
@@ -332,7 +331,7 @@ router.patch("/forgotten_password", async (req, res) => {
             res.sendStatus(422)
             return
         }
-        const userDoc = await User.findOne({ email: email })
+        const userDoc = await User.findOne({ email: {$eq: email} })
         //User doesn't exist or does not actually use the requested email
         if (userDoc._id === null || userDoc.email !== email) {
             res.sendStatus(403)
@@ -375,7 +374,7 @@ router.post("/invite_link", auth, async (req, res) => {
         return
     }
     const { email, role } = req.body
-    const userDoc = User.findOne({ email: email })
+    const userDoc = User.findOne({ email: {$eq: email} })
     if (userDoc._id != null) {
         console.log("Tried inviting user that already exists")
         res.status(422).json({ message: "User with that email already exists." })
@@ -494,7 +493,7 @@ router.post("/", async (req, res) => {
         res.sendStatus(422)
         return
     }
-    const userDoc = await User.findOne({ email: email })
+    const userDoc = await User.findOne({ email: {$eq: email} })
     if (userDoc != null && userDoc._id != null) {
         res.status(409).json({ Error: "This registration link has already been used." })
         return
@@ -535,19 +534,21 @@ router.post("/", async (req, res) => {
  */
 router.patch("/:id/email", auth, async (req, res) => {
     console.log("User PUT email")
+    const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+.[^,\/\\\s@]+/
     if (req.role !== "admin" && req.userid !== req.params.id) {
         res.sendStatus(403)
         return
     }
-    const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+.[^,\/\\\s@]+/
-    if (!email_regex.test(req.body.email)) {
+    const re_email = escapeStringRegexp(req.body.email)
+    const me_userId = me(req.params.id)
+    if (!email_regex.test(re_email)) {
         res.sendStatus(422)
         return
     }
     try {
-        const doc = await User.findById(req.params.id)
+        const doc = await User.findById(me_userId)
         if (!doc || doc_id == null) {
-            throw new Error("No user with id: ", req.params.id)
+            throw new Error("No user with id: ", me_userId)
         }
         doc.email = req.body.email
         await doc.save()

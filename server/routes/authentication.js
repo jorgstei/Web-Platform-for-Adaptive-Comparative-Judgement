@@ -3,6 +3,10 @@ const User = require('../models/User')
 const { compareHash } = require("../Utility/hashing")
 const mongoose = require('mongoose')
 const { Router } = require('express')
+const me = require('mongo-escape').escape
+const escapeStringRegexp = require('escape-string-regexp')
+
+
 const router = Router()
 /*
     Expected fields in token:
@@ -88,7 +92,7 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body
     try {
         if (email && password) {
-            const userDoc = await User.findOne({ email: email })
+            const userDoc = await User.findOne({ email: {$eq: email} })
             if (userDoc) {
                 console.log("Found user with email: ", email)
                 if (compareHash(userDoc.hashed, password, userDoc.salt)) {

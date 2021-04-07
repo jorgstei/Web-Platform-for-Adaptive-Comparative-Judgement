@@ -381,9 +381,9 @@ router.post("/", auth, async (req, res) => {
 router.put("/:id", auth, async (req, res) => {
     console.log("called put for survey")
     let {
-        owners, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+        owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
         purpose, mediaType, accessibility
-    } = req.body
+    } = me(req.body)
     const ownerId = req.userid
     const surveyDoc = await Survey.findOne({ _id: req.params.id })
     if (surveyDoc._id == null) {
@@ -408,7 +408,7 @@ router.put("/:id", auth, async (req, res) => {
         items = _items;
         const surveyReplaceResult = await Survey.updateOne({ _id: req.params.id },
             {
-                owners, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+                owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
                 purpose, mediaType, accessibility
             }
         )

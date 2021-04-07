@@ -62,6 +62,16 @@ export default class SurveyAnswerService extends Service{
         .then(response => response.data)
         .catch(error => console.log(error))
     }
+    
+    deleteByJudgeID(id){
+        return axios({
+            method: "delete",
+            url: this.path + "/surveyanswer/judge/"+id,
+            withCredentials: true
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
 }
 
 export let surveyAnswerService = new SurveyAnswerService()

@@ -35,10 +35,6 @@
             viewName: "items",
         },
         {
-            fieldName: "active",
-            viewName: "active",
-        },
-        {
             fieldName: "_id",
             viewName: "id",
         },
@@ -104,7 +100,6 @@
                 email,
                 DD_MM_YYYY_Date,
                 data[i].items.length,
-                data[i].active,
                 data[i]._id,
             ];
             if (

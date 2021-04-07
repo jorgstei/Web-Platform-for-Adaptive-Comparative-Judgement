@@ -211,4 +211,46 @@ router.delete("/:id", auth, async (req, res) => {
     }
 })
 
+/**
+ * @api {delete} /api/surveyanswer/judge/:id
+ * @apiName DELETESurveyanswersByJudge
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The ID of the judge who's answers should be deleted
+ * @apiSuccess (204) 204 No Content, the document was successfully deleted
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (404) 404 Not Found, No documents could be found.
+ * @apiError (500) 500 Internal Server Error
+ */
+ router.delete("/judge/:id", auth, async (req, res) => {
+    console.log("Delete surveyAnswers by judge")
+    const surveyAnswers = await SurveyAnswer.find({judgeId: req.params.id})
+    if(!surveyAnswers || !surveyAnswers.length > 0){
+        res.sendStatus(404)
+        return
+    }
+    const surveyDoc = await Survey.findOne({_id: surveyAnswers[0].surveyId})
+    console.log("delete surveyAnswers: ", surveyAnswers)
+    console.log("delete surveyDoc: ", surveyDoc)
+    if(!surveyDoc || !surveyDoc._id){
+        res.sendStatus(404)
+        return
+    }
+    if(req.role !== "admin" && req.userid !== surveyDoc.ownerId){
+        res.sendStatus(403)
+        return
+    }
+    const surveyAnswersIDs = surveyAnswers.map(e=>e._id);
+    console.log("Survey answer id's to be deleted: ", surveyAnswersIDs)
+    const result = await SurveyAnswer.deleteMany({_id: {$in:surveyAnswersIDs}})
+    console.log("Result from delete answers by judge: ", result);
+    if(result.deletedCount === surveyAnswers.length){
+        res.sendStatus(204)
+    }
+    else{
+        res.sendStatus(500)
+    }
+})
+
 module.exports = router

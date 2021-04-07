@@ -6,6 +6,8 @@
     import queryString from "query-string";
     import {surveyAnswerService} from "../Services/SurveyAnswerService";
     import axios from "axios";
+    import swal from "sweetalert";
+    import {dateFromObjectId} from "../Utility/dateFromObjectId";
 
     export let userInfo;
     
@@ -23,11 +25,21 @@
     });
     
 
-    let linearRankingHeaders = [{fieldName:"", viewName:"option"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"}, {fieldName:"", viewName:"wins"}, {fieldName:"", viewName:"theta"}];
+    let linearRankingHeaders = [
+        {fieldName:"", viewName:"option"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"},
+        {fieldName:"", viewName:"wins"}, {fieldName:"", viewName:"theta"}];
     let linearRanking = null;
-    let allJudgesHeaders = [{fieldName:"", viewName:"id"}, {fieldName:"", viewName:"agree"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"}];
+    let allJudgesHeaders = [
+        {fieldName:"", viewName:"id"}, {fieldName:"", viewName:"agree"}, {fieldName:"", viewName:"infit"},
+        {fieldName:"", viewName:"outfit"}, {fieldName:"", viewName:"Left bias"}, {fieldName:"", viewName:"Right bias"},
+        {fieldName:"", viewName:"Median time per answer"}, {fieldName:"", viewName:"Average time per answer"} ,{fieldName:"", viewName:"delete"}
+    ];
     let allJudges = null;
-    let allItemsHeaders = [{fieldName:"", viewName: "option"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"}, {fieldName:"", viewName:"propscore"}, {fieldName:"", viewName:"theta"}, {fieldName:"", viewName:"wins"}, {fieldName:"", viewName:"losses"}, {fieldName:"", viewName:"total comparisons"}, {fieldName:"", viewName:"option number"}];
+    let allItemsHeaders = [
+        {fieldName:"", viewName: "option"}, {fieldName:"", viewName:"infit"}, {fieldName:"", viewName:"outfit"},
+        {fieldName:"", viewName:"propscore"}, {fieldName:"", viewName:"theta"}, {fieldName:"", viewName:"wins"},
+        {fieldName:"", viewName:"losses"}, {fieldName:"", viewName:"total comparisons"}, {fieldName:"", viewName:"option number"}
+    ];
     let allItems2DArray = null;
     
     let currentContentView = "linearRanking";
@@ -85,7 +97,11 @@
                     }
                     else{
                         linearRanking2DArray.push([answerWithSameId.data, linearRanking[i].infit, linearRanking[i].outfit, linearRanking[i].score, linearRanking[i].theta])
-                        allItems2DArray.push([answerWithSameId.data, linearRanking[i].infit, linearRanking[i].outfit, linearRanking[i].propscore, linearRanking[i].theta,  linearRanking[i].N1, linearRanking[i].N0, linearRanking[i].Ntot, linearRanking[i].id])
+                        allItems2DArray.push([
+                            answerWithSameId.data, linearRanking[i].infit, linearRanking[i].outfit,
+                            linearRanking[i].propscore, linearRanking[i].theta,  linearRanking[i].N1, linearRanking[i].N0,
+                            linearRanking[i].Ntot, linearRanking[i].id
+                        ])
                     }
                 }
                 
@@ -93,9 +109,16 @@
                 linearRanking = linearRanking2DArray;
                 allItems2DArray = allItems2DArray;
                 
+                
+
                 let allJudges2DArray= [];
                 allJudges.forEach(e => {
-                    allJudges2DArray.push([e.judge, e.agree, e.infit, e.outfit]);
+                    const leftBias = getLeftBias(answers, e.judge);
+                    allJudges2DArray.push([
+                        e.judge,e.agree, e.infit, e.outfit, 
+                        leftBias, 1-leftBias, getMedianTime(answers, e.judge) + " seconds", 
+                        getAverageTime(answers, e.judge) + " seconds"
+                    ])
                 });
                 console.log("Transformed all judges from", allJudges, "to", allJudges2DArray);
                 allJudges = allJudges2DArray;
@@ -107,10 +130,43 @@
         .catch(error => console.log("Could not fetch answers for the survey. Failed with error:\n", error))
         
         answerValues = answerValues;
+
     })
     }
     getSurveyAnswers();
 
+
+    const getLeftBias = (answers, judgeId) => {
+        let matchingAnswers = answers.filter(answer => answer.judgeId == judgeId);
+        let totalLeftChoices = 0;
+        matchingAnswers.forEach(e => e.winner == 1 ? totalLeftChoices++: {});
+        return totalLeftChoices/matchingAnswers.length;
+    }
+    
+    const getMedianTime = (answers, judgeId) => {
+        let matchingAnswers = answers.filter(answer => answer.judgeId == judgeId);
+        let timestamps = matchingAnswers.map(e => dateFromObjectId(e._id).getTime()/1000);
+        let differences = [];
+        for (let i = 0; i < timestamps.length-1; i++) {
+            differences.push(timestamps[i+1] - timestamps[i]);
+        }
+        differences.sort((a,b)=>{return b-a});
+        if(differences.length%2==0){
+            return (differences[differences.length/2-1] + differences[differences.length/2]) / 2;
+        }
+        else{
+            return differences[Math.floor(differences.length/2)];
+        }
+    }
+
+    const getAverageTime = (answers, judgeId) => {
+        let matchingAnswers = answers.filter(answer => answer.judgeId == judgeId);
+        let timestamps = matchingAnswers.map(e => {return dateFromObjectId(e._id).getTime()/1000});
+        timestamps.sort((a,b)=>{return a-b});
+        console.log(timestamps);
+        console.log("len-1, 0", timestamps[timestamps.length-1],  timestamps[0])
+        return (timestamps[timestamps.length-1] - timestamps[0])/timestamps.length;
+    }
     
 
     
@@ -130,9 +186,10 @@
     let downloadFunc = (headers, rows, filename)=> {
         console.log("In download func");
         console.log("rows: ", rows);
-        let csvContent = "SEP=, \r\n" + headers.join(',') + "\r\n";
+        let headersString = "";
+        headers.forEach((e)=>headersString+=e.viewName+",");
+        let csvContent = "SEP=, \r\n" + headersString + "\r\n";
         rows.forEach(e => {
-            console.log("E", e);
             csvContent += e.join(",") + "\r\n";
         });
         let blob = new Blob([csvContent], {type: "text/csv;charset=utf-8"});
@@ -216,7 +273,13 @@
         {/if}
     {:else if currentContentView=="byJudge"}
         {#if allJudges != null && allJudges.length > 0}
-            <Table bind:tableData={allJudges} bind:userInfo={userInfo} tableAttributes={allJudgesHeaders} element={csvDownloadByJudgeButton}></Table>
+            <Table bind:tableData={allJudges} bind:userInfo={userInfo} tableAttributes={allJudgesHeaders} element={csvDownloadByJudgeButton} 
+            tableTitle="Judges"
+            deleteFunc={
+                async (id) =>{
+                    await surveyAnswerService.deleteByJudgeID(id);
+                }
+            }></Table>
         {:else}
             <h3>This survey is yet to be answered. Come back once you've gathered some participants, or taken the test yourself!</h3>
         {/if}
@@ -272,3 +335,5 @@
     }
     
     </style>
+
+

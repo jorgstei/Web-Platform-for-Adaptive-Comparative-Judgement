@@ -3,7 +3,7 @@
     import {onMount} from 'svelte'
     import { toast } from "@zerodevx/svelte-toast";
     import { Link } from "svelte-routing";
-import { attr } from "svelte/internal";
+    import { attr } from "svelte/internal";
     export let filterBy = undefined;
     export let tableTitle = undefined;
     // The attributes "data", "edit", "share", "delete" have predefined behaviors. Please be careful with how you use these.
@@ -18,12 +18,16 @@ import { attr } from "svelte/internal";
     console.log("in table",tableData)
 
     async function updateFilterBy(e, attr){
-        console.log("filter before counter:",filterBy)
-        filterBy = {
-            filterName: attr,
-            counter: (filterBy.counter+1)
+        
+        if(!attr.fieldName==""){
+            console.log("filter before counter:",filterBy)
+            filterBy = {
+                filterName: attr.fieldName,
+                counter: (filterBy.counter+1)
+            }
+            console.log("filter after counter:",filterBy)
         }
-        console.log("filter after counter:",filterBy)
+        
     }
     function printTableData(){
         console.log("tableData in Table:",tableData)
@@ -45,7 +49,7 @@ import { attr } from "svelte/internal";
     <table class="main_table">
         <tr id="table_header">
             {#each tableAttributes as attr}
-                <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr.fieldName)}>{attr.viewName}</th>
+                <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>{attr.viewName}</th>
             {/each}
         </tr>
         {#each tableData as row}

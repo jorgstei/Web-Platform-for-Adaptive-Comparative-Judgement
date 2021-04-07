@@ -178,14 +178,12 @@ router.get("/item/:id", async (req, res) => {
                 allUniqueComparisons.push({left: surveyDoc.items[i], right: surveyDoc.items[j]});
             }
         }
-        //console.log("All unique comparisons:\n", allUniqueComparisons);
         // Random indeces to be picked out of allUniqueComparisons
         let randomComparisonIndeces = [];
         let addedIndeces = 0;
         while(addedIndeces < expectedComparisons){
             const randomIndex = Math.floor(Math.random() * allUniqueComparisons.length);
             //Check that comparison hasn't already been chosen,
-            //console.log("RandomIndex = ", randomIndex, "\nArray = ", randomComparisonIndeces);
             if(randomComparisonIndeces.find(e=>e===randomIndex) === undefined){
                 //Add index to array
                 randomComparisonIndeces.push(randomIndex);

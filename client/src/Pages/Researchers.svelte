@@ -9,7 +9,7 @@
   console.log("in researchers");
   const tableFilterParams = {
     countFunction: () => userService.getCount(),
-    limit: 5,
+    limit: 10,
     direction: -1,
     filterFunction: (a, b, c, d) => userService.getSorted(a, b, c, d),
   };

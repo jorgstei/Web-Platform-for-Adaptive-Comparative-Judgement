@@ -5,7 +5,7 @@
     import {userService} from "../Services/UserService";
 
     export let userInfo = undefined;
-    export let limit = 5;
+    export let limit = 10;
     export let currentPage = 0;
     export let filterBy = {filterName: "", counter: 0};
     let oldFilterBy = {filterName: "", counter: 0};
@@ -118,7 +118,7 @@
         <li>
             <select name="limit" id="dropdown-limit" on:change={setLimit}>
                 <option value="5">5</option>
-                <option value="10">10</option>
+                <option value="10" selected>10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>

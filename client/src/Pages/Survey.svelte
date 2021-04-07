@@ -42,6 +42,9 @@
         if(counter < maxCounter){
             counter++;
         }
+        if(counter >= maxCounter){
+            complete();
+        }
     }
 
     let rightChoiceClicked = () => {
@@ -56,6 +59,9 @@
         surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res))
         if(counter < maxCounter){
             counter++;
+        }
+        if(counter >= maxCounter){
+            complete();
         }
     }
 
@@ -130,9 +136,6 @@
             <h1>Thank you for participating!</h1>
             <h2>We greatly appreciate it :)</h2>
         </div>
-        {
-            complete()
-        }
     {/if}
 
 </main>

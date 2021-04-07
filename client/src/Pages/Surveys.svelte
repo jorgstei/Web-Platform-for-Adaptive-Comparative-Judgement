@@ -8,8 +8,8 @@
 
     const tableFilterParams = {
         countFunction: () => surveyService.getCount(),
-        limit: 5,
-        direction: -1,
+        limit: 10,
+        direction: 1,
         filterFunction: (a, b, c, d) => surveyService.getSorted(a, b, c, d),
     };
     let filterBy = {

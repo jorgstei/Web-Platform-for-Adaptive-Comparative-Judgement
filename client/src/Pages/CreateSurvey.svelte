@@ -133,14 +133,11 @@
 
         let info = {
             title: document.getElementById("survey_title").value,
-            internalDescription: document.getElementById("survey_description")
-                .value,
-            judgeInstructions: document.getElementById("judge_instructions")
-                .value,
+            internalDescription: document.getElementById("survey_description").value,
+            judgeInstructions: document.getElementById("judge_instructions").value,
             surveyQuestion: document.getElementById("survey_question").value,
             purpose: document.getElementById("purposeDropdown").value,
-            accessibility: document.getElementById("accessibilityDropdown")
-                .value,
+            accessibility: document.getElementById("accessibilityDropdown").value,
             mediaType: getMediaType(),
             active: document.getElementById("activeCheckbox").checked,
             items: optionsData,
@@ -153,8 +150,18 @@
         let [everyFieldFilled, errorMessage] = validateFormInputs(info);
         console.log(errorMessage);
         if (!everyFieldFilled) {
-            alert("Every field is obligatory.\n" + errorMessage);
+            swal("Invalid input", "Every field is obligatory. " + errorMessage, "error");
         } else {
+            let amountOfUniqueComparisons = 0;
+            let toAdd = 1;
+            while(toAdd < info.items.length){
+                amountOfUniqueComparisons += toAdd;
+                toAdd++;
+            }
+            if(amountOfUniqueComparisons < info.expectedComparisons){
+                swal("Invalid input", "Amount of expected comparisons: " + info.expectedComparisons + " must be less than or equal to amount of possible unique comparisons " + amountOfUniqueComparisons, "error");
+                return
+            }
             console.log(surveyService);
             if (editing) {
                 surveyService

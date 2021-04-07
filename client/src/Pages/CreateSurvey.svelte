@@ -81,6 +81,31 @@
                     });
                 }
                 optionsData = optionsData;
+                const generalInfoForm = document.getElementById("general_info_form");
+                if(generalInfoForm){
+                    console.log("passed createwrapper")
+                    let cancelButton = document.createElement("button");
+                    cancelButton.id = "cancelButton";
+                    cancelButton.innerHTML="Cancel";
+                    cancelButton.onclick = () => {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Are you sure you want to discard your changes to this survey? All your work will be lost.",
+                            icon: "warning",
+                            dangerMode: true,
+                            buttons: ["Nevermind", "Discard"]
+                        })
+                        .then(willDiscard => {
+                            if(willDiscard){
+                                navigate("/admin_board/surveys")
+                            }
+                        })
+                    }
+                    const main_input_wrapper = document.getElementById("main_input_wrapper");
+                    if (main_input_wrapper){
+                        generalInfoForm.insertBefore(cancelButton, main_input_wrapper);
+                    }
+                }
             });
         });
     } else {
@@ -650,5 +675,14 @@
         grid-template-columns: auto;
         grid-column-gap: 2vh;
         margin-right: 1.5vw;
+    }
+    :global(#cancelButton) {
+        background-color: red;
+        width: 10vw;
+        height: 5rem;
+        font-size: 2rem;
+        right: 2vw;
+        top: 10vh;
+        position: fixed;
     }
 </style>

@@ -4,7 +4,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --host --single --http2 --cert /project/certs/cert1.pem --key /project/certs/privkey1.pem" 
+    "prod": "sirv public --host --single --http2 --cert /project/certs/cert1.pem --key /project/certs/privkey1.pem",
+    "start": "sirv public --host --single"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",

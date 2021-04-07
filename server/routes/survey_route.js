@@ -185,14 +185,12 @@ router.get("/item/:id", async (req, res) => {
         while(addedIndeces < expectedComparisons){
             const randomIndex = Math.floor(Math.random() * allUniqueComparisons.length);
             //Check that comparison hasn't already been chosen,
-            console.log("RandomIndex = ", randomIndex, "\nArray = ", randomComparisonIndeces);
+            //console.log("RandomIndex = ", randomIndex, "\nArray = ", randomComparisonIndeces);
             if(randomComparisonIndeces.find(e=>e===randomIndex) === undefined){
                 //Add index to array
                 randomComparisonIndeces.push(randomIndex);
                 addedIndeces++;
-                //console.log("Added index to array!")
             }
-            //console.log("addedindeces: " + addedIndeces);
         }
         let comparisons = [];
         randomComparisonIndeces.forEach(index=>comparisons.push(allUniqueComparisons[index]));

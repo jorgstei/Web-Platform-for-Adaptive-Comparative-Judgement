@@ -77,6 +77,16 @@ export default class UserService extends Service{
         .catch(error => console.log(error))
     }
 
+    refreshJudgeToken(){
+        return axios({
+            method: "post",
+            url: this.path.split("api")[0]+"auth/refresh-judge-token",
+            withCredentials: true
+        })
+        .then(response => response.data)
+        .catch(error => console.log(error))
+    }
+
     patchPassword(id, data){
         return axios({
             method: "patch",

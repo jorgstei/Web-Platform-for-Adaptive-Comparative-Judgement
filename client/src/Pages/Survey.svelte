@@ -45,6 +45,7 @@
         if(counter >= maxCounter){
             complete();
         }
+        userService.refreshJudgeToken();
     }
 
     let rightChoiceClicked = () => {
@@ -63,6 +64,7 @@
         if(counter >= maxCounter){
             complete();
         }
+        userService.refreshJudgeToken();
     }
 
     let complete = () => {

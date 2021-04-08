@@ -66,7 +66,10 @@ router.post("/function/estimate", auth, async (req, res) => {
         }
     )
     .then(response => res.status(200).json(response.data))
-    .catch(response => res.status(500).json(response.response.data))
+    .catch(response => {
+        console.log(response)
+        res.sendStatus(500)
+    })
 
 })
 

@@ -42,7 +42,8 @@ export default {
 		replace({
 			processs: JSON.stringify({
 				envv: {
-					apiBasePath: production ? "https://compair.it.ntnu.no:3000/api" : "http://localhost:3000/api"
+					apiBasePath: production ? "https://compair.it.ntnu.no:3000/api" : "http://localhost:3000/api",
+					estimateServicePath: production ? "http://compair.it.ntnu.no:1030/estimate" : "http://acj.heroesunknown.net:1030/estimate"
 				}
 			})
 		}),

@@ -131,27 +131,29 @@ router.post("/login", async (req, res) => {
 router.post("/refresh-token", async (req, res) => {
     console.log("Called post /refresh-token")
     if (!req.headers.cookie) {
-        console.log("no cookies")
         res.sendStatus(401)
+        console.log("Sent status 401 because no cookies");
         return
     }
     const cookies = req.cookies
-    if (!cookies["access-token"] && !cookies["judge-token"]) {
-        console.log("no cookies")
+    if (!cookies["access-token"]) {
         res.sendStatus(401)
+        console.log("Sent status 401 because no cookies #2");
         return
     }
     if(cookies["access-token"]) {
         jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
             if (err) {
                 console.log(err)
-                res.status(401).json({ error: "Not authorized." })
+                res.sendStatus(401);
+                console.log("Sent status 401 couldnt verify");
                 return
             }
             else {
                 const userDoc = await User.findOne({ _id: decoded.userid })
                 if (!userDoc) {
                     res.sendStatus(401)
+                    console.log("Sent status 401 because no userDoc");
                     return
                 }
                 const now = new Date(Date.now())
@@ -173,9 +175,14 @@ router.post("/refresh-token", async (req, res) => {
                 let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
                 res.cookie("access-token", newToken, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
                 res.status(200).json({ email: userDoc.email, userid: decoded.userid, role: decoded.role })
+                return
             }
         })
     }
+    else{
+        res.sendStatus(401);
+        return
+    }   
 })
 
 router.post("/refresh-judge-token", async (req, res) => {
@@ -218,8 +225,9 @@ router.post("/refresh-judge-token", async (req, res) => {
 
 router.post("/login/judge", async (req, res) => {
     console.log("Called get /login/judge")
-    const { requestedSurveyID, passphrase } = req.body
+    const { requestedSurveyID } = req.body
     try {
+        //TODO actually use requestedSurveyID :)
         if (requestedSurveyID) {
             const now = new Date(Date.now())
             const exp = new Date(now)

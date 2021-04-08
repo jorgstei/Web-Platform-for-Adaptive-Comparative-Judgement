@@ -2,25 +2,23 @@
 	import CostumInput from "../Components/CostumInput.svelte";
 	import queryString from "query-string";
 	import {navigate} from "svelte-routing";
+	import { surveyService } from "../Services/SurveyService";
+	import {navigateWithRefreshToken} from "../Utility/naviagte";
 
-	export let studyTitle;
-	let params = queryString.parse(window.location.search);
-	let page_id = params.id;
+	export let surveyID;
 
-	let validate = (id, actualCode) => {
-		let code = document.getElementById(id);
-		if(code == actualCode){
-
-		}
-		navigate("/quiz");
+	let validate = async () => {
+		let code = document.getElementsByClassName("bigInput")[0].value;
+		surveyID = code;
+		navigate("/survey");
 	}
 </script>
 
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>You've been asked to participate in the judgement of "{studyTitle}"</h2>
-		<CostumInput onClickFunc={validate} funcParams={params} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
+		<h2>You've been asked to participate in judgement</h2>
+		<CostumInput onClickFunc={validate} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 	<!--
 	<Card title="Yo" w="400px" h="400px" alt="Pillars of creation" img="https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/pillars_of_creation.jpg"></Card>

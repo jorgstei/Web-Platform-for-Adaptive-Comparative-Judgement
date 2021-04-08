@@ -9,6 +9,7 @@
     
     export let userInfo;
     export let surveyID;
+    console.log("In survey with surveyid", surveyID);
     let question = "";
     let completed = false
     let navwrap = document.getElementById("navWrapper");

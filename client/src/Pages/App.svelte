@@ -17,34 +17,31 @@
 	import ForgottenPassword from "./ForgottenPassword.svelte";
 	import IntroductionToSurvey from "./IntroductionToSurvey.svelte";
 	import { navigateWithRefreshToken } from "../Utility/naviagte";
+	import { navigate }from "svelte-routing"
 
 	export let url="";
 	let userInfo = null;
 
-	let params = queryString.parse(window.location.search);
-	console.log("PARAMS: ", params)
-	if(params.takeSurvey == 1){
-		if(params.surveyID){
-			surveyService.getSurveyToken(params.surveyID).then(data => {
-				console.log("Get survey Token data: ", data)
-					if(data.role === "judge"){
-						userInfo = data
-						navigateWithRefreshToken("/survey?surveyID="+params.surveyID).then(data => userInfo = data)
-					}
-				}
-			)
+	
+	let surveyID;
+	/*
+	let goToSurvey = () => {
+				
+	
+		else{
+			console.log("userInfo: ", userInfo)
+			console.log("1. Attempting to refresh token")
+			userService.refreshToken().then(data => setUserInfo(data))
 		}
 	}
-	else{
-		console.log("userInfo: ", userInfo)
-		console.log("1. Attempting to refresh token")
-		userService.refreshToken().then(data => setUserInfo(data))
-	}
+	
+	
 
 	function setUserInfo(info){
 		userInfo = info
 		console.log("userInfo: ", userInfo)
 	}
+	*/
 
 	$: userInfo
 </script>
@@ -53,7 +50,7 @@
 	<Navbar bind:userInfo={userInfo}></Navbar>
 
 	<Route path="/">
-		<LandingPage studyTitle="Eksamensoppgave 3b TDAT2001 vår 2020"></LandingPage>
+		<LandingPage bind:surveyID={surveyID}></LandingPage>
 	</Route>
 
 	<Route path="login">
@@ -65,11 +62,11 @@
 	</Route>
 
 	<Route path="survey">
-		<IntroductionToSurvey surveyID={params.surveyID} bind:userInfo={userInfo}/>
+		<IntroductionToSurvey bind:surveyID={surveyID} bind:userInfo={userInfo}/>
 	</Route>
 	
 	<Route path="take_survey">
-		<Survey surveyID={params.surveyID} bind:userInfo={userInfo}/>
+		<Survey bind:surveyID={surveyID} bind:userInfo={userInfo}/>
 	</Route>
 
 	<Route path="create_survey">

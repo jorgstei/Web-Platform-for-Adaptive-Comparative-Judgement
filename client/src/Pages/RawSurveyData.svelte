@@ -110,14 +110,14 @@
                 allItems2DArray = allItems2DArray;
                 
                 
-
+                
                 let allJudges2DArray= [];
                 allJudges.forEach(e => {
                     const leftBias = getLeftBias(answers, e.judge);
                     allJudges2DArray.push([
                         e.judge,e.agree, e.infit, e.outfit, 
-                        leftBias, 1-leftBias, getMedianTime(answers, e.judge) + " seconds", 
-                        getAverageTime(answers, e.judge) + " seconds"
+                        leftBias.toFixed(2), (1-leftBias).toFixed(2), getMedianTime(answers, e.judge).toFixed(2) + " seconds", 
+                        getAverageTime(answers, e.judge).toFixed(2) + " seconds"
                     ])
                 });
                 console.log("Transformed all judges from", allJudges, "to", allJudges2DArray);

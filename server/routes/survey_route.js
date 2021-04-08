@@ -10,10 +10,11 @@ const mongoose = require('mongoose')
 const router = Router()
 
 //Returns -1 on error, otherwise returns the invite code as a number (must be padded with 0's from the left on client side)
-function generateUniqueHashCode(data){
+async function generateUniqueHashCode(data){
+    data = data.toString();
     //We use a prime number as mod m because it shares no factors
     const LARGEST_PRIME_BELOW_1M = 999983;
-    const results = Survey.countDocuments({inviteCode: {$ne: -1}})
+    const results = await Survey.countDocuments({inviteCode: {$ne: -1}})
     console.log("Total number of surveys that are active with inviteCode: ", results)
     //If our fillrate is larger than 75%, the cost to find a open key is too expensive, so we have to stop.
     if(results >= Math.floor(LARGEST_PRIME_BELOW_1M*0.75)){
@@ -29,7 +30,7 @@ function generateUniqueHashCode(data){
     const haveResetOnce = false;
     let unique = false;
     while(!unique){
-        const surveyDoc = Survey.findOne({inviteCode: result})
+        const surveyDoc = await Survey.findOne({inviteCode: result})
         if(surveyDoc == undefined || surveyDoc._id == null){
             unique = true;
         }
@@ -276,6 +277,10 @@ router.get("/:id", auth, async (req, res) => {
         res.status(404).json({ message: "Could not find survey." })
     }
 })
+
+
+
+
 //* @apiSuccess (200) {String} items.type The type of the item (text, pdf, latex)
 //* @apiSuccess (200) {String} items.data The data for the item (for <code>type</code>=text this will be the actual data. For other types this will be a url to fetch the full data)
 
@@ -291,16 +296,25 @@ router.get("/:id", auth, async (req, res) => {
  * @apiError (403) 403 Forbidden
  * @apiError (404) 404 Not Found
  */
-router.get("/judge/:id", async (req, res) => {
+router.get("/judge/:id", auth, async (req, res) => {
     console.log("Called get survey by id as judge");
     try {
-        let survey = await Survey.findOne({ _id: req.params.id }).select(["-internalDescription", "-title"]);
-        const foundOwner = survey.owners.find(owner => owner.ownerId === req.userid)
-        // DELETE THIS, JUST TEST
-        req.role = "judge";
 
-        if (req.role !== "admin" && req.role !== "judge" && req.userid !== foundOwner.ownerId) {
-            res.sendStatus(403)
+        console.log("In judge by id survey:", req.params.id);
+        let survey = undefined;
+        if(req.params.id.length === 6){
+            const code = parseInt(req.params.id, 10);
+            survey = await Survey.findOne({ inviteCode: {$eq: code} }).select(["-internalDescription", "-title"]);
+        }
+        else{
+            
+            survey = await Survey.findOne({ _id: {$eq: req.params.id} }).select(["-internalDescription", "-title"]);
+        }
+        console.log("Survey in get by id as judge: ", survey);
+        const foundOwner = survey.owners.find(owner => owner.ownerId === req.userid)
+
+        if (req.role !== "admin" && req.role !== "judge" && (foundOwner == undefined || req.userid !== foundOwner.ownerId)) {
+            res.sendStatus(403);
             return
         }
         console.log("Survey: ", survey)
@@ -310,12 +324,7 @@ router.get("/judge/:id", async (req, res) => {
         if (!survey.active) {
             throw new Error('survey_route.js GET by id as judge: Survey is not active')
         }
-        if (survey.accessibility == "code") {
-            if (!(req.body.code === survey.code)) {
-                res.sendStatus(403).json("survey_route.js GET by id as judge: Code does not match")
-                return
-            }
-        }
+
         survey.accessibility = undefined;
         survey.purpose = undefined;
         survey.owners = undefined;
@@ -376,7 +385,8 @@ router.post("/", auth, async (req, res) => {
     try {
         let inviteCode = -1;
         if(active === true){
-            inviteCode = generateUniqueHashCode(new mongoose.Types.ObjectId())
+            inviteCode = await generateUniqueHashCode(new mongoose.Types.ObjectId())
+            console.log("Invite code became: ", inviteCode);
         }
         const survey = await Survey.create({
             owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
@@ -451,7 +461,7 @@ router.put("/:id", auth, async (req, res) => {
         items = _items;
         let inviteCode = -1;
         if(active === true){
-            inviteCode = generateUniqueHashCode(new mongoose.Types.ObjectId())
+            inviteCode = await generateUniqueHashCode(new mongoose.Types.ObjectId())
         }
         const surveyReplaceResult = await Survey.updateOne({ _id: req.params.id },
             {

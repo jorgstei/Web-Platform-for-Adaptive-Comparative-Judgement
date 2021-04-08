@@ -2,9 +2,8 @@
     export let fieldTitle;
     export let buttonTitle;
     export let onClickFunc;
-    export let funcParams;
-    
 </script>
+
 <div class="wrapper">
     <label class="inputLabel" for="inp">{fieldTitle}</label>
     <input class="bigInput" name="inp" type="text" maxlength=6>

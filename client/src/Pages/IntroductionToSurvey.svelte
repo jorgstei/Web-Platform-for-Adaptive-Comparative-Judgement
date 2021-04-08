@@ -1,36 +1,46 @@
 <script>
     import { onMount } from "svelte";
-import { navigate } from "svelte-routing";
+    import { navigate } from "svelte-routing";
     import { surveyService } from "../Services/SurveyService";
+    import queryString from "query-string";
 
     export let userInfo;
     export let surveyID;
-    console.log("SurveyID from IntroductionToSurvey.svelte: ", surveyID)
-    console.log("judgeID: ", userInfo.userid)
+    console.log("SurveyID from IntroductionToSurvey.svelte: ", surveyID);
     let navwrap = document.getElementById("navWrapper");
     if(navwrap){
         navwrap.style.display = "none";
     }
 
-
     let survey;
-    onMount(async ()=>{
-        await surveyService.getSurveyByIdAsJudge(surveyID)
-        .then((surveyData)=>{
-            console.log("Survey data from instructions: ", surveyData);
-            survey = surveyData;
-            let questionHeader = document.getElementById("surveyQuestion");
-            questionHeader.innerHTML = survey.surveyQuestion;
-            let textarea  = document.getElementById("judgeInstructionTextArea");
-            textarea.innerHTML = survey.judgeInstructions;
-            textarea.style.height = (textarea.scrollHeight > textarea.clientHeight) ? (textarea.scrollHeight+5)+"px" : "20vh";
-            let text2 = document.getElementById("generalInfoTextArea");
-            text2.innerHTML = "You will be presented with several pairs of items to compare.\nThese items will be answers to the question above, and you should choose the one which best fits your preference. An item can be a text field, pdf, image, etc. To choose an item you can click the button beneath it, or use the arrow keys.\nYou will be asked to answer 10 comparisons!\n\nGood luck!";
-            text2.style.height = (text2.scrollHeight > text2.clientHeight) ? (text2.scrollHeight+5)+"px" : "20vh";
+
+    onMount(async()=>{
+        let params = queryString.parse(window.location.search);
+        if(params.takeSurvey == 1 && params.surveyID != undefined){
+            surveyID = params.surveyID;
+        }
+        await surveyService.getSurveyToken(surveyID).then(async data => {
+            console.log("Get survey Token data: ", data)
+            if(data.role === "judge"){
+                userInfo = data;
+                await surveyService.getSurveyByIdAsJudge(surveyID)
+                .then((surveyData)=>{
+                    surveyID = surveyData._id;
+                    console.log("Survey data from instructions: ", surveyData);
+                    survey = surveyData;
+                    
+                })
+                .catch(err => {console.log(err)})
+            }
         })
-        .catch((err)=>{
-            console.log("Could not get survey by id in instructions\n", err);
-        })
+        let questionHeader = document.getElementById("surveyQuestion");
+        questionHeader.innerHTML = survey.surveyQuestion;
+        let textarea  = document.getElementById("judgeInstructionTextArea");
+        textarea.innerHTML = survey.judgeInstructions;
+        textarea.style.height = (textarea.scrollHeight > textarea.clientHeight) ? (textarea.scrollHeight+5)+"px" : "20vh";
+        let text2 = document.getElementById("generalInfoTextArea");
+        text2.innerHTML = "You will be presented with several pairs of items to compare.\nThese items will be answers to the question above, and you should choose the one which best fits your preference. An item can be a text field, pdf, image, etc. To choose an item you can click the button beneath it, or use the arrow keys.\nYou will be asked to answer 10 comparisons!\n\nGood luck!";
+        text2.style.height = (text2.scrollHeight > text2.clientHeight) ? (text2.scrollHeight+5)+"px" : "20vh";
     })
 
     

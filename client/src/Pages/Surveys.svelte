@@ -35,6 +35,10 @@
             viewName: "items",
         },
         {
+            fieldName: "inviteCode",
+            viewName: "code"
+        },
+        {
             fieldName: "_id",
             viewName: "id",
         },
@@ -95,18 +99,20 @@
             const YYYY_MM_DD_Date = data[i].dateCreated.split("T")[0];
             const DD_MM_YYYY_Date = YYYY_MM_DD_Date.split("-").reverse().join(".");
             //console.log(YYYY_MM_DD_Date, " -> ", DD_MM_YYYY_Date);
+            let strInviteCode = data[i].inviteCode+"";
+            while(strInviteCode.length < 6){
+                strInviteCode = "0"+strInviteCode
+            }
             const arr = [
                 data[i].title,
                 email,
                 DD_MM_YYYY_Date,
                 data[i].items.length,
+                strInviteCode,
                 data[i]._id,
             ];
-            if (
-                !data2DArray.some(
-                    (e) => e[e.length - 1] == arr[arr.length - 1]
-                )
-            ) {
+            
+            if ( !data2DArray.some((e) => e[e.length - 1] == arr[arr.length - 1]) ) {
                 data2DArray.push(arr);
                 data2DArray[i] = data2DArray[i];
             }

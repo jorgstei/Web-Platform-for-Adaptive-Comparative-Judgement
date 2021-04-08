@@ -75,7 +75,7 @@
                     {#if surveyActivityStatus[tableData.findIndex(e=>e==row)] === true}
                         <td class="col"><img title="Copy the judge link to your clipboard." class="small_icon" src="https://w7.pngwing.com/pngs/592/864/png-transparent-computer-icons-icon-design-cut-copy-and-paste-taobao-clothing-promotional-copy-text-rectangle-emoticon-thumbnail.png" alt="Share link button" 
                         on:click={()=>{
-                            navigator.clipboard.writeText(window.location.href.split("/admin_board")[0] + "/?takeSurvey=1&surveyID=" + row[tableAttributes.findIndex(e=>e.viewName=="id")])
+                            navigator.clipboard.writeText(window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + row[tableAttributes.findIndex(e=>e.viewName=="id")])
                             .then(()=>{
                                 toast.push("Link to the survey has been copied to your clipboard!", {duration: 2000});
                             })

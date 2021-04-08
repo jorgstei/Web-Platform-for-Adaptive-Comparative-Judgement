@@ -659,6 +659,7 @@
     }
     #expected_comparisons{
         padding: 1vh;
+        border: 1px solid #ccc;
     }
     #searchWrapper {
         margin-left: 2vw;
@@ -678,9 +679,9 @@
     }
     :global(#cancelButton) {
         background-color: red;
-        width: 10vw;
-        height: 5rem;
-        font-size: 2rem;
+        width: 6vw;
+        height: 4rem;
+        font-size: 1.5rem;
         right: 2vw;
         top: 10vh;
         position: fixed;

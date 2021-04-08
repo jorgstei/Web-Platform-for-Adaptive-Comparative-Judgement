@@ -68,15 +68,7 @@
             });
             console.log("Transformed answer values, attempting to send to analyzing module:\n", answerValues);
 
-            axios.defaults.withCredentials = false;
-            axios(
-                {
-                    headers: {"Content-Type": "text/plain"},
-                    method: "post",
-                    url: "http://acj.heroesunknown.net:1030/estimate",
-                    data: newJSON
-                }
-            )
+            surveyService.estimate(newJSON)
             .then(async (response) => {
                 surveyStatistics = response.data;
                 console.log("Successfully recieved statistics for the survey:\n", surveyStatistics);

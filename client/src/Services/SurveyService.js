@@ -12,6 +12,20 @@ export default class SurveyService extends Service{
         .catch(error => console.log(error))
     }
 
+    estimate(data){
+        return axios(
+            {
+                headers: {"Content-Type": "text/plain"},
+                method: "post",
+                url: processs.envv.estimateServicePath,
+                data: data,
+                withCredentials: false
+            }
+        )
+        .then(response => response)
+        .catch(response => response)
+    }
+
     getSurveyByID(id){
         return axios({
             method: "get",

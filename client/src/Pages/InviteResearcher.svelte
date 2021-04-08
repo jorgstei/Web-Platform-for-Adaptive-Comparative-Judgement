@@ -2,15 +2,13 @@
     import { userService } from "../Services/UserService";
     import swal from 'sweetalert';
     import {navigate} from "svelte-routing"
-    import { Row, Select, MaterialApp } from 'svelte-materialify';
+    import { Row, Select, TextField, Button } from 'svelte-materialify';
     import { navigateWithRefreshToken } from "../Utility/naviagte";
     let showErrorField = false;
     export let userInfo;
 
 
-    const register = () => {
-        const email = document.getElementById("email").value;
-        const role = document.getElementById("role_dropdown").value;
+    const register = (role, email) => {
         const errorField = document.getElementById("errorField");
         
         let [formIsValid, errormsg] = checkValues(email);
@@ -64,34 +62,44 @@
         }
     }
 
-    const items = [
+    const selectItems = [
         {name: "Researcher", value: "researcher"},
         {name: "Admin", value: "admin"}
     ]
-    let value;
-
+    let selectedValue;
+    let txtValue;
 
 </script>
 
 
-<div class="d-flex flex-col justify-center wrapper">
-    <h1>Invite a researcher!</h1>
-        <Row noGutters class="mt-2 ml-16">
-          <Select {items} bind:value>Regular</Select>
-          <p>chosen value: {value}</p>
-        </Row>
-    
-    <select name="role" class="role_dropdown">
-        <option value="researcher">Researcher</option>
-        <option value="admin">Admin</option>
-    </select>
 
-    <label class="inputLabel" for="email">Email</label>
-    <input id="email" class="inputfield" name="email" type="text" on:keydown={registerOnEnterPress}>
-    
-    <button class="submitBtn" on:click={register}>Register user</button>
-    <p id="errorField"></p>
+<div class="d-flex flex-row justify-center">
+    <div class="d-flex flex-column">
+        <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Invite Researcher</h1>
+
+        <Select class="ma-2" items={selectItems} bind:value={selectedValue}>Role</Select>
+        <TextField class="ma-2" bind:value={txtValue}>Email</TextField>
+        <Button class="ma-2 mt-6" outlined on:click={()=>{register(selectedValue, txtValue)}}>Register user</Button>
+        <p id="errorField"></p>
+    </div>
 </div>
+
+
+<!--
+    <div class="wrapper">
+        <h1>Invite a researcher!</h1>
+        <select name="role" class="role_dropdown">
+            <option value="researcher">Researcher</option>
+            <option value="admin">Admin</option>
+        </select>
+    
+        <label class="inputLabel" for="email">Email</label>
+        <input id="email" class="inputfield" name="email" type="text" on:keydown={registerOnEnterPress}>
+        
+        <button class="submitBtn" on:click={register}>Register user</button>
+        
+    </div>
+-->
 
 
 
@@ -101,7 +109,6 @@
         width: 25%;
         margin: auto;
         margin-bottom: 3vh;
-        margin-left: 500px;
     }
     h1 {
 		padding: 0;
@@ -114,15 +121,12 @@
 	}
 
     .wrapper{
-        /*
         max-width: 60vw;
         display: grid;
         grid-template-rows: auto;
         text-align: center;
         background-color: #eee;
         margin-left: 0;
-        */
-        display: flex;
     }
     .inputLabel{
         font-size: 1.5em;

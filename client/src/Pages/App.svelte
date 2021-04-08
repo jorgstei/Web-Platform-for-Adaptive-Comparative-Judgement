@@ -48,7 +48,7 @@
 
 	$: userInfo
 </script>
-<MaterialApp theme="light">
+<MaterialApp>
 	<Router url={url}>
 		<Navbar bind:userInfo={userInfo}></Navbar>
 	
@@ -61,7 +61,7 @@
 		</Route>
 	
 		<Route path="forgotten_password">
-			<ForgottenPassword></ForgottenPassword>
+			<ForgottenPassword bind:userInfo={userInfo}></ForgottenPassword>
 		</Route>
 	
 		<Route path="survey">

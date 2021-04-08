@@ -3,7 +3,10 @@
     import {navigate} from "svelte-routing";
     import queryString from "query-string";
     import swal from 'sweetalert';
+    import { TextField, Button, Icon } from 'svelte-materialify';
+    import { mdiEyeOff, mdiEye } from "@mdi/js";
 
+    export let userInfo;
     export let resetPassword = false;
     let token = null
     const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
@@ -21,10 +24,13 @@
         console.log("Forgotten password token:", token)
     }
     let showErrorField = false;
-
+    let email;
+    let pw1;
+    let pw2;
+    let showpw1;
+    let showpw2;
 
     const sendForgottenPasswordLink = () => {
-        const email = document.getElementById("email").value;
         let [formIsValid, errormsg] = checkValues();
         if(formIsValid){
             userService.sendForgottenPasswordLink({email: email}).then(res => {
@@ -47,8 +53,6 @@
     }
 
     const changeThePassword = () => {
-        const pw1 = document.getElementById("pw1").value;
-        const email = document.getElementById("email").value;
         const errorField = document.getElementById("errorField");
         let [formIsValid, errormsg] = checkValues();
         if(formIsValid){
@@ -65,6 +69,7 @@
             })
             .catch((err)=>{
                 console.log("Failed to patch password. Error:\n", err);
+                swal("Invalid password!", "err", "error")
             })
         }
         else{
@@ -75,11 +80,6 @@
     }
 
     function checkResetPasswordFields(){
-        const email = document.getElementById("email").value;
-        const pw1 = document.getElementById("pw1").value;
-        const pw2 = document.getElementById("pw2").value;
-
-
         // Checks if each field has a value
         if(email === "" || pw1 === "" || pw2 === ""){
             return {
@@ -121,7 +121,6 @@
     }
 
     function checkSendForgottenpasswordLinkFields(){
-        const email = document.getElementById("email").value;
         if(email.length > 64){
             return {
                 valid:false,
@@ -166,7 +165,7 @@
 
     const loginOnEnterPress = (e) => {
         if(e.keyCode == 13){
-            login();
+            resetPassword ? changeThePassword() : sendForgottenPasswordLink();
         }
     }
 
@@ -174,29 +173,49 @@
         document.getElementById("errorField").innerHTML = "";
     }
 
+    
 </script>
 
 <main>
-    <div class="wrapper">
-        <h1>Forgotten password</h1>
-        {#if resetPassword == false}
-        <h2>Submit your email below to recieve an email with instructions on how to create a new password</h2>
-        {:else}
-        <h2>Please fill in the email address your account was created with,<br>then create a new password and repeat it in the following fields. </h2>
-        {/if}
-        <label class="inputLabel" for="email">Email</label>
-        <input id="email" class="inputfield" name="email" type="text" on:keydown={loginOnEnterPress} on:input={clearErrorField}>
-        {#if resetPassword == true}
-            <label class="inputLabel" for="pw1">New password</label>
-            <input id="pw1" class="inputfield" name="pw1" type="password" on:input={clearErrorField}>
+    <div class="d-flex flex-row justify-center">
+        <div class="d-flex flex-column">
+            <h1 class="text-h1 ma-2">Forgotten password</h1>
+            {#if resetPassword == false}
+            <h2 class="text-h2 ma-2">Submit your email below to recieve an email with instructions on how to create a new password</h2>
+            {:else}
+            <h2 class="text-h2 ma-2">Please fill in the email address your account was created with, then create a new password and repeat it in the following fields. </h2>
+            {/if}
+            <TextField class="ma-2" bind:value={email} on:keydown={loginOnEnterPress} on:input={clearErrorField}>Email</TextField>
+            <!--
+                <label class="inputLabel" for="email">Email</label>
+                <input id="email" class="inputfield" name="email" type="text" on:keydown={loginOnEnterPress} on:input={clearErrorField}>
+            -->
+            {#if resetPassword == true}
 
-            <label class="inputLabel" for="pw2">Repeat new password</label>
-            <input id="pw2" class="inputfield" name="pw2" type="password" on:input={clearErrorField}>
-        {/if}
-        <p id="errorField"></p>
-        <button class="submitBtn" on:click={resetPassword ? changeThePassword : sendForgottenPasswordLink}>
-        {resetPassword ? "Change Password" : "Send reset password link"}
-        </button>      
+                <TextField type={showpw1 ? "text" : "password"} class="ma-2" bind:value={pw1} on:keydown={loginOnEnterPress} on:input={clearErrorField}>
+                    New password
+                    <div
+                        slot="append"
+                        on:click={() => (showpw1 = !showpw1)}
+                    >
+                        <Icon path={showpw1 ? mdiEyeOff : mdiEye} />
+                    </div>
+                </TextField>
+
+                <TextField type={showpw2 ? "text" : "password"} class="ma-2" bind:value={pw2} on:keydown={loginOnEnterPress} on:input={clearErrorField}>
+                    Repeat new password
+                    <div
+                        slot="append"
+                        on:click={() => (showpw2 = !showpw2)}
+                    >
+                        <Icon path={showpw2 ? mdiEyeOff : mdiEye} />
+                    </div>
+                </TextField>
+            {/if}
+            <p id="errorField"></p>
+            <Button class="ma-2 mt-6" outlined on:click={()=>{resetPassword ? changeThePassword() : sendForgottenPasswordLink()}}>{resetPassword ? "Change Password" : "Send reset password link"}</Button>
+            
+        </div>
     </div>
 </main>
 

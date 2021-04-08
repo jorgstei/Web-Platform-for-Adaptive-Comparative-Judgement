@@ -13,13 +13,13 @@ export default class SurveyService extends Service{
     }
 
     estimate(data){
+        console.log("Data sent to function/esitmate:",data)
         return axios(
             {
-                headers: {"Content-Type": "text/plain"},
                 method: "post",
-                url: processs.envv.estimateServicePath,
+                url: this.path + "/survey/function/estimate",//processs.envv.estimateServicePath,
                 data: data,
-                withCredentials: false
+                withCredentials: true
             }
         )
         .then(response => response)

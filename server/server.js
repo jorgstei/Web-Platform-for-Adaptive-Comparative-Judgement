@@ -48,7 +48,7 @@ mongoose.connect(mongoConnectionString,
 
 server.use(cors({
     origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000", "http://compair.it.ntnu.no"
-    , "https://compair.it.ntnu.no", "https://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:5000"
+    , "https://compair.it.ntnu.no", "https://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:1030"
     ],
     credentials: true
 }))

@@ -1,9 +1,10 @@
-const { Router } = require('express')
+const { Router, response } = require('express')
 const Survey = require('../models/Survey')
 const SurveyAnswer = require("../models/SurveyAnswer")
 const { auth } = require("./authentication")
 const me = require('mongo-escape').escape
 const escapeStringRegexp = require('escape-string-regexp')
+const axios = require('axios')
 
 const mongoose = require('mongoose')
 
@@ -48,6 +49,26 @@ async function generateUniqueHashCode(data){
     }
     return result;
 }
+
+router.post("/function/estimate", auth, async (req, res) => {
+    console.log("Called survey/function/estimate")
+    if(req.role !== "admin" && req.role !== "researcher"){
+        res.sendStatus(401)
+        return;
+    }
+    axios(
+        {
+            headers: {"Content-Type": "text/plain"},
+            method: "post",
+            url: process.env.estimateServicePath,
+            data: req.body,
+            withCredentials: false
+        }
+    )
+    .then(response => res.status(200).json(response.data))
+    .catch(response => res.status(500).json(response.response.data))
+
+})
 
 /**
  * @apiDefine SuccessGetFullSurveyArray

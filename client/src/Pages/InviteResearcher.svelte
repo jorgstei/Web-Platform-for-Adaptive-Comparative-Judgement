@@ -2,7 +2,8 @@
     import { userService } from "../Services/UserService";
     import swal from 'sweetalert';
     import {navigate} from "svelte-routing"
-import { navigateWithRefreshToken } from "../Utility/naviagte";
+    import { Row, Select, MaterialApp } from 'svelte-materialify';
+    import { navigateWithRefreshToken } from "../Utility/naviagte";
     let showErrorField = false;
     export let userInfo;
 
@@ -63,16 +64,28 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
         }
     }
 
+    const items = [
+        {name: "Researcher", value: "researcher"},
+        {name: "Admin", value: "admin"}
+    ]
+    let value;
+
 
 </script>
 
 
-<div class="wrapper">
+<div class="d-flex flex-col justify-center wrapper">
     <h1>Invite a researcher!</h1>
-    <select name="role" id="role_dropdown">
+        <Row noGutters class="mt-2 ml-16">
+          <Select {items} bind:value>Regular</Select>
+          <p>chosen value: {value}</p>
+        </Row>
+    
+    <select name="role" class="role_dropdown">
         <option value="researcher">Researcher</option>
         <option value="admin">Admin</option>
     </select>
+
     <label class="inputLabel" for="email">Email</label>
     <input id="email" class="inputfield" name="email" type="text" on:keydown={registerOnEnterPress}>
     
@@ -84,10 +97,11 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
 
 
 <style>
-    #role_dropdown {
+    .role_dropdown {
         width: 25%;
         margin: auto;
         margin-bottom: 3vh;
+        margin-left: 500px;
     }
     h1 {
 		padding: 0;
@@ -100,12 +114,15 @@ import { navigateWithRefreshToken } from "../Utility/naviagte";
 	}
 
     .wrapper{
+        /*
         max-width: 60vw;
         display: grid;
         grid-template-rows: auto;
         text-align: center;
         background-color: #eee;
         margin-left: 0;
+        */
+        display: flex;
     }
     .inputLabel{
         font-size: 1.5em;

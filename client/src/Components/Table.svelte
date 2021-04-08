@@ -44,7 +44,7 @@
 </script>
 <div class="container">
     {#if tableTitle}
-    <h1>{tableTitle}</h1>
+    <h3>{tableTitle}</h3>
     {/if}
     <table class="main_table">
         <tr id="table_header">
@@ -79,6 +79,7 @@
                             .then(()=>{
                                 toast.push("Link to the survey has been copied to your clipboard!", {duration: 2000});
                             })
+                            .catch(err=> console.log(err));
                         }}></td>
                     {:else}
                         <td class="col disabledLink"><img title="The survey must be made active in order for judges to start answering it." class="small_icon" src="../img/disabled_share.png" alt="Share link button"></td>
@@ -150,6 +151,7 @@
 
 <style>
 .container {
+    margin-top:5vh;
     max-width: 90vw;
     margin-left: auto;
     margin-right: auto;

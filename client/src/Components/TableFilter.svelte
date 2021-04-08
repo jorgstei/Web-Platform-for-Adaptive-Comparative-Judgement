@@ -116,7 +116,7 @@
             <label class="label-hori" for="dropdown-limit">Limit:</label>
         </li>
         <li>
-            <select name="limit" id="dropdown-limit" on:change={setLimit}>
+            <select name="limit" id="dropdown-limit" on:change={setLimit} title="Entries per page">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
                 <option value="25">25</option>
@@ -125,21 +125,20 @@
             </select>
         </li>
         <li>
-            <img class="navigate-image" on:click={gotoFirstPage} src="/img/arrow-end-left.svg" alt="Go to first page">
+            <img class="navigate-image" on:click={gotoFirstPage} src="/img/arrow-end-left.svg" alt="Go to first page" title="Go to first page">
         </li>
         <li>
-            <img class="navigate-image" on:click={goBackOnePage} src="/img/triangle-left-arrow.svg" alt="Go back one page">
+            <img class="navigate-image" on:click={goBackOnePage} src="/img/triangle-left-arrow.svg" alt="Go back one page" title="Go back one page">
         </li>
         <li>
-            <input class="goto-page-input" type="text" placeholder={currentPage} on:input={validateGotoPageInput} value={currentPage} maxlength=5>
+            <input class="goto-page-input" type="text" placeholder={currentPage} on:input={validateGotoPageInput} value={currentPage} maxlength=5 title="Page number">
         </li>
         <li>
-            <img class="navigate-image" on:click={goForwardOnePage} src="/img/triangle-right-arrow.svg" alt="Go forward one page">
+            <img class="navigate-image" on:click={goForwardOnePage} src="/img/triangle-right-arrow.svg" alt="Go forward one page" title="Go forward one page">
         </li>
         <li>
-            <img class="navigate-image" on:click={gotoLastPage} src="/img/arrow-end-right.svg" alt="Go to last page">
+            <img class="navigate-image" on:click={gotoLastPage} src="/img/arrow-end-right.svg" alt="Go to last page" title="Go to last page">
         </li>
-        
     </ul>
 </div>
 

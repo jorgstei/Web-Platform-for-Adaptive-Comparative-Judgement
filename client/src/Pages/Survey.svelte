@@ -6,6 +6,7 @@
     import {navigate} from "svelte-routing";
     import {navigateWithRefreshToken} from "../Utility/naviagte"
     import { onMount } from "svelte";
+import swal from "sweetalert";
     
     export let userInfo;
     export let surveyID;
@@ -39,7 +40,7 @@
             winner: 1,
         }
         console.log("Sending left answer: ", answer);
-        surveyAnswerService.post(answer).then(res => console.log("Posted answer, leftChoiceClicked, Response: ", res))
+        surveyAnswerService.post(answer).then(res => console.log("Posted answer, leftChoiceClicked, Response: ", res)).catch(err => swal("Something went wrong..", "Could not post answer. Recieved error:\n" + err, "error"));
         if(counter < maxCounter){
             counter++;
         }
@@ -58,7 +59,7 @@
             rightOption: randomPair[counter].right._id,
             winner: 0,
         }
-        surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res))
+        surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res)).catch(err => swal("Something went wrong..", "Could not post answer. Recieved error:\n" + err, "error"));
         if(counter < maxCounter){
             counter++;
         }
@@ -86,7 +87,8 @@
 
     onMount(() => {
         surveyService.getSurveyByIdAsJudge(surveyID)
-        .then(data=>question=data.surveyQuestion);
+        .then(data=>question=data.surveyQuestion)
+        .catch(err => swal("Something went wrong..", "Could not get survey info. If the problem persists, please contact an administrator.", "error"));
         let main = document.getElementById("surveyWrapper");
         main.focus();
         let arrowHandler = (e) => {

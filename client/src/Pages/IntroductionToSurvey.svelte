@@ -3,6 +3,9 @@
     import { navigate } from "svelte-routing";
     import { surveyService } from "../Services/SurveyService";
     import queryString from "query-string";
+    
+    import { Button } from 'svelte-materialify';
+
 
     export let userInfo;
     export let surveyID;
@@ -33,6 +36,7 @@
                 .catch(err => {console.log(err)})
             }
         })
+        .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error"));
         let questionHeader = document.getElementById("surveyQuestion");
         questionHeader.innerHTML = survey.surveyQuestion;
         let textarea  = document.getElementById("judgeInstructionTextArea");
@@ -62,9 +66,9 @@
         <h3>How a survey works:</h3>
         <textarea readonly id="generalInfoTextArea"></textarea>
     </div>
-    <button id="startTest" 
+    <Button outlined id="startTest" 
     on:click={() => {navigate("/take_survey")}}
-    >Take survey</button>
+    >Take survey</Button>
     
 </main>
 

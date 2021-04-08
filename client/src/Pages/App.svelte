@@ -18,6 +18,7 @@
 	import IntroductionToSurvey from "./IntroductionToSurvey.svelte";
 	import { navigateWithRefreshToken } from "../Utility/naviagte";
 	import { navigate }from "svelte-routing"
+	import { MaterialApp } from 'svelte-materialify';
 
 	export let url="";
 	let userInfo = null;
@@ -45,54 +46,54 @@
 
 	$: userInfo
 </script>
-
-<Router url={url}>
-	<Navbar bind:userInfo={userInfo}></Navbar>
-
-	<Route path="/">
-		<LandingPage bind:surveyID={surveyID}></LandingPage>
-	</Route>
-
-	<Route path="login">
-		<LoginPage newUser="false" bind:userInfo={userInfo}></LoginPage>
-	</Route>
-
-	<Route path="forgotten_password">
-		<ForgottenPassword></ForgottenPassword>
-	</Route>
-
-	<Route path="survey">
-		<IntroductionToSurvey bind:surveyID={surveyID} bind:userInfo={userInfo}/>
-	</Route>
+<MaterialApp theme="light">
+	<Router url={url}>
+		<Navbar bind:userInfo={userInfo}></Navbar>
 	
-	<Route path="take_survey">
-		<Survey bind:surveyID={surveyID} bind:userInfo={userInfo}/>
-	</Route>
-
-	<Route path="create_survey">
-		<CreateSurvey userInfo={userInfo}></CreateSurvey>
-	</Route>
-
-	<Route path="about">
-		<AboutProject></AboutProject>
-	</Route>
-
-	<Route path="register_account">
-		<RegisterAccount></RegisterAccount>
-	</Route>
-
-	<Route path="test">
-		<UserServiceTest/>
-	</Route>
-
-	<Route path="admin_board/*">
-		<AdminBoard bind:userInfo={userInfo}/>
-	</Route>
-
+		<Route path="/">
+			<LandingPage bind:surveyID={surveyID}></LandingPage>
+		</Route>
 	
+		<Route path="login">
+			<LoginPage newUser="false" bind:userInfo={userInfo}></LoginPage>
+		</Route>
+	
+		<Route path="forgotten_password">
+			<ForgottenPassword></ForgottenPassword>
+		</Route>
+	
+		<Route path="survey">
+			<IntroductionToSurvey bind:surveyID={surveyID} bind:userInfo={userInfo}/>
+		</Route>
+		
+		<Route path="take_survey">
+			<Survey bind:surveyID={surveyID} bind:userInfo={userInfo}/>
+		</Route>
+	
+		<Route path="create_survey">
+			<CreateSurvey userInfo={userInfo}></CreateSurvey>
+		</Route>
+	
+		<Route path="about">
+			<AboutProject></AboutProject>
+		</Route>
+	
+		<Route path="register_account">
+			<RegisterAccount></RegisterAccount>
+		</Route>
+	
+		<Route path="test">
+			<UserServiceTest/>
+		</Route>
+	
+		<Route path="admin_board/*">
+			<AdminBoard bind:userInfo={userInfo}/>
+		</Route>
+	
+	</Router>
+	<SvelteToast options={{ reversed: true, intro: { y: 192 } }} />
+</MaterialApp>
 
-</Router>
-<SvelteToast options={{ reversed: true, intro: { y: 192 } }} />
 
 
 <style>

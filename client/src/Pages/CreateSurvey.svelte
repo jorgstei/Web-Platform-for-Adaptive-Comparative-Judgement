@@ -217,7 +217,7 @@
                     })
                     .catch((err) => {
                         console.log(err);
-                        swal("Failed to submit survey! ", "error");
+                        swal("Failed to edit survey.", "Please try again, and contact an administator if it still doesn't work. Error:\n" + err, "error");
                     });
             } else {
                 surveyService
@@ -245,7 +245,7 @@
                     })
                     .catch((err) => {
                         console.log(err);
-                        swal("Failed to create survey.", "error");
+                        swal("Failed to create survey.", "Please try again, and contact an administator if it still doesn't work. Error:\n" + err, "error");
                     });
             }
         }

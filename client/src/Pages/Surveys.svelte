@@ -88,6 +88,7 @@
                 });
             }
             activeStatus.push(data[i].active);
+            console.log("Pushed active status", data[i].active, "from survey", data[i]);
             let email = "No owner";
             if (
                 data[i].users != undefined &&

@@ -215,11 +215,13 @@ router.post("/refresh-judge-token", async (req, res) => {
                 let expMillis = exp.getTime() - now.getTime(); //Cookie max age converts milliseconds from creation into expires at DateTime
                 res.cookie("judge-token", newToken, { httpOnly: true, maxAge: expMillis, sameSite: "lax" })
                 res.status(200).json({ email: decoded.email, userid: decoded.userid, role: decoded.role })
+                return;
             }
         })
     }
     else{
         res.sendStatus(401);
+        return
     }
 })
 

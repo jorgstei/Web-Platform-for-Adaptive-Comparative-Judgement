@@ -22,7 +22,9 @@
 	export let url="";
 	let userInfo = null;
 
-	
+	if(userInfo == undefined || userInfo == null){
+		userService.refreshToken().then(data => userInfo = data)
+	}
 	let surveyID;
 	/*
 	let goToSurvey = () => {

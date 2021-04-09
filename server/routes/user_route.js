@@ -17,17 +17,17 @@ const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|
 
 function acceptablePassword(password, role){
     //8 chars, one letter and one number
-    const pwResearcherRegex = /(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)/;
+    const pwResearcherRequirement = /(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)/;
     //10 chars, 1 upper letter, 1 lower letter, one number
-    const pwAdminRegex = /(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10,}$)/;
+    const pwAdminRequirement = /(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10,}$)/;
     if(role === "admin"){
-        if(pwAdminRegex.test(password)){
+        if(pwAdminRequirement.test(password)){
             return true
         }
         return false
     }
     if(role === "researcher"){
-        if(pwResearcherRegex.test(password)){
+        if(pwResearcherRequirement.test(password)){
             return true
         }
         return false
@@ -239,9 +239,10 @@ router.get("/function/sort", auth, async (req, res) => {
  * @apiUse AuthMiddleware
  * @apiError (500) 500 Internal Server Error
  */
-router.get("/search/:term", auth, async (req, res) => {
+router.post("/search/:term", auth, async (req, res) => {
     const term = me(req.params.term)
     const regex = escapeStringRegexp(term)
+    const {me_limit} = me(req.body)
     if (regex.length > 64) {
         res.status(422).json({message: "Max search term length is 64 characters."})
         return
@@ -254,9 +255,9 @@ router.get("/search/:term", auth, async (req, res) => {
                     { firstName: { $regex: regex, $options: 'i' } },
                     { lastName: { $regex: regex, $options: 'i' } },
                     { email: { $regex: regex, $options: 'i' } }
-                ]
-            }
-        ).select(["-hashed", "-salt"])
+                ],
+            },
+        ).limit(me_limit).select(["-hashed", "-salt"])
         res.json(users)
     } catch (error) {
         console.log("Error while searching users:", error)

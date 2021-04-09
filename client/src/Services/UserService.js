@@ -131,10 +131,11 @@ export default class UserService extends Service{
         .catch(error => error.response)
     }
 
-    search(term){
+    search(term, data){
         return axios({
-            method: "get",
+            method: "post",
             url: "http://localhost:3000/api/user/search/"+term,
+            data: data,
             withCredentials: true
         })
         .then(response => response)

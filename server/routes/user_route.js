@@ -131,7 +131,7 @@ router.get("/function/count", auth, async (req, res) => {
     console.log("Get count of users")
     try{
         if (req.role !== "admin") {
-            res.sendStatus(403)
+            res.status(403).json({message:"Forbidden"})
             return
         }
         if(req.role === "admin"){
@@ -140,7 +140,7 @@ router.get("/function/count", auth, async (req, res) => {
         }
     } catch(error){
         console.log("user/function/count error:",error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -182,11 +182,11 @@ router.get("/function/sort", auth, async (req, res) => {
     const me_direction = Number(me(direction))
 
     if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
-        res.sendStatus(400)
+        res.status(400).json({message: "Missing fields."})
         return
     }
     if (me_skip < 0 || me_limit < 1 || (me_direction != 1 && me_direction != -1)) {
-        res.sendStatus(422)
+        res.status(422).json({message: "Skip or Limit invalid values."})
         return
     }
     try {
@@ -219,7 +219,7 @@ router.get("/function/sort", auth, async (req, res) => {
         ).then(result => res.json(result))
     } catch (error) {
         console.log("Error sorting users:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -243,7 +243,7 @@ router.get("/search/:term", auth, async (req, res) => {
     const term = me(req.params.term)
     const regex = escapeStringRegexp(term)
     if (regex.length > 64) {
-        res.sendStatus(422)
+        res.status(422).json({message: "Max search term length is 64 characters."})
         return
     }
     var timeStart = process.hrtime()
@@ -260,7 +260,7 @@ router.get("/search/:term", auth, async (req, res) => {
         res.json(users)
     } catch (error) {
         console.log("Error while searching users:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
     var timeEnd = process.hrtime(timeStart)
     console.log("Search with term:", regex, ", took: ", timeEnd[1] / 1000000, "ms")
@@ -304,9 +304,8 @@ router.post("/forgotten_my_password", async (req, res) => {
         res.sendStatus(204)
     } catch (error) {
         console.log("forgotten password error: ", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
-
 })
 
 /**
@@ -428,7 +427,7 @@ router.get("/", auth, async (req, res) => {
     console.log("Called get all for User")
     try {
         if (req.role !== "admin") {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const users = await User.find().select(["-hashed", "-salt"])
@@ -461,7 +460,7 @@ router.get("/:id", auth, async (req, res) => {
     console.log("Called get user by id")
     try {
         if (req.role !== "admin" && req.role !== "researcher") {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const user = await User.findOne({ _id: req.params.id }).select(["-hashed", "-salt"])
@@ -497,17 +496,17 @@ router.post("/", async (req, res) => {
     const [real, role] = await verifyUserRegistration(token, email)
     console.log("New user role:", role)
     if(!acceptablePassword(password, role)){
-        res.sendStatus(422)
+        res.status(422).json({message: "Password too weak."})
         return
     }
     const userDoc = await User.findOne({ email: {$eq: email} })
     if (userDoc != null && userDoc._id != null) {
-        res.status(409).json({ Error: "This registration link has already been used." })
+        res.status(409).json({ message: "This registration link has already been used." })
         return
     }
     if (real == false) {
         console.log("Requestee is not the real invited person")
-        res.sendStatus(403)
+        res.status(403).json({message: "Wrong email address."})
         return
     }
     const result = hash(password)
@@ -543,13 +542,13 @@ router.patch("/:id/email", auth, async (req, res) => {
     console.log("User PUT email")
     const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+.[^,\/\\\s@]+/
     if (req.role !== "admin" && req.userid !== req.params.id) {
-        res.sendStatus(403)
+        res.status(403).json({message: "Forbidden"})
         return
     }
     const re_email = escapeStringRegexp(req.body.email)
     const me_userId = me(req.params.id)
     if (!email_regex.test(re_email)) {
-        res.sendStatus(422)
+        res.status(422).json({message: "Invalid email address."})
         return
     }
     try {
@@ -561,7 +560,7 @@ router.patch("/:id/email", auth, async (req, res) => {
         await doc.save()
         res.sendStatus(204)
     } catch (error) {
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find user."})
     }
 })
 
@@ -624,7 +623,7 @@ router.patch("/:id/change_password", auth, async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
     console.log("Called delete user by id with id: " + req.userid);
     if (req.role !== "admin" && req.userid !== req.params.id) {
-        res.sendStatus(403)
+        res.status(403).json({message: "Forbidden"})
         return
     }
     const result = await User.deleteOne({ _id: req.params.id })
@@ -644,7 +643,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(204)
     }
     else {
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find user."})
     }
 })
 

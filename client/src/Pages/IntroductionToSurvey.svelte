@@ -52,20 +52,23 @@
 </script>
 
 <main>
-    <div id="titleWrapper">
-        <h1>You've been asked to participate in this survey!</h1>
-        <h2>The question is:</h2>
-        <h1 id="surveyQuestion"></h1>
+    
+    <div class="d-flex flex-column " >
+        <h1 class="text-h2">You've been asked to participate in this survey!</h1>
+        <h2 class="text-h3">The question is:</h2>
+        <h1 class="text-h2" id="surveyQuestion"></h1>
+
+        <div class="d-flex flex-row justify-space-between">
+            <h3>Researcher instructions:</h3>
+            <textarea id="judgeInstructionTextArea" readonly></textarea>
+
+            <h3>How a survey works:</h3>
+            <textarea readonly id="generalInfoTextArea"></textarea>
+        </div>
+
     </div>
     
-    <div id="judgeInstructionsWrapper">
-        <h3>Researcher instructions:</h3>
-        <textarea id="judgeInstructionTextArea" readonly></textarea>
-    </div>
-    <div id="generalInfoWrapper">
-        <h3>How a survey works:</h3>
-        <textarea readonly id="generalInfoTextArea"></textarea>
-    </div>
+    
     <Button outlined id="startTest" 
     on:click={() => {navigate("/take_survey")}}
     >Take survey</Button>

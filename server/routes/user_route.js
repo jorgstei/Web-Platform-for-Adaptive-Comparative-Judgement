@@ -229,6 +229,7 @@ router.get("/function/sort", auth, async (req, res) => {
  * @apiGroup User
  * @apiVersion 0.1.0
  * @apiParam (Parameter) {String{1-64}} term The term which the user object fields will be matched against.
+ * @apiParam (Body) {Number{1-..}} limit Number of results to return after searching.
  * @apiSuccess (200) {Object[]} users An array of user objects
  * @apiSuccess (200) {String} users.email The users registered email
  * @apiSuccess (200) {String} users.firstName The users first name
@@ -257,7 +258,7 @@ router.post("/search/:term", auth, async (req, res) => {
                     { email: { $regex: regex, $options: 'i' } }
                 ],
             },
-        ).limit(me_limit).select(["-hashed", "-salt"])
+        ).sort({_id: -1}).limit(me_limit).select(["-hashed", "-salt"])
         res.json(users)
     } catch (error) {
         console.log("Error while searching users:", error)

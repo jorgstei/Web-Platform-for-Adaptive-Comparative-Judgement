@@ -434,6 +434,11 @@
 
 <div id="create_wrapper">
     <div id="general_info_form">
+        {#if editing}
+            <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Edit Survey: {surveyTitleValue}</h1>
+        {:else}
+            <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Create Survey</h1>
+        {/if}
         <div id="main_input_wrapper">
             {#if editing}
                 <Button fab style="right: 2vw; top:7vh; position: fixed; min-width:4vw; min-height:4vw;" on:click={()=>{

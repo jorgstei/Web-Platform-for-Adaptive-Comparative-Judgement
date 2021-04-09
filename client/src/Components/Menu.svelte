@@ -37,7 +37,7 @@
 
 {#if userInfo != null && userInfo != undefined}
 <NavigationDrawer style="position: fixed; margin-top:5vh;margin-right:auto;z-index:2;">
-    <h4 class="text-h4 mb-2 mt-2">Menu</h4>
+    <h4 class="text-h4 mb-2 mt-6">Menu</h4>
     <List nav dense>
         <ListItemGroup>
             {#each menuItems as item}

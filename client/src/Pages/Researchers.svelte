@@ -73,6 +73,7 @@
   <ProgressCircular color="white" indeterminate size={128} />
 </Overlay>
 {#if data2DArray}
+  <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Users</h1>
   <Table
     bind:filterBy
     tableTitle="Researchers"

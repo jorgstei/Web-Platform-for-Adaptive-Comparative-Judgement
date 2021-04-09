@@ -9,6 +9,7 @@
   import CreateSurvey from "./CreateSurvey.svelte";
   import RawSurveyData from "./RawSurveyData.svelte";
   import LoginPage from "./LoginPage.svelte";
+import Profile from "./Profile.svelte";
   export let userInfo;
 
   $: userInfo;
@@ -21,6 +22,9 @@
         <Menu {userInfo} />
       </div>
       <div class="contentWrapper">
+        <Route path="profile">
+          <Profile bind:userInfo></Profile>
+        </Route>
         <Route path="researchers">
           <Researchers bind:userInfo={userInfo} />
         </Route>

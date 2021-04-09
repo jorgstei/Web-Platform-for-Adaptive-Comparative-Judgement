@@ -231,7 +231,7 @@
 </script>
 
 {#if changePassword == true}
-    <div class="d-flex flex-column justify-left align-left">
+    <div class="d-flex flex-column justify-left align-left" style="margin-top: 5vh;">
         <h3 class="text-h3 mb-2">Change Password</h3>
         <div class="d-flex flex-column justify-center align-left">
             <TextField
@@ -278,7 +278,7 @@
         </div>
     </div>
 {:else}
-    <div class="d-flex flex-column justify-center align-center">
+    <div class="d-flex flex-column justify-center align-center" style="margin-top: 10vh">
         <h1 class="text-h3 mb-2">Welcome back to ACJ!</h1>
         <h2 class="text-h4 mb-2">
             Log in below to see your surveys, and continue making new ones.

@@ -4,6 +4,7 @@
     import { toast } from "@zerodevx/svelte-toast";
     import {userService} from "../Services/UserService";
 
+    export let loadingData = false;
     export let userInfo = undefined;
     export let limit = 10;
     export let currentPage = 0;
@@ -24,6 +25,7 @@
     })
 
     function filter(){
+        loadingData = true;
         filterFunction(filterBy.filterName, currentPage*limit, limit, direction).then(res => 
         {
             if(res == undefined) return;
@@ -35,6 +37,7 @@
                 toast.push("Something went wrong during filtering, please try to refresh.", {duration: 4000});
             }
             //data = data
+            loadingData = false;
         })
         userService.refreshToken().then(res => res?.status == 200 ? userInfo = res.data : userInfo = null)
         console.trace()

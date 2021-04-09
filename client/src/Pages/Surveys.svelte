@@ -4,8 +4,12 @@
     import Table from "../Components/Table.svelte";
     import { onMount } from "svelte";
     import TableFilter from "../Components/TableFilter.svelte";
+    import { Overlay, ProgressCircular } from 'svelte-materialify';
+
     export let userInfo;
 
+    let loadingData = true;
+    
     const tableFilterParams = {
         countFunction: () => surveyService.getCount(),
         limit: 10,
@@ -132,6 +136,10 @@
     $: data && generateTable();
 </script>
 
+<Overlay bind:active={loadingData}>
+    <h1 class="text-h1 mb-16 white-text">Loading data...</h1>
+    <ProgressCircular color="white" indeterminate size={128} />
+</Overlay>
 {#if data2DArray}
     <Table
         bind:filterBy
@@ -145,7 +153,7 @@
             await surveyService.deleteSurvey(id);
         }}
     />
-    <TableFilter bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+    <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
 {/if}
 
 <style>

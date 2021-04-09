@@ -57,7 +57,6 @@
     grid-template-columns: 1fr 5fr;
     grid-column-gap: 0;
     width: 100vw;
-    height: 95vh;
     padding-top: 5vh;
     text-align: center;
   }

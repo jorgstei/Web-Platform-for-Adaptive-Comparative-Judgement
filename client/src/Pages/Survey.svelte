@@ -1,13 +1,16 @@
 <script>
-    import Card from "../Components/Card.svelte";
+    //import Card from "../Components/Card.svelte";
     import {userService} from "../Services/UserService"
     import {surveyService} from "../Services/SurveyService"
     import {surveyAnswerService} from "../Services/SurveyAnswerService"
     import {navigate} from "svelte-routing";
     import {navigateWithRefreshToken} from "../Utility/naviagte"
     import { onMount } from "svelte";
-import swal from "sweetalert";
-    
+    import swal from "sweetalert";
+    import { Button, Card, CardText, Overlay, Icon, CardActions } from 'svelte-materialify';
+    import { fade, fly } from 'svelte/transition';
+
+
     export let userInfo;
     export let surveyID;
     console.log("In survey with surveyid", surveyID);
@@ -28,7 +31,7 @@ import swal from "sweetalert";
         randomPair = data.data;
         maxCounter = data.data.length;
     });
-    const transition_distance = 300;
+    
 
     let leftChoiceClicked = () => {
         const answer = 
@@ -92,33 +95,33 @@ import swal from "sweetalert";
         let main = document.getElementById("surveyWrapper");
         main.focus();
         let arrowHandler = (e) => {
-            let container = document.getElementById("container");
-            if(container != null){
-                switch (e.keyCode) {
+            switch (e.keyCode) {
                 case 37:
                     console.log("left arrow");
-                    let leftButton = container.childNodes[0].childNodes[2];
-                    leftButton.click();
+                    leftChoiceClicked();
                     main.removeEventListener("keyup", arrowHandler);
                     setTimeout(()=>{main.addEventListener("keyup", arrowHandler)}, 1000)
                     break;
                 case 39:
                     console.log("right arrow");
-                    let rightButton = container.childNodes[2].childNodes[2];
-                    rightButton.click();
+                    rightChoiceClicked();
                     main.removeEventListener("keyup", arrowHandler);
                     setTimeout(()=>{main.addEventListener("keyup", arrowHandler)}, 1000)
                     break;
                 default:
                     break;
-                }
             }
         }
         main.addEventListener("keyup", arrowHandler);
     });
     
 
-    
+    const in_duration = 1000;
+    const in_delay = 500;
+    const out_duration = 1000;
+    const out_delay = 500;
+    const transition_x = 300;
+
     //img="https://i.pinimg.com/736x/04/f5/8a/04f58afd7424a02a826eb74eddf98d91.jpg" https://wwwremaprodstorage.blob.core.windows.net/sys-master-hyb-prod/he6/h4c/8796881485854
     //img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Neckertal_20150527-6384.jpg/1920px-Neckertal_20150527-6384.jpg" https://thestayathomechef.com/wp-content/uploads/2017/08/Most-Amazing-Lasagna-2-e1574792735811.jpg
     //<h1>{surveyTitle}</h1>
@@ -129,23 +132,53 @@ import swal from "sweetalert";
     {#key counter}
     
     <h1>{question}</h1>
-    <div id="container">
+    <div id="container" class="d-flex flex-row ">
         {#if randomPair != null}
+        <!--
+
             <Card className="left" buttonText="Choose left" mediaType="text" text={randomPair[counter].left.data} onClickFunc = {leftChoiceClicked} width=100 height=90  transition_x={-transition_distance} img="https://i.pinimg.com/736x/04/f5/8a/04f58afd7424a02a826eb74eddf98d91.jpg"></Card>
             <Card className="right" buttonText="Choose right" mediaType="text" text={randomPair[counter].right.data} onClickFunc = {rightChoiceClicked} width=100 height=90  transition_x={transition_distance} img="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Neckertal_20150527-6384.jpg/1920px-Neckertal_20150527-6384.jpg"></Card>
-        {/if}
-    </div>
-    {/key}
+        -->
+            <div style="width:40%; height:80%;" in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}>
+                <Card style="min-width:100%; min-height:100%; position: relative;" hover outlined class="grey lighten-4">
+                    <CardText style="text-align: center;">
+                        <div class="text--primary text-h4">{randomPair[counter].left.data}</div>
+                    </CardText>
+    
+                    <CardActions>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={leftChoiceClicked}>Choose left</Button>
+                    </CardActions>
+                </Card>
+            </div>
+            <div style="width:40%; height:80%;"in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}>
+                <Card style="min-width:100%; min-height:100%; position: relative;" hover outlined class="grey lighten-4">
+                    <CardText style="text-align: center;">
+                        <div class="text--primary text-h4">{randomPair[counter].right.data}</div>
+                    </CardText>
+                    
+                    <CardActions>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={rightChoiceClicked}>Choose right</Button>
+                    </CardActions>
+                </Card>
+            </div>
+                
+            
+            {/if}
+        </div>
+        {/key}
     {:else}
         <div id="thank_you_message">
-            <h1>Thank you for participating!</h1>
-            <h2>We greatly appreciate it :)</h2>
+            <h1 class="text-h2" style="margin-bottom:5vh;">Thank you for participating!</h1>
+            <h2 class="text-h3">We greatly appreciate it :)</h2>
         </div>
     {/if}
 
 </main>
 
 <style>
+    .leftRightButtons{
+
+    }
     main {
         margin:auto;
         margin-top: 0;
@@ -158,9 +191,8 @@ import swal from "sweetalert";
         padding-top: 5vh;
         width: 80%;
         height: 80%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-column-gap: 10%;
+        display: flex;
+        justify-content: space-evenly;
     }
     #thank_you_message {
         margin: auto;

@@ -121,10 +121,10 @@ router.post("/login", async (req, res) => {
                 }
             }
         }
-        throw new Error("Email or password not provided.")
+        res.status(401).json({message: "Incorrect username or password"})
     } catch (error) {
         console.log("Error: ", error)
-        res.sendStatus(401)
+        res.sendStatus(500).json({message: "Internal Server Error"})
     }
 })
 

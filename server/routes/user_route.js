@@ -12,19 +12,22 @@ const escapeStringRegexp = require('escape-string-regexp')
 
 const router = Router()
 
+//Email regex:
+const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+
 function acceptablePassword(password, role){
     //8 chars, one letter and one number
-    const pwResearcherRegex = /(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)/;
+    const pwResearcherRequirement = /(^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$)/;
     //10 chars, 1 upper letter, 1 lower letter, one number
-    const pwAdminRegex = /(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10,}$)/;
+    const pwAdminRequirement = /(^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{10,}$)/;
     if(role === "admin"){
-        if(pwAdminRegex.test(password)){
+        if(pwAdminRequirement.test(password)){
             return true
         }
         return false
     }
     if(role === "researcher"){
-        if(pwResearcherRegex.test(password)){
+        if(pwResearcherRequirement.test(password)){
             return true
         }
         return false
@@ -128,7 +131,7 @@ router.get("/function/count", auth, async (req, res) => {
     console.log("Get count of users")
     try{
         if (req.role !== "admin") {
-            res.sendStatus(403)
+            res.status(403).json({message:"Forbidden"})
             return
         }
         if(req.role === "admin"){
@@ -137,7 +140,7 @@ router.get("/function/count", auth, async (req, res) => {
         }
     } catch(error){
         console.log("user/function/count error:",error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -179,11 +182,11 @@ router.get("/function/sort", auth, async (req, res) => {
     const me_direction = Number(me(direction))
 
     if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
-        res.sendStatus(400)
+        res.status(400).json({message: "Missing fields."})
         return
     }
     if (me_skip < 0 || me_limit < 1 || (me_direction != 1 && me_direction != -1)) {
-        res.sendStatus(422)
+        res.status(422).json({message: "Skip or Limit invalid values."})
         return
     }
     try {
@@ -216,7 +219,7 @@ router.get("/function/sort", auth, async (req, res) => {
         ).then(result => res.json(result))
     } catch (error) {
         console.log("Error sorting users:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -236,11 +239,12 @@ router.get("/function/sort", auth, async (req, res) => {
  * @apiUse AuthMiddleware
  * @apiError (500) 500 Internal Server Error
  */
-router.get("/search/:term", auth, async (req, res) => {
+router.post("/search/:term", auth, async (req, res) => {
     const term = me(req.params.term)
     const regex = escapeStringRegexp(term)
+    const {me_limit} = me(req.body)
     if (regex.length > 64) {
-        res.sendStatus(422)
+        res.status(422).json({message: "Max search term length is 64 characters."})
         return
     }
     var timeStart = process.hrtime()
@@ -251,13 +255,13 @@ router.get("/search/:term", auth, async (req, res) => {
                     { firstName: { $regex: regex, $options: 'i' } },
                     { lastName: { $regex: regex, $options: 'i' } },
                     { email: { $regex: regex, $options: 'i' } }
-                ]
-            }
-        ).select(["-hashed", "-salt"])
+                ],
+            },
+        ).limit(me_limit).select(["-hashed", "-salt"])
         res.json(users)
     } catch (error) {
         console.log("Error while searching users:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
     var timeEnd = process.hrtime(timeStart)
     console.log("Search with term:", regex, ", took: ", timeEnd[1] / 1000000, "ms")
@@ -271,7 +275,6 @@ router.get("/search/:term", auth, async (req, res) => {
  * @apiVersion 0.1.0
  * @apiParam {String} email The registered email/username you've forgotten the password for.
  * @apiSuccess (204) 204 No Content, a "reset password" link has been sent to the <code>email</code>.
- * @apiError (404) 404 Not found, No user with the supplied email was found.
  * @apiError (500) 500 Internal Server Error
  */
 router.post("/forgotten_my_password", async (req, res) => {
@@ -279,8 +282,8 @@ router.post("/forgotten_my_password", async (req, res) => {
     console.log("Called forgotten my password with email:", email)
     const userDoc = await User.findOne({ email: {$eq: email} })
     console.log("Forgotten my password userDoc: ", userDoc)
-    if (userDoc._id == null) {
-        res.sendStatus(404)
+    if (userDoc?._id == null) {
+        res.sendStatus(204) //We send 204 despite "not finding the user" in order to protect registered users emails
         return;
     }
 
@@ -302,9 +305,8 @@ router.post("/forgotten_my_password", async (req, res) => {
         res.sendStatus(204)
     } catch (error) {
         console.log("forgotten password error: ", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
-
 })
 
 /**
@@ -328,17 +330,17 @@ router.patch("/forgotten_password", async (req, res) => {
         console.log("Real:", real, ", issuedAt:", issuedAt)
         //If the user supplied email address doesn't match with the one stored in the token, HTTP 422 and early return
         if (!real) {
-            res.sendStatus(422)
+            res.status(422).json({message: "Wrong email provided."})
             return
         }
         const userDoc = await User.findOne({ email: {$eq: email} })
         //User doesn't exist or does not actually use the requested email
         if (userDoc._id === null || userDoc.email !== email) {
-            res.sendStatus(403)
+            res.status(403).json({message: "User no longer exist."})
             return
         }
         if(!acceptablePassword(newPassword, userDoc.role)){
-            res.sendStatus(422)
+            res.status(422).json({message: "Password too weak."})
             return
         }
         //TODO: If the last edited time for the users password falls within the issuedAt time and the exp time, early return
@@ -352,7 +354,7 @@ router.patch("/forgotten_password", async (req, res) => {
         res.sendStatus(204)
     } catch (error) {
         console.log(error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -370,14 +372,19 @@ router.patch("/forgotten_password", async (req, res) => {
  */
 router.post("/invite_link", auth, async (req, res) => {
     if (req.role !== "admin") {
-        res.sendStatus(403)
+        res.status(403).json({message: "Unauthorized"})
         return
     }
     const { email, role } = req.body
-    const userDoc = User.findOne({ email: {$eq: email} })
-    if (userDoc._id != null) {
+    const userDoc = await User.findOne({ email: {$eq: email} })
+    console.log("user/invite_link, email:",email,"userDoc:",userDoc)
+    if (userDoc?._id != null) {
         console.log("Tried inviting user that already exists")
         res.status(422).json({ message: "User with that email already exists." })
+        return
+    }
+    if(email?.length > 64 || !email_regex.test(email)){
+        res.status(422).json({message: "Email address too long, or not a valid email address."})
         return
     }
     const link = process.env.CLIENT_BASE_URL + "/register_account/?role="+role+"&token=" + createUserRegisterToken(hashNoSalt(email), role)
@@ -395,10 +402,10 @@ router.post("/invite_link", auth, async (req, res) => {
         }
         const emailResponse = await sendMail(emailOptions)
         console.log("Mail response:", emailResponse)
-        res.sendStatus(204)
+        res.status(204).json({message: "Ok, No Content"})
     } catch (error) {
         console.log("user registration error: ", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -421,7 +428,7 @@ router.get("/", auth, async (req, res) => {
     console.log("Called get all for User")
     try {
         if (req.role !== "admin") {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const users = await User.find().select(["-hashed", "-salt"])
@@ -454,7 +461,7 @@ router.get("/:id", auth, async (req, res) => {
     console.log("Called get user by id")
     try {
         if (req.role !== "admin" && req.role !== "researcher") {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const user = await User.findOne({ _id: req.params.id }).select(["-hashed", "-salt"])
@@ -490,17 +497,17 @@ router.post("/", async (req, res) => {
     const [real, role] = await verifyUserRegistration(token, email)
     console.log("New user role:", role)
     if(!acceptablePassword(password, role)){
-        res.sendStatus(422)
+        res.status(422).json({message: "Password too weak."})
         return
     }
     const userDoc = await User.findOne({ email: {$eq: email} })
     if (userDoc != null && userDoc._id != null) {
-        res.status(409).json({ Error: "This registration link has already been used." })
+        res.status(409).json({ message: "This registration link has already been used." })
         return
     }
     if (real == false) {
         console.log("Requestee is not the real invited person")
-        res.sendStatus(403)
+        res.status(403).json({message: "Wrong email address."})
         return
     }
     const result = hash(password)
@@ -536,13 +543,13 @@ router.patch("/:id/email", auth, async (req, res) => {
     console.log("User PUT email")
     const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+.[^,\/\\\s@]+/
     if (req.role !== "admin" && req.userid !== req.params.id) {
-        res.sendStatus(403)
+        res.status(403).json({message: "Forbidden"})
         return
     }
     const re_email = escapeStringRegexp(req.body.email)
     const me_userId = me(req.params.id)
     if (!email_regex.test(re_email)) {
-        res.sendStatus(422)
+        res.status(422).json({message: "Invalid email address."})
         return
     }
     try {
@@ -554,7 +561,7 @@ router.patch("/:id/email", auth, async (req, res) => {
         await doc.save()
         res.sendStatus(204)
     } catch (error) {
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find user."})
     }
 })
 
@@ -574,20 +581,20 @@ router.patch("/:id/email", auth, async (req, res) => {
 router.patch("/:id/change_password", auth, async (req, res) => {
     console.log("User PATCH password")
     if (req.userid !== req.params.id) {
-        res.sendStatus(403)
+        res.status(403).json({error: "Forbidden"})
         console.log("ID's in patch password: ", req.userid, req.params.id)
         return
     }
     try {
         const { currentPassword, newPassword } = req.body
         if (!currentPassword || !newPassword) {
-            res.sendStatus(422)
+            res.status(422).json({error: "Unprocessable Entity"})
             return
         }
         const userDoc = await User.findOne({ _id: req.userid })
         const samePassword = compareHash(userDoc.hashed, currentPassword, userDoc.salt)
         if (!samePassword) {
-            res.status(403).json({ message: "Password not correct." })
+            res.status(403).json({ error: "Password not correct." })
             return
         }
         const result = hash(newPassword)
@@ -599,7 +606,7 @@ router.patch("/:id/change_password", auth, async (req, res) => {
         res.sendStatus(204)
     } catch (error) {
         console.log(error)
-        res.sendStatus(500)
+        res.status(500).json({error: "Internal Server Error"})
     }
 })
 
@@ -617,7 +624,7 @@ router.patch("/:id/change_password", auth, async (req, res) => {
 router.delete("/:id", auth, async (req, res) => {
     console.log("Called delete user by id with id: " + req.userid);
     if (req.role !== "admin" && req.userid !== req.params.id) {
-        res.sendStatus(403)
+        res.status(403).json({message: "Forbidden"})
         return
     }
     const result = await User.deleteOne({ _id: req.params.id })
@@ -637,7 +644,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(204)
     }
     else {
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find user."})
     }
 })
 

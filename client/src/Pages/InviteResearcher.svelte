@@ -6,6 +6,8 @@
     import { navigateWithRefreshToken } from "../Utility/naviagte";
     let showErrorField = false;
     export let userInfo;
+    //Email regex:
+    const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
 
     const register = (role, email) => {
@@ -20,12 +22,20 @@
             }
             console.log("Form was valid. Attempting to invite user with user object: ", userObj)
             userService.sendInviteLink(userObj)
-                .then(()=>{
-                    swal("You have successfully made an account for '" + email + "''.").then(navigateWithRefreshToken("/admin_board/researchers").then(data => userInfo = data));
+                .then((res)=>{
+                    if(res?.status == 204){
+
+                        swal("Success","You have successfully invited '" + email + " . They should receive an email with a link to complete their registration.",
+                        "success")
+                        .then(navigateWithRefreshToken("/admin_board/researchers").then(res => res?.status == 200 ? userInfo = res.data : userInfo = null))
+                    }
+                    else{
+                        swal("Error", "Could not invite account.\n"+res?.data?.message, "error")
+                    }
                 })
                 .catch(err => {
-                    console.log("Could not create account for " + email + ". Error:\n", err)
-                    swal("Could not create account for " + email);
+                    console.log("Could not invite account for " + email + ". Error:\n", err)
+                    swal("Error","Could not invite account for " + email+"\n", "error");
                 })       
         }
         else{
@@ -76,9 +86,8 @@
 <div class="d-flex flex-row justify-center">
     <div class="d-flex flex-column">
         <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Invite Researcher</h1>
-
-        <Select class="ma-2" items={selectItems} bind:value={selectedValue}>Role</Select>
-        <TextField class="ma-2" bind:value={txtValue}>Email</TextField>
+        <Select class="ma-2" hint="*Required" items={selectItems} bind:value={selectedValue}>Role</Select>
+        <TextField class="ma-2" hint="*Required" bind:value={txtValue}>Email</TextField>
         <Button class="ma-2 mt-6" outlined on:click={()=>{register(selectedValue, txtValue)}}>Register user</Button>
         <p id="errorField"></p>
     </div>

@@ -389,8 +389,9 @@
             ) {
                 oldSearchTerm = search_term;
                 epochMsAtLastSearch = new Date().getTime();
+                console.log("Searching for: ", search_term)
                 userService
-                    .search(search_term)
+                    .search(search_term, {limit: 5})
                     .then((result) => {
                         console.log("Search result: ", result);
                         searchResults = result.data;

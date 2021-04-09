@@ -549,9 +549,9 @@
                         </CardText>
                         <CardActions>
                             <div class="d-flex flex-column justfiy-left">
-                                <Checkbox checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid}>Manage members</Checkbox>
-                                <Checkbox checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid}>Edit survey</Checkbox>
-                                <Checkbox checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid}>View results</Checkbox>
+                                <Checkbox bind:checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid}>Manage members</Checkbox>
+                                <Checkbox bind:checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid}>Edit survey</Checkbox>
+                                <Checkbox bind:checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid}>View results</Checkbox>
                             </div>
                         </CardActions>
                     </Card>
@@ -629,7 +629,7 @@
         flex-direction: column;
         justify-content: center;
         background-color: #fff;
-        width: 60%;
+        width: 50vw;
         padding: 1vh;
         margin: 1vh auto 1vh auto;
     }

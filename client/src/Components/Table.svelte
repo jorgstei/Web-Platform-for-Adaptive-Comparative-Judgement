@@ -159,9 +159,26 @@
     padding-left: 2vw;
     padding-right: 2vw;
 }
+
+table{
+    min-width: 60vw;
+    border-top: 0;
+    margin-bottom: 1vh;
+    border-collapse: collapse;
+}
+
+th {
+    border-right: 2px solid white;
+}
 td, th {
+    
     padding: 0.5vh 0.5vw 0.5vh 0.5vw;
 }
+tr {
+    border-bottom: 1px solid #888;
+}
+
+
 
 .col-sortable{
     cursor: pointer;
@@ -183,7 +200,7 @@ td, th {
 
 :global(.table_row) {
     background-color: #ffffff;
-    border-radius: 0.1vw;
+    border: 1px solid #777;
     text-align: center;
     margin-bottom: 1vh;
 }
@@ -196,11 +213,6 @@ td, th {
     cursor: pointer;
 }
 
-table{
-    min-width: 60vw;
-    border: 0px black solid;
-}
-
 :root {
     --toastContainerTop: auto;
     --toastContainerRight: auto;
@@ -211,4 +223,6 @@ table{
     color: red;
     cursor: not-allowed;
 }
+
+
 </style>

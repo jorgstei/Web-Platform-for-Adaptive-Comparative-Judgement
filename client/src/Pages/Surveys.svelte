@@ -73,6 +73,8 @@
 
     async function generateTable() {
         data2DArray = [];
+        activeStatus = [];
+        userRights = [];
         for (let i = 0; i < data.length; i++) {
             console.log("data length:", data.length);
             if (!(userInfo.role == "admin")) {
@@ -101,8 +103,13 @@
             const DD_MM_YYYY_Date = YYYY_MM_DD_Date.split("-").reverse().join(".");
             //console.log(YYYY_MM_DD_Date, " -> ", DD_MM_YYYY_Date);
             let strInviteCode = data[i].inviteCode+"";
-            while(strInviteCode.length < 6){
-                strInviteCode = "0"+strInviteCode
+            if(strInviteCode !=="-1"){
+                while(strInviteCode.length < 6){
+                    strInviteCode = "0"+strInviteCode
+                }
+            }
+            else{
+                strInviteCode = "Not active";
             }
             const arr = [
                 data[i].title,

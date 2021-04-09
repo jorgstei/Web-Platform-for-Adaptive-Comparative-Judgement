@@ -4,7 +4,9 @@
     import { surveyService } from "../Services/SurveyService";
     import queryString from "query-string";
     
-    import { Button } from 'svelte-materialify';
+    import { Button, Card, CardText, Overlay, Icon } from 'svelte-materialify';
+    import { mdiArrowExpand, mdiArrowCollapse } from "@mdi/js";
+    
 
 
     export let userInfo;
@@ -15,7 +17,7 @@
         navwrap.style.display = "none";
     }
 
-    let survey;
+    let survey = {judgeInstructions: "Loading...", surveyQuestion: "Loading...", expectedComparisons:"..."};
 
     onMount(async()=>{
         let params = queryString.parse(window.location.search);
@@ -37,41 +39,108 @@
             }
         })
         .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error"));
-        let questionHeader = document.getElementById("surveyQuestion");
-        questionHeader.innerHTML = survey.surveyQuestion;
-        let textarea  = document.getElementById("judgeInstructionTextArea");
-        textarea.innerHTML = survey.judgeInstructions;
-        textarea.style.height = (textarea.scrollHeight > textarea.clientHeight) ? (textarea.scrollHeight+5)+"px" : "20vh";
-        let text2 = document.getElementById("generalInfoTextArea");
-        text2.innerHTML = "You will be presented with several pairs of items to compare.\nThese items will be answers to the question above, and you should choose the one which best fits your preference. An item can be a text field, pdf, image, etc. To choose an item you can click the button beneath it, or use the arrow keys.\nYou will be asked to answer 10 comparisons!\n\nGood luck!";
-        text2.style.height = (text2.scrollHeight > text2.clientHeight) ? (text2.scrollHeight+5)+"px" : "20vh";
     })
 
-    
+    let showGeneralInfoOverlay = false;
+    let showSurveyJudgeInstructions = false;
     $: survey;
 </script>
 
 <main>
-    
-    <div class="d-flex flex-column " >
-        <h1 class="text-h2">You've been asked to participate in this survey!</h1>
-        <h2 class="text-h3">The question is:</h2>
-        <h1 class="text-h2" id="surveyQuestion"></h1>
+    <div class="d-flex flex-column justify-center" style=" padding-top: 10vh;">
+        <h1 class="text-h2" style="margin-bottom: 3vh;">You've been asked to participate in a survey!</h1>
+        <h2 class="text-h3" style="margin-bottom: 2vh;">The question is:</h2>
+        <h1 class="text-h2" style="margin-bottom: 3vh;">{survey.surveyQuestion}</h1>
 
-        <div class="d-flex flex-row justify-space-between">
-            <h3>Researcher instructions:</h3>
-            <textarea id="judgeInstructionTextArea" readonly></textarea>
+        <div class="d-flex flex-row justify-space-between" style="margin-top: 5vh;">
 
-            <h3>How a survey works:</h3>
-            <textarea readonly id="generalInfoTextArea"></textarea>
+            <Card style="width:40%;" hover outlined class="grey lighten-4">
+                <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showSurveyJudgeInstructions = true; e.stopPropagation();}}>
+                    <Icon path={mdiArrowExpand} size="2vw"></Icon>
+                </Button>
+                <CardText>
+                  <div>Extra info</div>
+                  <div class="text--primary text-h4">Researcher instructions</div>
+                  <div class="text--primary text-h6" style="text-align: left; padding-top: 1vh;">
+                    {survey.judgeInstructions}
+                  </div>
+                </CardText>
+            </Card>
+
+            <Overlay
+                bind:active={showSurveyJudgeInstructions}
+                on:click={()=> showSurveyJudgeInstructions = false}>
+                <div style="min-height: 60vh; width: 60vw; margin: auto;" on:click={(e)=>{e.stopPropagation()}}>
+                    <Card class="grey lighten-4" style="min-height: 60vh;">
+                        <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showSurveyJudgeInstructions = false; e.stopPropagation();}}>
+                            <Icon path={mdiArrowCollapse} size="2vw"></Icon>
+                        </Button>
+                        <CardText class="align-items-center">
+                            <div class="text-h6">Extra info</div>
+                            <div class="text--primary text-h2" style="padding: 2vh 0 2vh 0;">Researcher instructions</div>
+                            <div class="text--primary text-h4" style="text-align: left; padding: 1vh 2vw 1vh 2vw;">
+                                {survey.judgeInstructions}
+                            </div>
+                        </CardText>
+                    </Card>
+                </div>
+            </Overlay>
+            
+            <Card style="width:40%;" hover outlined class="grey lighten-4" >
+                <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showGeneralInfoOverlay = true; e.stopPropagation();}}>
+                    <Icon path={mdiArrowExpand} size="2vw"></Icon>
+                </Button>
+                <CardText>
+                    <div>Extra info</div>
+                    <div class="text--primary text-h4">How a survey works</div>
+                    <div class="text--primary text-h6" style="text-align: left; padding-top: 1vh;">
+                        You will be presented with several pairs of items to compare.
+                        These items will be answers to the question above, and you should choose the one which best fits your preference.
+                        An item can be a text field, pdf, image, etc.
+                        To choose an item you can click the button beneath it, or use the arrow keys.
+                        You will be asked to answer {survey.expectedComparisons} comparisons! 
+                    </div>
+                    <div class="text--primary text-h5" style="text-align: left; margin-top: 1vh;">
+                        Good luck!
+                    </div>
+                </CardText>
+            </Card>
+
+            <Overlay
+                bind:active={showGeneralInfoOverlay}
+                on:click={()=> showGeneralInfoOverlay = false}>
+                <div style="min-height: 60vh; width: 60vw; margin: auto;" on:click={(e)=>{e.stopPropagation()}}>
+                    <Card class="grey lighten-4" style="min-height: 60vh;">
+                        <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showGeneralInfoOverlay = false; e.stopPropagation();}}>
+                            <Icon path={mdiArrowCollapse} size="2vw"></Icon>
+                        </Button>
+                        <CardText class="align-items-center">
+                            <div class="text-h6">Extra info</div>
+                            <div class="text--primary text-h2" style="padding: 2vh 0 2vh 0;">How a survey works</div>
+                            <div class="text--primary text-h4" style="text-align: left; padding: 1vh 2vw 1vh 2vw;">
+                                You will be presented with several pairs of items to compare.
+                                These items will be answers to the question above, and you should choose the one which best fits your preference.
+                                An item can be a text field, pdf, image, etc.
+                                To choose an item you can click the button beneath it, or use the arrow keys.
+                                You will be asked to answer {survey.expectedComparisons} comparisons! 
+                            </div>
+                            <div class="text--primary text-h3" style="text-align: left; padding: 1vh 2vw 1vh 2vw;">
+                                Good luck!
+                            </div>
+                        </CardText>
+                    </Card>
+                </div>
+            </Overlay>
+
         </div>
-
+        
+        <Button outlined style="width: 30%; height: 5vh; margin-top: 10vh;" class="align-self-center" 
+            on:click={() => {navigate("/take_survey")}}
+        >Take survey</Button>
     </div>
     
     
-    <Button outlined id="startTest" 
-    on:click={() => {navigate("/take_survey")}}
-    >Take survey</Button>
+    
     
 </main>
 
@@ -79,41 +148,6 @@
     main {
         text-align: center;
         margin: auto;
-        grid-template-areas:
-        "title title"
-        "specific general"
-        "specific general"
-        "btn btn";
-        grid-column-gap: 5vw;
-        display: grid;
         width: 80%;
-        padding-top: 5vh;
-    }
-    textarea {
-        line-height: 2rem;
-        font-size: 1.5rem;
-        min-height: 20vh;
-        min-width: 40vw;
-        height: auto;
-        word-wrap:break-word;
-        padding: 2vw;
-        margin-bottom: 5vh;
-        background-color: #eee;
-        resize: none;  
-    }
-    #titleWrapper {
-        grid-area: title;
-    }
-    #judgeInstructionsWrapper{
-        grid-area: specific;
-    }
-    #generalInfoWrapper {
-        grid-area: general;
-    }
-    #startTest {
-        grid-area: btn;
-        width: 10vw;
-        height: 10vh;
-        margin: auto;
     }
 </style>

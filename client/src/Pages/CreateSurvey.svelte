@@ -451,7 +451,7 @@
                         })
                 }}><Icon class="red-text" path={mdiFileCancel} size="3vw"></Icon></Button>
             {/if}
-            <Textarea rows={2} noResize class="text-h5" bind:value={surveyTitleValue} on:focus={()=>console.log("title got focused")}>
+            <Textarea style="margin-top: 2vh;"rows={2} noResize class="text-h5" bind:value={surveyTitleValue} on:focus={()=>console.log("title got focused")}>
                 <div slot="append">
                     <Tooltip top bind:active={showSurveyTitleTooltip} >
                         <Icon path={mdiInformationOutline} />
@@ -461,9 +461,7 @@
                 Survey title
             </Textarea>
 
-            <br>
-
-            <Textarea rows={2} noResize class="text-h5" bind:value={surveyQuestionValue}>
+            <Textarea style="margin-top: 2vh;" rows={2} noResize class="text-h5" bind:value={surveyQuestionValue}>
                 <div slot="append">
                     <Tooltip top bind:active={showSurveyQuestionTooltip} >
                         <Icon path={mdiInformationOutline} />
@@ -473,9 +471,7 @@
                 Survey question
             </Textarea>
 
-            <br>
-
-            <Textarea rows={4} autogrow class="text-h6" bind:value={judgeInstructionsValue}>
+            <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={judgeInstructionsValue}>
                 <div slot="append">
                     <Tooltip top bind:active={showSurveyJudgeInstructionsTooltip} >
                         <Icon path={mdiInformationOutline}/>
@@ -484,8 +480,8 @@
                 </div>
                 Judge instructions
             </Textarea>
-            <br>
-            <Textarea rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue}>
+            
+            <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue}>
                 <div slot="append">
                     <Tooltip top bind:active={showSurveyInternalDescriptionTooltip}>
                         <Icon path={mdiInformationOutline} />
@@ -495,16 +491,23 @@
                 Survey description
             </Textarea>
 
-            <br>
-            <br>
-            <br>
-            <br>
 
-            <div class="d-flex flex-rows">
-                <Select items={purposeItems} bind:value={selectedPurpose}>Purpose</Select>
-                <Select items={mediaTypeItems} bind:value={selectedMediaType}>Media Type</Select>
-                <Select items={accessibilityItems} bind:value={selectedAccessibility}>Media Type</Select>
-                <Select items={activeItems} bind:value={selectedActiveLevel}>Active</Select>
+            <div class="d-flex flex-rows" style="margin-top: 4vh;">
+                <div style="min-width: 25%;">
+                    <Select items={purposeItems} bind:value={selectedPurpose}>Purpose</Select>
+                </div>
+                <div style="min-width: 25%;">
+                    <Select items={mediaTypeItems} bind:value={selectedMediaType}>Media Type</Select>
+                </div>
+                <div style="min-width: 25%;">
+                    <Select items={accessibilityItems} bind:value={selectedAccessibility}>Media Type</Select>
+                </div>
+                <div style="min-width: 25%;">
+
+                    <Select items={activeItems} bind:value={selectedActiveLevel}>Active</Select>
+                </div>
+                
+                
             </div>
 
             <div class="centeredInputFieldWrapper">
@@ -606,15 +609,9 @@
         margin: 2vh auto 2vh auto;
     }
     #create_wrapper {
-        display: grid;
         margin: auto;
         padding-top: 5vh;
         text-align: center;
-        background-color: #eee;
-        grid-template:
-            "menu title"
-            "menu main_inputs"
-            "menu options";
         overflow: hidden;
     }
     #general_info_form {
@@ -629,71 +626,22 @@
         flex-direction: column;
         justify-content: center;
         background-color: #fff;
-        width: 50vw;
+        width: 60vw;
         padding: 1vh;
         margin: 1vh auto 1vh auto;
-    }
-    .text_input {
-        width: 100%;
-    }
-    #survey_title {
-        font-size: 2.5rem;
-        max-height: 20vh;
-    }
-    #survey_question {
-        font-size: 2rem;
-        max-height: 16vh;
-    }
-    .textareas {
-        line-height: 2rem;
-        font-size: 1.5rem;
-        min-height: 18vh;
-        height: auto;
-        word-wrap: break-word;
-        padding: 2vw;
-        margin-bottom: 5vh;
+        border: 0.2vw solid rgba(200, 200, 200, 0.6);
     }
 
-    .dropdownWrappers {
-        margin-left: 2vw;
-        font-size: 1.2rem;
-        float: left;
-        /*border: 2px solid rgba(160, 160, 160, 0.6);*/
-        padding: 1vh;
-        text-align: center;
-        height: 60%;
-    }
-    label {
-        margin-bottom: 1vh;
-    }
-    #dropdownsAndCheckboxesWrapper {
-        height: 16vh;
-    }
-    p {
-        font-size: 1.5rem;
-    }
     #general_info_form {
         text-align: left;
     }
 
-    label {
-        left: 0;
-    }
     input {
         padding: 2vw;
         border-top: 0px;
         border-left: 0px;
         border-right: 0px;
     }
-    textarea {
-        padding: 1vh;
-        border-top: 0px;
-        border-left: 0px;
-        border-right: 0px;
-        max-width: 100%;
-        min-width: 100%;
-    }
-
     :global(.option_title) {
         font-size: 1rem;
         float: left;
@@ -702,60 +650,13 @@
         font-size: 1rem;
         float: left;
     }
-    #title {
-        grid-area: "title";
-    }
-    #options_wrapper {
-        grid-area: "options";
-        background-color: #fff;
-        width: 60%;
-        margin: 1vh auto 1vh auto;
-    }
-    #new_option_button {
-        position: fixed;
-        right: 2vh;
-        bottom: 7vh;
-        font-size: 3rem;
-    }
-    #submitBtn {
-        margin-top: 5vh;
-        margin-left: 40%;
-        width: 20%;
-        font-size: 1.5rem;
-    }
+
     #dummy {
         visibility: hidden;
         height: 1vh;
         margin:auto;
     }
-    #activeCheckbox {
-        margin: auto;
-        transform: scale(2);
-    }
-    #expectedComparisonsWrapper{
-        margin-left: 2vw;
-        font-size: 1.6rem;
-    }
-    #expected_comparisons{
-        padding: 1vh;
-        border: 1px solid #ccc;
-    }
-    #searchWrapper {
-        margin-left: 2vw;
-        font-size: 1.6rem;
-    }
-    #researcher_search {
-        padding: 1vh;
-        width: 40%;
-        font-size: 1.2rem;
-    }
 
-    .addedResearchersWrapper {
-        display: grid;
-        grid-template-columns: auto;
-        grid-column-gap: 2vh;
-        margin-right: 1.5vw;
-    }
     :global(#cancelButton) {
         background-color: red;
         width: 6vw;
@@ -766,9 +667,6 @@
         position: fixed;
     }
 
-    .textWrappers{
-        margin-bottom: 15vh;
-    }
 </style>
 
 

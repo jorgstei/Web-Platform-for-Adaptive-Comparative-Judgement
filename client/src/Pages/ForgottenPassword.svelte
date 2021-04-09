@@ -3,8 +3,9 @@
     import {navigate} from "svelte-routing";
     import queryString from "query-string";
     import swal from 'sweetalert';
-    import { TextField, Button, Icon } from 'svelte-materialify';
+    import { TextField, Button, Icon, Tooltip } from 'svelte-materialify';
     import { mdiEyeOff, mdiEye } from "@mdi/js";
+    import { mdiInformationOutline } from '@mdi/js'
 
     export let userInfo;
     export let resetPassword = false;
@@ -173,7 +174,7 @@
         document.getElementById("errorField").innerHTML = "";
     }
 
-    
+    let show=false;
 </script>
 
 <main>
@@ -185,7 +186,17 @@
             {:else}
             <h2 class="text-h2 ma-2">Please fill in the email address your account was created with, then create a new password and repeat it in the following fields. </h2>
             {/if}
-            <TextField class="ma-2" bind:value={email} on:keydown={loginOnEnterPress} on:input={clearErrorField}>Email</TextField>
+            
+            <TextField class="ma-2" bind:value={email} on:keydown={loginOnEnterPress} on:input={clearErrorField}>
+                Email
+                <div slot="append">
+                    <Tooltip top bind:active={show} >
+                        <Icon path={mdiInformationOutline} />
+                        <span slot="tip">Enter your email</span>
+                    </Tooltip>
+                </div>
+                
+            </TextField>
             <!--
                 <label class="inputLabel" for="email">Email</label>
                 <input id="email" class="inputfield" name="email" type="text" on:keydown={loginOnEnterPress} on:input={clearErrorField}>

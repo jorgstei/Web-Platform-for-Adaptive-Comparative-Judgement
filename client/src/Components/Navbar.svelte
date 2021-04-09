@@ -28,6 +28,7 @@
         cursor: pointer;
     }
     nav {
+        z-index: 3;
         margin: 0;
         padding: 0;
         overflow: hidden;

@@ -241,9 +241,10 @@ router.get("/function/sort", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.post("/search/:term", auth, async (req, res) => {
-    const term = me(req.params.term)
+    const term = req.params.term.replace("$", "")
     const regex = escapeStringRegexp(term)
-    const {me_limit} = me(req.body)
+    console.log(req.body)
+    const {limit} = me(req.body)
     if (regex.length > 64) {
         res.status(422).json({message: "Max search term length is 64 characters."})
         return
@@ -258,7 +259,7 @@ router.post("/search/:term", auth, async (req, res) => {
                     { email: { $regex: regex, $options: 'i' } }
                 ],
             },
-        ).sort({_id: -1}).limit(me_limit).select(["-hashed", "-salt"])
+        ).sort({_id: -1}).limit(limit).select(["-hashed", "-salt"])
         res.json(users)
     } catch (error) {
         console.log("Error while searching users:", error)

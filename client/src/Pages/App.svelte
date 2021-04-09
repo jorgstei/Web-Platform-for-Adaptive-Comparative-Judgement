@@ -23,28 +23,18 @@
 	export let url="";
 	let userInfo = null;
 
-	if(userInfo == undefined || userInfo == null){
-		userService.refreshToken().then(data => userInfo = data)
+	if(userInfo == null){
+		userService.refreshToken().then(data => {
+			if(data.status === 200){
+				userInfo = data.data;
+			}
+			else{
+				console.log("RefreshToken failed")
+				userInfo = null;
+			}
+		})
 	}
 	let surveyID;
-	/*
-	let goToSurvey = () => {
-				
-	
-		else{
-			console.log("userInfo: ", userInfo)
-			console.log("1. Attempting to refresh token")
-			userService.refreshToken().then(data => setUserInfo(data))
-		}
-	}
-	
-	
-
-	function setUserInfo(info){
-		userInfo = info
-		console.log("userInfo: ", userInfo)
-	}
-	*/
 
 	$: userInfo
 </script>
@@ -73,7 +63,7 @@
 		</Route>
 	
 		<Route path="create_survey">
-			<CreateSurvey userInfo={userInfo}></CreateSurvey>
+			<CreateSurvey bind:userInfo={userInfo}></CreateSurvey>
 		</Route>
 	
 		<Route path="about">

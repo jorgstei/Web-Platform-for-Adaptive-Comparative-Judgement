@@ -36,7 +36,7 @@
             }
             //data = data
         })
-        userService.refreshToken().then(res => userInfo = res)
+        userService.refreshToken().then(res => res?.status == 200 ? userInfo = res.data : userInfo = null)
         console.trace()
     }
 

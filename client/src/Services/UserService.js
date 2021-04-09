@@ -9,7 +9,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     getUserByID(id){
@@ -19,7 +19,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     registerUser(user){
@@ -30,7 +30,7 @@ export default class UserService extends Service{
             data: user
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     login(user){
@@ -43,8 +43,8 @@ export default class UserService extends Service{
                 password: user.password
             }
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     logout(){
@@ -54,7 +54,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     logoutJudge(){
@@ -64,7 +64,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     refreshToken(){
@@ -73,8 +73,8 @@ export default class UserService extends Service{
             url: this.path.split("api")[0]+"auth/refresh-token",
             withCredentials: true
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     refreshJudgeToken(){
@@ -84,7 +84,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     patchPassword(id, data){
@@ -95,7 +95,11 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response)
-        .catch(error => console.log(error))
+        .catch(error => {
+            console.log("patchPassword error:",error,"type of error:", typeof error)
+            console.log("error response:", error.response)
+            return error.response
+        })
     }
 
     getCount(){
@@ -105,7 +109,7 @@ export default class UserService extends Service{
             withCredentials: true,
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     getSorted(field, skip, limit, direction){
@@ -124,7 +128,7 @@ export default class UserService extends Service{
             withCredentials: true
         })        
         .then(response => response)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     search(term){
@@ -134,7 +138,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     patchForgottenPassword(data){
@@ -145,7 +149,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response)
-        .catch(error => console.error(error))
+        .catch(error => error.response)
     }
 
     sendForgottenPasswordLink(data){
@@ -156,7 +160,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response)
-        .catch(error => console.error(error))
+        .catch(error => error.response)
     }
 
     sendInviteLink(userObj){
@@ -166,8 +170,8 @@ export default class UserService extends Service{
             withCredentials:true,
             data: userObj
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     deleteUserByID(id){
@@ -177,7 +181,7 @@ export default class UserService extends Service{
             withCredentials: true
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 }
 

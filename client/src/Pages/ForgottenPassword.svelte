@@ -36,11 +36,11 @@
             userService.sendForgottenPasswordLink({email: email}).then(res => {
                 console.log("Successfully sent password reset link. Response: ", res);
                 if(res != null){
-                    swal("If there is a user registered with this email, a mail has been sent with a link to reset the password.")
+                    swal("Success", "If there is a user registered with this email, a mail has been sent with a link to reset the password.", "success")
                     .then(() => navigate("/login"))
                 }
                 else{
-                    document.getElementById("errorField").innerHTML = "Invalid credentials. Please try to re-enter your email/password.";
+                    document.getElementById("errorField").innerHTML = "Invalid email. Please try to re-enter your email.";
                 }
             })
             .catch((err) => {
@@ -60,11 +60,14 @@
             userService.patchForgottenPassword({email: email, newPassword: pw1, token: token})
             .then((res)=>{
                 if(res.status == 204){
-                    swal("Your password has been changed!\nYou will now be logged out")
+                    swal("Success","Your password has been changed!\nYou will now be logged out", "success")
                     .then(()=>{
                         userInfo=null;
                         navigate("/");
                     })
+                }
+                else{
+                    swal("Error", "Failed to set password. \nReason: "+res?.data.message, "error")
                 }
             })
             .catch((err)=>{

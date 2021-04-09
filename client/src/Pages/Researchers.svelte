@@ -4,6 +4,9 @@
   import {dateFromObjectId} from "../Utility/dateFromObjectId"
   import Table from "../Components/Table.svelte";
   import TableFilter from "../Components/TableFilter.svelte";
+  import { Overlay, ProgressCircular } from 'svelte-materialify';
+
+  let loadingData = true;
   export let userInfo;
 
   console.log("in researchers");
@@ -65,6 +68,10 @@
   $: data && generateTable();
 </script>
 
+<Overlay bind:active={loadingData}>
+  <h1 class="text-h1 mb-16 white-text">Loading data...</h1>
+  <ProgressCircular color="white" indeterminate size={128} />
+</Overlay>
 {#if data2DArray}
   <Table
     bind:filterBy
@@ -76,7 +83,7 @@
       await userService.deleteUserByID(id);
     }}
   />
-  <TableFilter bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+  <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
 {/if}
 
 <style>

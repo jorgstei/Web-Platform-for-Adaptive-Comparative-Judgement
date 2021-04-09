@@ -1,17 +1,19 @@
-html, body {
+html {
 	position: relative;
 	width: 100%;
-	height: 100%;
-	background-color: #eee;
+	height: auto;
+	min-height: 100%;
+	background-color: #FFF;
 }
 
 body {
-	color: #333;
+	color: #FFF;
 	margin: 0;
 	padding: 0;
 	top: 0;
-	box-sizing: border-box;
 	max-width: 100%;
+	height: auto;
+	min-height: 100vh;
 	
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }

@@ -21,6 +21,9 @@ async function generateUniqueHashCode(data){
     if(results >= Math.floor(LARGEST_PRIME_BELOW_1M*0.75)){
         return -1;
     }
+    //Calculate the key and create a large spread by using pow with a prime.
+    //With a 6 digit code we have to use a power of 3.4 or greater to get a key pre-mod above LARGEST_PRIME_BELOW_1m.
+    //When data is ObjectID, the largest value produced (all lower case z's) is around 1E38, well within the capabilities of JS Number.
     let key = 0;
     for(let i = 0; i < data.length; i++){
         key += data.charCodeAt(i);
@@ -30,6 +33,7 @@ async function generateUniqueHashCode(data){
     const firstResult = result;
     const haveResetOnce = false;
     let unique = false;
+    //This loop should probably be made more efficient, f.ex. generating multiple keys and checking them in paralell (or just 1 call to the DB)
     while(!unique){
         const surveyDoc = await Survey.findOne({inviteCode: result})
         if(surveyDoc == undefined || surveyDoc._id == null){
@@ -50,10 +54,11 @@ async function generateUniqueHashCode(data){
     return result;
 }
 
+//TODO: document api
 router.post("/function/estimate", auth, async (req, res) => {
     console.log("Called survey/function/estimate")
     if(req.role !== "admin" && req.role !== "researcher"){
-        res.sendStatus(401)
+        res.status(401).json({message: "Forbidden"})
         return;
     }
     axios(
@@ -68,9 +73,8 @@ router.post("/function/estimate", auth, async (req, res) => {
     .then(response => res.status(200).json(response.data))
     .catch(response => {
         console.log(response)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     })
-
 })
 
 /**
@@ -132,17 +136,17 @@ router.get("/", auth, async (req, res) => {
     console.log("Called get all surveys")
     try {
         if (req.role !== "admin") {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const surveys = await Survey.find()
         if (!surveys) {
-            throw new Error("survey_route.js get all surveys failed")
+            throw new Error("survey_route.js get all surveys failed.")
         }
         res.json(surveys)
     } catch (error) {
         console.log("Error get all surveys: ", error)
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find any documents."})
     }
 })
 

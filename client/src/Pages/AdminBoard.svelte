@@ -16,12 +16,12 @@ import Profile from "./Profile.svelte";
 </script>
 
 <Router url="admin_board/">
-  <main>
+  <main class="d-flex flex-row">
     {#if userInfo != null && userInfo != undefined && userInfo.email != null}
       <div id="menuWrapper">
         <Menu {userInfo} />
       </div>
-      <div class="contentWrapper">
+      <div class="contentWrapper flex-grow-1">
         <Route path="profile">
           <Profile bind:userInfo></Profile>
         </Route>
@@ -57,23 +57,17 @@ import Profile from "./Profile.svelte";
 
 <style>
   main {
-    display: grid;
-    grid-template-columns: 1fr 5fr;
-    grid-column-gap: 0;
-    width: 100vw;
-    padding-top: 5vh;
+    width: auto;
     text-align: center;
   }
 
   #menuWrapper {
     width: 15vw;
-    padding-top: 10vh;
-    padding-left: 2vw;
-    padding-right: 0;
-    margin-right: 0;
   }
 
   .contentWrapper {
+    /*
     max-width: fit-content;
+    */
   }
 </style>

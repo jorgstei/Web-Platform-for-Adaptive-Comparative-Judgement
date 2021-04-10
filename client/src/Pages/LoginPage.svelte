@@ -279,7 +279,7 @@
         </div>
     </div>
 {:else}
-    <div class="d-flex flex-column justify-center align-center">
+    <div class="d-flex flex-column justify-center align-center" style="padding-top: 10vh;">
         <div class="d-flex flex-column">
             <h1 class="text-h3 mb-3 align-self-center">Welcome back to ACJ!</h1>
             <h2 class="text-h4 mb-6 align-self-center">

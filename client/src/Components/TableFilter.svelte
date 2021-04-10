@@ -124,8 +124,8 @@
 
 <div class="table-filter-container">
     <ul>
-        <li style="width:15%;">
-            <Select items={limitItems} bind:value={limit} on:change={setLimit}>Limit</Select>
+        <li style="width:15%;" on:click={() => setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100)}>
+            <Select items={limitItems} bind:value={limit} mandatory on:change={setLimit}>Limit</Select>
         </li>
 
         <li>
@@ -175,7 +175,7 @@ li > select {
 }
 ul{
     list-style-type: none;
-    padding: 0;   
+    padding: 0;
 }
 
 </style>

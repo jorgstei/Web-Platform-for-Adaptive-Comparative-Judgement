@@ -462,26 +462,26 @@
         { name: "Testing", value: "testing" },
         { name: "For fun", value: "fun" },
     ];
-    let selectedPurpose;
+    let selectedPurpose = "research";
     let mediaTypeItems = [
         { name: "Mix", value: "mix" },
         { name: "PDF", value: "pdf" },
         { name: "Text", value: "text" },
         { name: "Image", value: "image" },
     ];
-    let selectedMediaType;
+    let selectedMediaType = "mix";
 
     let accessibilityItems = [
         { name: "Link", value: "link" },
         { name: "Code", value: "code" },
     ];
-    let selectedAccessibility;
+    let selectedAccessibility = "link";
 
     let activeItems = [
         { name: "Yes", value: "1" },
         { name: "No", value: "0" },
     ];
-    let selectedActiveLevel;
+    let selectedActiveLevel = "1";
 
     let surveyTitleValue;
     let surveyQuestionValue;
@@ -540,13 +540,14 @@
 
 <div id="create_wrapper">
     <div id="general_info_form">
-        
-        <div id="main_input_wrapper">
+        <div id="titleWrapper">
             {#if editing}
-            <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">Edit Survey: {surveyTitleValue}</h1>
-        {:else}
-            <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem; margin: auto;" >Create Survey</h1>
-        {/if}
+                <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">Edit Survey: {surveyTitleValue}</h1>
+                {:else}
+                <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem; margin: auto;" >Create Survey</h1>
+            {/if}
+        </div>
+        <div id="main_input_wrapper">
             {#if editing}
                 <Button
                     fab
@@ -657,24 +658,24 @@
 
             <div class="d-flex flex-rows" style="margin-top: 4vh;">
                 <div style="min-width: 25%;">
-                    <Select items={purposeItems} bind:value={selectedPurpose}
+                    <Select mandatory items={purposeItems} bind:value={selectedPurpose}
                         >Purpose</Select
                     >
                 </div>
                 <div style="min-width: 25%;">
-                    <Select
+                    <Select mandatory
                         items={mediaTypeItems}
                         bind:value={selectedMediaType}>Media Type</Select
                     >
                 </div>
                 <div style="min-width: 25%;">
-                    <Select
+                    <Select mandatory
                         items={accessibilityItems}
                         bind:value={selectedAccessibility}>Media Type</Select
                     >
                 </div>
                 <div style="min-width: 25%;">
-                    <Select items={activeItems} bind:value={selectedActiveLevel}
+                    <Select mandatory items={activeItems} bind:value={selectedActiveLevel}
                         >Active</Select
                     >
                 </div>
@@ -975,6 +976,13 @@
         margin: 1vh auto 1vh auto;
         border: 0.2vw solid rgba(200, 200, 200, 0.6);
     }
+
+    #titleWrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
 
     #general_info_form {
         text-align: left;

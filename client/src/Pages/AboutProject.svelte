@@ -3,7 +3,7 @@
 <main>
   <h1>About this project</h1>
   <div id="about1" class="textbox">
-      <h2>What is adaptive comparative judgement?</h2>
+      <h2 class="text-h4 mb-4">What is adaptive comparative judgement?</h2>
       <p>
         Comparative judgement is a method derived from L.L. Thurstone's conceived "Law of comparative judgement". 
         This law essentially states that we generally rank things more accurately when asked to compare it to other similar things, as opposed to ranking it by itself on an absolute scale.
@@ -29,7 +29,7 @@
   </div>
 
   <div id="about3" class="textbox">
-    <h2>About us</h2>
+    <h2 class="text-h4 mb-4">About us</h2>
       <p>
         This project is the result of a bachelor thesis in computer engineering at the Norwegian University of Science and Technology (NTNU).
         The students who authored the code for this project are Lasse Ivar Seivaag and Jørgen Steig, under supervision from Olav Skundberg.
@@ -42,7 +42,7 @@
       <p>There are aspirations for this project to later serve as a (hopefully) better way for professors to grade their students.</p>
   </div>
   <div id="about4" class="textbox">
-    <h2>Can we use your product?</h2>
+    <h2 class="text-h4 mb-4">Can we use your product?</h2>
     <p>
       Although initially built with the purpose of assisting scientists at NTNU to do their research, we gladly welcome anyone else who would like to utilize the product!
       The source code is avaliable fully open-source on <a href="https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement">GitHub</a>, distributed under the Creative Commons by-nc-sa license.

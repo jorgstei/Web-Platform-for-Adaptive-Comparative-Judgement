@@ -280,26 +280,28 @@
     </div>
 {:else}
     <div class="d-flex flex-column justify-center align-center">
-        <h1 class="text-h3 mb-2">Welcome back to ACJ!</h1>
-        <h2 class="text-h4 mb-2">
-            Log in below to see your surveys, and continue making new ones.
-        </h2>
-        <div class="d-flex flex-column justify-center align-left">
-            <TextField class="ma-2" rules={[validateEmail]} bind:value={email}>
-                Email
-            </TextField>
-            <TextField
-                class="ma-2"
-                bind:value={newPw1}
-                type={newPw1Show ? "text" : "password"}
-            >
-                Password
-                <div slot="append" on:click={() => (newPw1Show = !newPw1Show)}>
-                    <Icon path={newPw1Show ? mdiEyeOff : mdiEye} />
-                </div>
-            </TextField>
-            <Button class="ma-2 mt-6" outlined on:click={login}>Log in</Button>
-            <Link class="justify-self-center" to="forgotten_password">Forgotten your password?</Link>
+        <div class="d-flex flex-column">
+            <h1 class="text-h3 mb-3 align-self-center">Welcome back to ACJ!</h1>
+            <h2 class="text-h4 mb-6 align-self-center">
+                Log in below to see your surveys, and continue making new ones.
+            </h2>
+            <div class="d-flex flex-column justify-center align-left">
+                <TextField class="ma-2" rules={[validateEmail]} bind:value={email}>
+                    Email
+                </TextField>
+                <TextField
+                    class="ma-2"
+                    bind:value={newPw1}
+                    type={newPw1Show ? "text" : "password"}
+                >
+                    Password
+                    <div slot="append" on:click={() => (newPw1Show = !newPw1Show)}>
+                        <Icon path={newPw1Show ? mdiEyeOff : mdiEye} />
+                    </div>
+                </TextField>
+                <Button class="ma-2 mt-6 mb-4" outlined on:click={login}>Log in</Button>
+                <Link class="align-self-center text-h5" to="forgotten_password">Forgotten your password?</Link>
+            </div>
         </div>
     </div>
 {/if}

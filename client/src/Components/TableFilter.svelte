@@ -134,7 +134,7 @@
             <img class="navigate-image" on:click={goBackOnePage} src="/img/triangle-left-arrow.svg" alt="Go back one page" title="Go back one page">
         </li>
         <li>
-            <input class="goto-page-input" type="text" placeholder={currentPage} on:input={validateGotoPageInput} value={currentPage} maxlength=5 title="Page number">
+            <input class="goto-page-input" type="text" placeholder={currentPage} on:input={validateGotoPageInput} bind:value={currentPage} style={"width:" + 1.5*currentPage.toString().length + "vw"} title="Page number">
         </li>
         <li>
             <img class="navigate-image" on:click={goForwardOnePage} src="/img/triangle-right-arrow.svg" alt="Go forward one page" title="Go forward one page">
@@ -153,7 +153,7 @@
     max-width: 60vw;
 }
 .goto-page-input{
-    max-width: 2rem;
+    
     margin-top:0;
     padding-top:0;
     text-align: center;

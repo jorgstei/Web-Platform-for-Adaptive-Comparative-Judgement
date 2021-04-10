@@ -165,7 +165,7 @@ router.get("/user/:id", auth, async (req, res) => {
     try {
         if (req.role !== "admin" && req.userid !== req.params.id) {
             console.log("req.role: ", req.role, "req.params.id: ", req.params.id, "req.userid: ", req.userid)
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const surveys = await Survey.find({ "owners.ownerId": req.params.id })
@@ -175,7 +175,7 @@ router.get("/user/:id", auth, async (req, res) => {
         res.json(surveys)
     } catch (error) {
         console.log("Error get all surveys: ", error)
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find any documents."})
     }
 })
 
@@ -193,7 +193,7 @@ router.get("/function/count", auth, async (req, res) => {
     console.log("Get count of surveys")
     try {
         if (req.role !== "admin" && req.role !== "researcher") {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         const me_userid = me(req.userid)
@@ -206,22 +206,20 @@ router.get("/function/count", auth, async (req, res) => {
         }
     } catch (error) {
         console.log("survey/function/count error:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
 //Get random item pair from survey by id
-router.get("/item/:id", async (req, res) => {
+router.get("/item/:id", auth, async (req, res) => {
     console.log("called get random pair from survey by id for item")
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id })
         if (!surveyDoc || surveyDoc._id == null) {
             throw new Error("Could not find survey by id")
         }
-        if (!surveyDoc.accessibility === "linkonly") {
-            if (!req.role === "judge" && !req.userid === surveyDoc.ownerId) {
-                //TODO: Check that the passphrase from cookie is valid for this survey
-            }
+        if (!req.role === "judge" && !req.role === "admin" && !req.userid === surveyDoc.ownerId) {
+            res.status(403).json({message: "Forbidden"})
         }
         const expectedComparisons = surveyDoc.expectedComparisons;
         const count = surveyDoc.items.length

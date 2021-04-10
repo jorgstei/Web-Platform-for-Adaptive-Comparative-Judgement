@@ -73,18 +73,21 @@
   <ProgressCircular color="white" indeterminate size={128} />
 </Overlay>
 {#if data2DArray}
-  <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Users</h1>
-  <Table
-    bind:filterBy
-    tableTitle="Researchers"
-    bind:userInfo
-    bind:tableData={data2DArray}
-    {tableAttributes}
-    deleteFunc={async (id) => {
-      await userService.deleteUserByID(id);
-    }}
-  />
-  <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+  <h1 class="text-h1 ma-2" style="font-size: 5rem">Users</h1>
+  <div class="d-flex flex-column justify-content-center">
+      <Table
+      bind:filterBy
+      bind:userInfo
+      bind:tableData={data2DArray}
+      itemName = "researcher"
+      {tableAttributes}
+      deleteFunc={async (id) => {
+        await userService.deleteUserByID(id);
+      }}
+    />
+    <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+  </div>
+  
 {/if}
 
 <style>

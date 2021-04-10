@@ -22,7 +22,7 @@
         }
         :
         {
-            text: "Log out", fun: () => {userService.logout().then((res)=>{userInfo=null; navigate("/"); return;})}
+            text: "Log out", fun: () => {userService.logout().then(()=>{userInfo=null; navigate("/")})}
         }
     ].reverse()
 

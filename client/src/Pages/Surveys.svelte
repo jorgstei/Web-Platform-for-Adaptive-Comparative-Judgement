@@ -142,19 +142,21 @@
 </Overlay>
 <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Surveys</h1>
 {#if data2DArray}
-    <Table
-        bind:filterBy
-        tableTitle="Surveys"
-        bind:tableData={data2DArray}
-        bind:userInfo
-        tableAttributes={dataHeaders}
-        {userRights}
-        surveyActivityStatus={activeStatus}
-        deleteFunc={async (id) => {
-            await surveyService.deleteSurvey(id);
-        }}
-    />
-    <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+    <div class="d-flex flex-column justify-content-center">
+        <Table
+            bind:filterBy
+            bind:tableData={data2DArray}
+            bind:userInfo
+            itemName = "survey"
+            tableAttributes={dataHeaders}
+            {userRights}
+            surveyActivityStatus={activeStatus}
+            deleteFunc={async (id) => {
+                await surveyService.deleteSurvey(id);
+            }}
+        />
+        <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+    </div>
 {/if}
 
 <style>

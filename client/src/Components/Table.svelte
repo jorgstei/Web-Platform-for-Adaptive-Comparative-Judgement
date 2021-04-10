@@ -15,10 +15,10 @@
     export let userRights = undefined;
     export let surveyActivityStatus = undefined;
     export let userInfo = undefined
+    export let itemName = "item";
     console.log("in table",tableData)
 
     async function updateFilterBy(e, attr){
-        
         if(!attr.fieldName==""){
             console.log("filter before counter:",filterBy)
             filterBy = {
@@ -40,11 +40,16 @@
         console.log("onMount Table.svelte", "tableAttributes: ", tableAttributes)
 
     })
+
+    const capitalizeFirstCharacter = (str) => {
+        const firstChar = str.charAt(0).toUpperCase();
+        return firstChar + str.substring(1,str.length);
+    }
     
 </script>
 <div class="container">
-    {#if tableTitle}
-    <h3>{tableTitle}</h3>
+    {#if tableTitle !== undefined}
+        <h3>{tableTitle}</h3>
     {/if}
     <table class="main_table">
         <tr id="table_header">
@@ -94,7 +99,7 @@
                             let content_id = row[tableAttributes.findIndex(e=>e.viewName=="id")]; 
                             swal({
                             title: "Are you sure?",
-                            text: "Are you sure you want to delete this " + tableTitle.toLowerCase().substring(0,tableTitle.length-1) + " ?",
+                            text: "Are you sure you want to delete this " + itemName + "?",
                             icon: "warning",
                             dangerMode: true,
                             buttons: ["Cancel", "Delete"]
@@ -102,7 +107,7 @@
                             .then(async willDelete => {
                                 if (willDelete) {
                                     await deleteFunc(content_id).then(()=> {
-                                        swal("Deleted!", tableTitle.substring(0,tableTitle.length-1) + " has been deleted!", "success");
+                                        swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
                                             tableData = tableData.filter(e => e[tableAttributes.findIndex(e=>e.viewName=="id")] != content_id);
                                     }).catch((err)=>{
                                         swal("Could not delete", "Due to error: " + err, "error");
@@ -118,7 +123,7 @@
                             let content_id = row[tableAttributes.findIndex(e=>e.viewName=="id")];
                             swal({
                             title: "Are you sure?",
-                            text: "Are you sure you want to delete this " + tableTitle.toLowerCase().substring(0,tableTitle.length-1) + " ?",
+                            text: "Are you sure you want to delete this " + itemName + "?",
                             icon: "warning",
                             dangerMode: true,
                             buttons: ["Cancel", "Delete"]
@@ -126,7 +131,7 @@
                             .then(async willDelete => {
                                 if (willDelete) {
                                     await deleteFunc(content_id).then(()=> {
-                                        swal("Deleted!", tableTitle.substring(0,tableTitle.length-1) + " has been deleted!", "success");
+                                        swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
                                             tableData = tableData.filter(e => e[tableAttributes.findIndex(e=>e.viewName=="id")] != content_id);
                                     }).catch((err)=>{
                                         swal("Could not delete", "Due to error: " + err, "error");

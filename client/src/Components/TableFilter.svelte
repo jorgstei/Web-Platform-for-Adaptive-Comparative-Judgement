@@ -15,6 +15,9 @@
     export let count = 0;
     export let direction = 1;
     export let data = undefined;
+    import { TextField, Button, Icon, Tooltip, Textarea, Select, ListItemGroup, ListItem, Card, CardText, CardActions, Checkbox} from 'svelte-materialify';
+    import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel   } from "@mdi/js";
+
 
     onMount(() => {
         countFunction().then(res => count = res)
@@ -53,8 +56,6 @@
     }
 
     function setLimit(e){
-        limit = e.target.value;
-        console.log(limit);
         currentPage = (currentPage > Math.floor((count/limit))) ? Math.floor(count/limit) : currentPage
         filter()
     }
@@ -110,23 +111,23 @@
         }
     }
 
+    let limitItems = [
+        {name:"5", value:5},
+        {name:"10", value:10},
+        {name:"25", value:25},
+        {name:"50", value:50},
+        {name:"100", value:100}
+    ];
+
     $:filterBy && updatedFilterBy()
 </script>
 
 <div class="table-filter-container">
     <ul>
-        <li>
-            <label class="label-hori" for="dropdown-limit">Limit:</label>
+        <li style="width:15%;">
+            <Select items={limitItems} bind:value={limit} on:change={setLimit}>Limit</Select>
         </li>
-        <li>
-            <select name="limit" id="dropdown-limit" on:change={setLimit} title="Entries per page">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </li>
+
         <li>
             <img class="navigate-image" on:click={gotoFirstPage} src="/img/arrow-end-left.svg" alt="Go to first page" title="Go to first page">
         </li>
@@ -148,7 +149,7 @@
 <style>
 .table-filter-container{
     /*border:2px solid #95A5A6 ;*/
-    margin-left: 2vw;
+    margin:1.5vh auto 0 auto;
     padding: 0;
     max-width: 60vw;
 }

@@ -7,8 +7,10 @@
     ListItem,
     Avatar,
     Icon,
-    Divider } from 'svelte-materialify';
-    import { mdiAccount, mdiAccountMultiple, mdiAccountPlus, mdiBook, mdiBookMultiple, mdiBookPlus } from "@mdi/js";
+    Divider,
+    Button,
+    } from 'svelte-materialify';
+    import { mdiAccount, mdiAccountMultiple, mdiAccountPlus, mdiBook, mdiBookMultiple, mdiBookPlus, mdiArrowLeftBoldCircleOutline, mdiArrowRightBoldCircleOutline, mdiArrowLeftDropCircleOutline, mdiArrowRightDropCircleOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
 
     const menuItems = [
         {
@@ -29,15 +31,37 @@
     ]
     export let userInfo;
     console.log("in menu", userInfo)
-
+    
+    
     let navigateTo = (to) => {
         navigate(to)
     }
+
+    let collapsedMenu = false;
+
 </script>
 
 {#if userInfo != null && userInfo != undefined}
-<NavigationDrawer style="position: fixed; margin-top:5vh;margin-right:auto;z-index:2;">
-    <h4 class="text-h4 mb-2 mt-6">Menu</h4>
+<NavigationDrawer bind:mini={collapsedMenu} style="position: fixed; margin-top:5vh;padding-top:5vh;margin-right:auto;z-index:2;" miniWidth="5vw;">
+
+    <ListItem>
+        <div class="d-flex flex-row justify-space-between">
+
+            {#if !collapsedMenu}
+                <h4 class="text-h4">Menu</h4>
+            {/if}
+            <Button fab style="width:2vw; height: 2vw;" on:click={()=>{collapsedMenu = !collapsedMenu;}}>
+                {#if !collapsedMenu}
+                    <Icon size="1vw" path={mdiChevronLeft }></Icon>
+                {:else}
+                <Icon path={mdiChevronRight}></Icon>
+                {/if}
+            </Button>
+        </div>
+        
+    </ListItem>
+
+    <Divider />
     <List nav dense>
         <ListItemGroup>
             {#each menuItems as item}

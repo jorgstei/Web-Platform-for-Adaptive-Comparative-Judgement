@@ -140,7 +140,7 @@
     <h1 class="text-h1 mb-16 white-text">Loading data...</h1>
     <ProgressCircular color="white" indeterminate size={128} />
 </Overlay>
-<h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Surveys</h1>
+<h1 class="text-h1 ma-2" style="font-size: 5rem">Surveys</h1>
 {#if data2DArray}
     <div class="d-flex flex-column justify-content-center">
         <Table

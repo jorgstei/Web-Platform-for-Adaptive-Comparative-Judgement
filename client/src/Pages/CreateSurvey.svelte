@@ -528,7 +528,7 @@
 </script>
 
 <div id="create_wrapper">
-    <div id="general_info_form">
+
         <div id="titleWrapper">
             {#if editing}
                 <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">Edit Survey: {surveyTitleValue}</h1>
@@ -819,7 +819,6 @@
             >
             <input type="text" id="dummy" />
         </div>
-    </div>
     <Button
         fab
         style="right: 2vw; bottom:7vh; position: fixed; min-width:4vw; min-height:4vw;"
@@ -944,15 +943,7 @@
     }
     #create_wrapper {
         margin: auto;
-        padding-top: 5vh;
         text-align: center;
-        overflow: hidden;
-    }
-    #general_info_form {
-        display: grid;
-        grid-template-rows: auto;
-        height: 100%;
-        margin-bottom: 5vh;
     }
 
     #main_input_wrapper {
@@ -970,11 +961,6 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-    }
-    
-
-    #general_info_form {
-        text-align: left;
     }
 
     input {

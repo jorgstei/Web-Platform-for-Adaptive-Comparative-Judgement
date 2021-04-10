@@ -94,23 +94,6 @@
 </div>
 
 
-<!--
-    <div class="wrapper">
-        <h1>Invite a researcher!</h1>
-        <select name="role" class="role_dropdown">
-            <option value="researcher">Researcher</option>
-            <option value="admin">Admin</option>
-        </select>
-    
-        <label class="inputLabel" for="email">Email</label>
-        <input id="email" class="inputfield" name="email" type="text" on:keydown={registerOnEnterPress}>
-        
-        <button class="submitBtn" on:click={register}>Register user</button>
-        
-    </div>
--->
-
-
 
 
 <style>
@@ -122,12 +105,12 @@
     h1 {
 		padding: 0;
         margin-top: 0;
-		color: #000;
-		font-size: 3rem;
-		font-weight: 100;
-        padding-top: 10vh;
 		font-weight: 100;
 	}
+    div{
+        padding:0;
+        margin:0;
+    }
 
     .wrapper{
         max-width: 60vw;

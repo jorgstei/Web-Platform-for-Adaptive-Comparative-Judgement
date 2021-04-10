@@ -97,58 +97,6 @@
 
 
 <style>
-    .role_dropdown {
-        width: 25%;
-        margin: auto;
-        margin-bottom: 3vh;
-    }
-    h1 {
-		padding: 0;
-        margin-top: 0;
-		font-weight: 100;
-	}
-    div{
-        padding:0;
-        margin:0;
-    }
-
-    .wrapper{
-        max-width: 60vw;
-        display: grid;
-        grid-template-rows: auto;
-        text-align: center;
-        background-color: #eee;
-        margin-left: 0;
-    }
-    .inputLabel{
-        font-size: 1.5em;
-        margin: auto;
-        text-align: center;
-    }
-    .inputfield{
-        width: 50%;
-        margin: auto;
-        margin-bottom: 3vh;
-        padding: 0.5em 2em;
-        font-size: 1em;
-        text-align: center;
-        background-color: rgba(200, 200, 200, 0.3);
-        border-color: rgba(200, 200, 200, 0.3);
-    }
-    .inputfield:hover{
-        background-color: rgba(150, 150, 150, 0.7);
-    }
-    .submitBtn{
-        width: 20%;
-        margin: auto;
-        margin-top: 2em;
-        font-size: 1em;
-        background-color: rgba(100, 100, 100, 0.05);
-        border-color: rgba(100, 100, 100, 0.05);
-    }
-    .submitBtn:hover{
-        background-color:  rgba(100, 100, 100, 0.3);
-    }
     #errorField{
         color:red;
         font-size: 1em;

@@ -38,8 +38,8 @@ export default class SurveyAnswerService extends Service{
             url: this.path + "/surveyanswer/survey/"+id,
             withCredentials: true,
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     post(surveyanswer){

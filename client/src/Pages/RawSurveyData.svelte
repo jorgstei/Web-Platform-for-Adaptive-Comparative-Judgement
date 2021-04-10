@@ -8,6 +8,7 @@
     import axios from "axios";
     import swal from "sweetalert";
     import { dateFromObjectId } from "../Utility/dateFromObjectId";
+    import {Select, Button, Row, Col, ListItem} from "svelte-materialify"
 
     export let userInfo;
 
@@ -39,6 +40,7 @@
     let linearRanking = null;
     let allJudgesHeaders = [
         { fieldName: "", viewName: "id" },
+        { fieldName: "", viewName: "answers" },
         { fieldName: "", viewName: "agree" },
         { fieldName: "", viewName: "infit" },
         { fieldName: "", viewName: "outfit" },
@@ -63,6 +65,13 @@
     let allItems2DArray = null;
 
     let currentContentView = "linearRanking";
+
+    let contentViewItems = [
+        {name:"Linear ranking", value:"linearRanking"},
+        {name:"By judge", value:"byJudge"},
+        {name:"By item", value:"byItem"},
+        {name:"Raw data", value:"rawdata"}
+    ]
 
     let surveyStatistics = null;
 
@@ -124,21 +133,21 @@
                         } else {
                             linearRanking2DArray.push([
                                 answerWithSameId.data,
-                                linearRanking[i].infit,
-                                linearRanking[i].outfit,
-                                linearRanking[i].score,
-                                linearRanking[i].theta,
+                                linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
+                                linearRanking[i].outfit === undefined ? "N/A": linearRanking[i].outfit,
+                                linearRanking[i].score === undefined ? "N/A": linearRanking[i].score,
+                                linearRanking[i].theta === undefined ? "N/A": linearRanking[i].theta,
                             ]);
                             allItems2DArray.push([
                                 answerWithSameId.data,
-                                linearRanking[i].infit,
-                                linearRanking[i].outfit,
-                                linearRanking[i].propscore,
-                                linearRanking[i].theta,
-                                linearRanking[i].N1,
-                                linearRanking[i].N0,
-                                linearRanking[i].Ntot,
-                                linearRanking[i].id,
+                                linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
+                                linearRanking[i].outfit === undefined ? "N/A": linearRanking[i].outfit,
+                                linearRanking[i].propscore === undefined ? "N/A": linearRanking[i].propscore,
+                                linearRanking[i].theta === undefined ? "N/A": linearRanking[i].theta,
+                                linearRanking[i].N1 === undefined ? "N/A": linearRanking[i].N1,
+                                linearRanking[i].N0 === undefined ? "N/A": linearRanking[i].N0,
+                                linearRanking[i].Ntot === undefined ? "N/A": linearRanking[i].Ntot,
+                                linearRanking[i].id === undefined ? "N/A": linearRanking[i].id,
                             ]);
                         }
                     }
@@ -155,17 +164,19 @@
                     let allJudges2DArray = [];
                     allJudges.forEach((e) => {
                         const leftBias = getLeftBias(answers, e.judge);
+                        const medianTime = getMedianTime(answers, e.judge);
+                        const averageTime = getAverageTime(answers, e.judge);
+
                         allJudges2DArray.push([
-                            e.judge,
-                            e.agree,
-                            e.infit,
-                            e.outfit,
-                            leftBias.toFixed(2),
-                            (1 - leftBias).toFixed(2),
-                            getMedianTime(answers, e.judge).toFixed(2) +
-                                " seconds",
-                            getAverageTime(answers, e.judge).toFixed(2) +
-                                " seconds",
+                            e.judge === undefined ? "N/A": e.judge,
+                            answers.filter((answer) => answer.judgeId == e.judge).length,
+                            e.agree === undefined ? "N/A": e.agree,
+                            e.infit === undefined ? "N/A": e.infit,
+                            e.outfit === undefined ? "N/A": e.outfit,
+                            leftBias === "N/A" ? leftBias: leftBias.toFixed(2),
+                            leftBias === "N/A" ? leftBias: (1 - leftBias).toFixed(2),
+                            medianTime === "N/A" ? medianTime: medianTime.toFixed(2) + " seconds",
+                            averageTime === "N/A" ? averageTime: averageTime.toFixed(2) + " seconds",
                         ]);
                     });
                     console.log(
@@ -241,6 +252,9 @@
     getSurveyAnswers();
 
     const getLeftBias = (answers, judgeId) => {
+        if(judgeId == "N/A"){
+            return "N/A";
+        }
         let matchingAnswers = answers.filter(
             (answer) => answer.judgeId == judgeId
         );
@@ -252,9 +266,15 @@
     };
 
     const getMedianTime = (answers, judgeId) => {
+        if(judgeId == "N/A"){
+            return "N/A";
+        }
         let matchingAnswers = answers.filter(
             (answer) => answer.judgeId == judgeId
         );
+        if(matchingAnswers.length < 2){
+            return "N/A";
+        }
         let timestamps = matchingAnswers.map(
             (e) => dateFromObjectId(e._id).getTime() / 1000
         );
@@ -266,20 +286,22 @@
             return b - a;
         });
         if (differences.length % 2 == 0) {
-            return (
-                (differences[differences.length / 2 - 1] +
-                    differences[differences.length / 2]) /
-                2
-            );
+            return ((differences[differences.length / 2 - 1] + differences[differences.length / 2]) / 2);
         } else {
             return differences[Math.floor(differences.length / 2)];
         }
     };
 
     const getAverageTime = (answers, judgeId) => {
+        if(judgeId == "N/A"){
+            return "N/A";
+        }
         let matchingAnswers = answers.filter(
             (answer) => answer.judgeId == judgeId
         );
+        if(matchingAnswers.length < 2){
+            return "N/A";
+        }
         let timestamps = matchingAnswers.map((e) => {
             return dateFromObjectId(e._id).getTime() / 1000;
         });
@@ -327,6 +349,7 @@
     let csvDownloadRawDataButton = document.createElement("button");
     csvDownloadRawDataButton.innerHTML = "Download as .csv";
     csvDownloadRawDataButton.style.float = "";
+    csvDownloadRawDataButton.style.border = "1px solid #aaa";
     csvDownloadRawDataButton.onclick = () => {
         console.log(
             "You just clicked the download raw data button! Downloading..."
@@ -337,6 +360,7 @@
     let csvDownloadByItemButton = document.createElement("button");
     csvDownloadByItemButton.innerHTML = "Download as .csv";
     csvDownloadByItemButton.style.float = "";
+    csvDownloadByItemButton.style.border = "1px solid #aaa";
     csvDownloadByItemButton.onclick = () => {
         console.log(
             "You just clicked the download by item button! Downloading..."
@@ -351,6 +375,7 @@
     let csvDownloadByJudgeButton = document.createElement("button");
     csvDownloadByJudgeButton.innerHTML = "Download as .csv";
     csvDownloadByJudgeButton.style.float = "";
+    csvDownloadByJudgeButton.style.border = "1px solid #aaa";
     csvDownloadByJudgeButton.onclick = () => {
         console.log(
             "You just clicked the download by judge button! Downloading..."
@@ -361,6 +386,7 @@
     let csvDownloadLinearRankingButton = document.createElement("button");
     csvDownloadLinearRankingButton.innerHTML = "Download as .csv";
     csvDownloadLinearRankingButton.style.float = "";
+    csvDownloadLinearRankingButton.style.border = "1px solid #aaa";
     csvDownloadLinearRankingButton.onclick = () => {
         console.log(
             "You just clicked the download linear ranking button! Downloading..."
@@ -381,37 +407,47 @@
         currentContentView;
 </script>
 
-<div id="surveyDataWrapper">
+<div class="d-flex flex-column align-center">
     <h1 id="title">{survey.title}</h1>
     {#if surveyStatistics != null}
-        <table>
-            <tr>
-                <th>Reliability</th>
-                <th>Number of items</th>
-                <th>Number of answers</th>
-                <th>Number of judges</th>
-            </tr>
-            <td>{surveyStatistics.rel}</td>
-            <td>{surveyStatistics.result.length}</td>
-            <td>{answerValues.length}</td>
-            <td>{surveyStatistics.judges.length}</td>
-        </table>
+        <div style="border:1px solid #aaa; width:60%; margin-bottom:4vh;">
+            <Row class="align-start" noGutters style="width:1+0%;">
+                <Col>
+                  <div class="font-weight-bold">Reliability</div>
+                </Col>
+                <Col>
+                  <div class="font-weight-bold">Number of items</div>
+                </Col>
+                <Col>
+                  <div class="font-weight-bold">Number of answers</div>
+                </Col>
+                <Col>
+                    <div class="font-weight-bold">Number of judges</div>
+                </Col>
+            </Row>
+            <Row class="align-start" noGutters style="width:100%; border-top: 1px solid #aaa;">
+                <Col>
+                  <div class="">{surveyStatistics.rel}</div>
+                </Col>
+                <Col>
+                  <div class="">{surveyStatistics.result.length}</div>
+                </Col>
+                <Col>
+                  <div class="">{answerValues.length}</div>
+                </Col>
+                <Col>
+                    <div class="">{surveyStatistics.judges.length}</div>
+                </Col>
+            </Row>
+        </div>
     {/if}
-    <ul class="dropdownList">
-        <li>
-            <label for="view">View</label>
-            <select
-                name="view"
-                id="viewDropdown"
-                on:input={updateCurrentContentView}
-            >
-                <option value="linearRanking">Linear ranking</option>
-                <option value="byJudge">By judge</option>
-                <option value="byItem">By item</option>
-                <option value="rawdata">Raw data</option>
-            </select>
-        </li>
-    </ul>
+    
+    <div style="max-width: 30%;">
+        <Select mandatory items={contentViewItems} bind:value={currentContentView}>View</Select>
+    </div>
+    
+
+
     {#if currentContentView == "linearRanking"}
         {#if linearRanking != null && linearRanking.length > 0}
             <Table
@@ -447,7 +483,7 @@
                 bind:userInfo
                 tableAttributes={allJudgesHeaders}
                 element={csvDownloadByJudgeButton}
-                tableTitle="Judges"
+                itemName="judge's answers"
                 deleteFunc={async (id) => {
                     await surveyAnswerService.deleteByJudgeID(id);
                 }}
@@ -476,13 +512,7 @@
 </div>
 
 <style>
-    #surveyDataWrapper {
-        display: grid;
-        grid-template-rows: 1fr;
-        width: fit-content;
-        text-align: center;
-        padding-top: 5vh;
-    }
+    
     .dropdownList {
         list-style-type: none;
         padding: 0;

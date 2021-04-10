@@ -76,7 +76,6 @@
                     internalDescriptionValue = data.internalDescription;
                     selectedMediaType = data.mediaType;
                     selectedPurpose = data.purpose;
-                    selectedAccessibility = data.accessibility;
                     selectedActiveLevel = data.active ? "1" : "0";
                     comparisonsPerJudge =
                         data.expectedComparisons != undefined
@@ -144,15 +143,14 @@
         let info = {
             title: surveyTitleValue,
             surveyQuestion: surveyQuestionValue,
-            internalDescription: internalDescriptionValue,
+            expectedComparisons: parseInt(comparisonsPerJudge, 10),
             judgeInstructions: judgeInstructionsValue,
+            internalDescription: internalDescriptionValue,
             purpose: selectedPurpose,
-            accessibility: selectedAccessibility,
             mediaType: selectedMediaType,
             active: selectedActiveLevel === "1",
             items: optionsData,
-            owners: surveyResearchers,
-            expectedComparisons: parseInt(comparisonsPerJudge, 10),
+            owners: surveyResearchers
         };
 
         console.log("CREATE SURVEY INFO OBJ", info);
@@ -172,13 +170,23 @@
                 amountOfUniqueComparisons += toAdd;
                 toAdd++;
             }
-            if (amountOfUniqueComparisons < info.expectedComparisons) {
+            if (amountOfUniqueComparisons < parseInt(info.expectedComparisons)) {
                 swal(
                     "Invalid input",
                     "Amount of expected comparisons: " +
                         info.expectedComparisons +
-                        " must be less than or equal to amount of possible unique comparisons " +
+                        " must be less than or equal to amount of possible unique comparisons" +
                         amountOfUniqueComparisons,
+                    "error"
+                );
+                return;
+            }
+            else if(parseInt(info.expectedComparisons) < 1){
+                swal(
+                    "Invalid input",
+                    "Amount of expected comparisons: '" +
+                        info.expectedComparisons +
+                        "' must be greater than 1.",
                     "error"
                 );
                 return;
@@ -292,14 +300,13 @@
         let errorMessage = "";
         for (let key in formObj) {
             let val = formObj[key];
-            console.log("keys: ", key, typeof key);
-            if (val === "") {
+            if (val === "" || Number.isNaN(val) || val===undefined || val===null) {
                 errorMessage = key + " is not filled out";
                 return [false, errorMessage];
-            } else if (key === "items") {
+            }
+            else if (key === "items") {
                 if (val.length < 2) {
                     errorMessage = "The survey must have 2 or more options";
-
                     return [false, errorMessage];
                 }
                 for (let i = 0; i < val.length; i++) {
@@ -464,16 +471,7 @@
     const checkIfAddResearcherByEnter = (e) => {
         console.log("in checkifadd researcher with keycode", e);
         if (e.keyCode == 13) {
-            console.log(
-                "current searchresults are",
-                searchResults,
-                "with len",
-                searchResults.length > 0
-            );
-            if (searchResults.length > 0) {
-                console.log("calling addresearcher");
-                addResearcher(searchResults[0]);
-            }
+            searchForUsers(e);
         }
     };
 
@@ -492,10 +490,6 @@
     ];
     let selectedMediaType = "mix";
 
-    let accessibilityItems = [
-        { name: "Link", value: "link" },
-        { name: "Code", value: "code" },
-    ];
     let selectedAccessibility = "link";
 
     let activeItems = [
@@ -552,15 +546,21 @@
     let showSurveyTitleTooltip,
         showSurveyQuestionTooltip,
         showSurveyJudgeInstructionsTooltip,
-        showSurveyInternalDescriptionTooltip = false;
+        showSurveyInternalDescriptionTooltip
+        = false;
+
     let showSurveyComparisonsPerJudgeTooltip,
-        showSurveySearchForUsersTooltip = false;
+        showSurveySearchForUsersTooltip,
+        showAddOptionTooltip,
+        showCancelEditingTooltip
+        = false;
+
 
     $: surveyResearchers & searchResults;
 </script>
 
 <div id="create_wrapper">
-    <div id="general_info_form">
+
         <div id="titleWrapper">
             {#if editing}
                 <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">Edit Survey: {surveyTitleValue}</h1>
@@ -577,7 +577,7 @@
                         swal({
                             title: "Are you sure?",
                             text:
-                                "Are you sure you want to discard your changes to this survey? All your work will be lost.",
+                                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
                             icon: "warning",
                             dangerMode: true,
                             buttons: ["Nevermind", "Discard"],
@@ -587,12 +587,13 @@
                             }
                         });
                     }}
-                    ><Icon
-                        class="red-text"
-                        path={mdiFileCancel}
-                        size="3vw"
-                    /></Button
-                >
+                    >
+                    
+                    <Tooltip top bind:active={showCancelEditingTooltip}>
+                        <Icon class="red-text" path={mdiFileCancel} size="3vw"/>
+                        <span slot="tip">Cancel editing</span>
+                    </Tooltip>
+                </Button>
             {/if}
             <Textarea
                 style="margin-top: 2vh;"
@@ -678,24 +679,19 @@
             </Textarea>
 
             <div class="d-flex flex-rows" style="margin-top: 4vh;">
-                <div style="min-width: 25%;">
+                <div style="min-width: 33%;">
                     <Select mandatory items={purposeItems} bind:value={selectedPurpose}
                         >Purpose</Select
                     >
                 </div>
-                <div style="min-width: 25%;">
+                <div style="min-width: 34%;">
                     <Select mandatory
                         items={mediaTypeItems}
                         bind:value={selectedMediaType}>Media Type</Select
                     >
                 </div>
-                <div style="min-width: 25%;">
-                    <Select mandatory
-                        items={accessibilityItems}
-                        bind:value={selectedAccessibility}>Media Type</Select
-                    >
-                </div>
-                <div style="min-width: 25%;">
+
+                <div style="min-width: 33%;">
                     <Select mandatory items={activeItems} bind:value={selectedActiveLevel}
                         >Active</Select
                     >
@@ -738,10 +734,10 @@
                             bind:active={showSurveySearchForUsersTooltip}
                         >
                             <Icon path={mdiInformationOutline} />
-                            <span slot="tip"
-                                >Search for researchers by name or email. Type
-                                in atleast 3 characters to get results</span
-                            >
+                            <span slot="tip">
+                                Search for researchers by name or email. Type
+                                in at least 3 characters to get results automatically, or just press enter to search.
+                            </span>
                         </Tooltip>
                     </div>
                     Add researchers
@@ -852,123 +848,30 @@
             >
             <input type="text" id="dummy" />
         </div>
-    </div>
-    <Button
-        fab
-        style="right: 2vw; bottom:7vh; position: fixed; min-width:4vw; min-height:4vw;"
-        on:click={() => {
-            surveyOptions.push({
-                input: "",
-                mediaType: "text",
-                showOptionTooltip: false,
-            });
-            surveyOptions = surveyOptions;
-            setTimeout(
-                () => window.scrollTo(0, document.body.scrollHeight),
-                100
-            );
-        }}
-    >
-        <Icon path={mdiPlusCircle} size="3vw" /></Button
-    >
+        <Button
+            fab
+            style="right: 2vw; bottom:7vh; position: fixed; min-width:4vw; min-height:4vw;"
+            on:click={() => {
+                surveyOptions.push({
+                    input: "",
+                    mediaType: "text",
+                    showOptionTooltip: false,
+                });
+                surveyOptions = surveyOptions;
+                setTimeout(
+                    () => window.scrollTo(0, document.body.scrollHeight),
+                    100
+                );
+            }}
+        >
+            <Tooltip top bind:active={showAddOptionTooltip}>
+            
+                <Icon path={mdiPlusCircle} size="3vw" />
+                <span slot="tip">Add option</span>
+            </Tooltip>
+
+        </Button>
 </div>
-
-<!--
-            <input
-                type="text"
-                class="text_input"
-                id="survey_title"
-                placeholder="Survey title"
-                title="A title for what you're researching. Will not be shown to the judges. e.g. 'Preference of snacks'"
-                />
-            <input
-                type="text"
-                class="text_input"
-                id="survey_question"
-                placeholder="Survey question"
-                title="The question the judges will answer. Will be shown to judges. e.g. 'Which snack do you prefer?'"
-            />
-            <textarea
-                on:keydown={textAreaAdjust}
-                class="text_input textareas"
-                id="judge_instructions"
-                placeholder="Judge instructions"
-                title="A field for extra info you want to give the judge before they answer your survey."
-            />
-            <textarea
-                on:keydown={textAreaAdjust}
-                class="text_input textareas"
-                id="survey_description"
-                placeholder="Survey description"
-                title="An internal description of the survey. Will not be shown to judges."
-            />
-            
-            
-
-            <div id="dropdownsAndCheckboxesWrapper">
-                <div id="purposeWrapper" class="dropdownWrappers">
-                    <label for="purpose">Purpose</label>
-                    <select name="purpose" id="purposeDropdown" value={purpose} title="The purpose of this survey. Will not be shown to judges.">
-                        <option value="research">Research</option>
-                        <option value="grading">Grading</option>
-                        <option value="fun">For fun</option>
-                        <option value="testing">Testing</option>
-                    </select>
-                </div>
-                <div id="mediaTypeWrapper" class="dropdownWrappers">
-                    <label for="mediaType">Media type</label>
-                    <select
-                        name="mediaType"
-                        id="mediaTypeDropdown"
-                        on:change={(e) => {
-                            surveyMediaType = e.target.value;
-                        }}
-                        value={surveyMediaType}
-                    >
-                        <option value="text">Text</option>
-                        <option value="image">Image</option>
-                        <option value="pdf">PDF</option>
-                        <option value="mix">Mix</option>
-                    </select>
-                </div>
-                <div class="dropdownWrappers">
-                    <label for="accessibility">Accessibility</label>
-                    <select name="accessibility" id="accessibilityDropdown" title="How you want judges to access your survey. Either share a full link or a 6-digit code.">
-                        <option value="link">Link</option>
-                        <option value="code">Code</option>
-                    </select>
-                </div>
-                <div id="checkboxWrapper" class="dropdownWrappers">
-                    <label for="activeCheckbox">Active survey</label>
-                    <input
-                        type="checkbox"
-                        id="activeCheckbox"
-                        name="activeCheckbox"
-                        value="active"
-                        title="Whether the survey should be active (answerable by judges). Can be changed at any time."
-                    />
-                </div>
-            </div>
-
-        <br/>
-            <div id="expectedComparisonsWrapper">
-                <label for="expected_comparisons">Expected comparisons per judge</label>
-                <input id="expected_comparisons" type="number" maxlength="3" max="100" on:input={validateExpectedComparisons}>
-            </div>
-            <br />
-
-
-            <div id="options_wrapper">
-            {#each optionsData as data}
-                <OptionBox
-                    title={data.title}
-                    bind:mediaType={data.mediatype}
-                    {userInfo}
-                />
-            {/each}
-            <button id="submitBtn" on:click={sendForm}>Submit</button>
-        </div>
-            -->
 
 <style>
     .centeredInputFieldWrapper {
@@ -977,15 +880,7 @@
     }
     #create_wrapper {
         margin: auto;
-        padding-top: 5vh;
         text-align: center;
-        overflow: hidden;
-    }
-    #general_info_form {
-        display: grid;
-        grid-template-rows: auto;
-        height: 100%;
-        margin-bottom: 5vh;
     }
 
     #main_input_wrapper {
@@ -1003,11 +898,6 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-    }
-    
-
-    #general_info_form {
-        text-align: left;
     }
 
     input {

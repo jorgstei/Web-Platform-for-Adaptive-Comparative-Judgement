@@ -50,7 +50,7 @@ import Profile from "./Profile.svelte";
         </Route>
       </div>
     {:else}
-      <p>You do not appear to be logged in.</p>
+      <h1 class="text-h5 align-self-center" style="text-align: center; margin:auto; padding-top: 10vh;">You do not appear to be logged in.</h1>
     {/if}
   </main>
 </Router>

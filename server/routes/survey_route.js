@@ -232,10 +232,14 @@ router.get("/item/:id", auth, async (req, res) => {
         }
         console.log("Length of survey items is " + count + ". It has " + amountOfUniqueComparisons + " unique comparisons");
         if (count < 2) {
-            throw new Error("Too few elements in collection.")
+            res.status(500).json({message: "Survey does not have enough items to do a comparison."})
+            return
         }
         else if(expectedComparisons > amountOfUniqueComparisons){
-            throw new Error("Expected amount of comparisons: " + expectedComparisons + " is greater than amount of unique comparisons: " + amountOfUniqueComparisons);
+            res.status(500).json({message: 
+                "Expected amount of comparisons: " + expectedComparisons + " is greater than amount of unique comparisons: " + amountOfUniqueComparisons
+            })
+            return
         }
         // Add all possible unique comparisons to array
         let allUniqueComparisons = [];
@@ -269,7 +273,6 @@ router.get("/item/:id", auth, async (req, res) => {
         res.status(200).json({data: comparisons})
     } catch (error) {
         res.status(404).json({ message: "Unable to get random ComparisonObjects for this survey" })
-        console.log("Error in getRandomComparisonObjects\n" + error);
     }
 })
 
@@ -290,7 +293,7 @@ router.get("/:id", auth, async (req, res) => {
         const survey = await Survey.findOne({ _id: req.params.id })
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.userid)
         if (req.role !== "admin" && req.userid !== foundOwner.ownerId) {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden"})
             return
         }
         console.log("Survey: ", survey)
@@ -340,15 +343,17 @@ router.get("/judge/:id", auth, async (req, res) => {
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.userid)
 
         if (req.role !== "admin" && req.role !== "judge" && (foundOwner == undefined || req.userid !== foundOwner.ownerId)) {
-            res.sendStatus(403);
+            res.status(403).json({message: "Forbidden"});
             return
         }
         console.log("Survey: ", survey)
         if (!survey || survey._id === null) {
-            throw new Error('survey_route.js GET by id as judge: Could not find document')
+            res.status(404).json({message: "Could not find the requested Survey"})
+            return
         }
         if (!survey.active) {
-            throw new Error('survey_route.js GET by id as judge: Survey is not active')
+            res.status(403).json({message: "Survey is not active and therefore cannot be judged."})
+            return
         }
 
         survey.accessibility = undefined;
@@ -365,7 +370,7 @@ router.get("/judge/:id", auth, async (req, res) => {
     }
     catch (error) {
         console.log("Error getting survey by id with judge authentication: ", error)
-        res.status(404).json({ message: "Could not find survey." })
+        res.status(500).json({ message: "Internal Server Error" })
     }
 })
 
@@ -405,7 +410,7 @@ router.post("/", auth, async (req, res) => {
     } = req.body
     console.log("req.role: ", req.role)
     if (req.role !== "admin" && req.role !== "researcher") {
-        res.sendStatus(403)
+        res.status(403).json({message: "Forbidden"})
         return
     }
     try {
@@ -466,12 +471,12 @@ router.put("/:id", auth, async (req, res) => {
     const ownerId = req.userid
     const surveyDoc = await Survey.findOne({ _id: req.params.id })
     if (surveyDoc._id == null) {
-        res.sendStatus(404)
+        res.status(404).json({message: "Could not find survey to update."})
         return
     }
     const userIsOwner = await surveyDoc.owners.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
     if (req.role !== "admin" && req.role !== "researcher" && !userIsOwner) {
-        res.sendStatus(403)
+        res.status(403).json({message: "Forbidden"})
         return
     }
     try {
@@ -522,11 +527,11 @@ router.delete("/:id", auth, async (req, res) => {
         console.log(surveyDoc.owners)
         const foundOwner = surveyDoc.owners.find(owner => owner.ownerId === req.userid)
         if (req.role !== "admin" && req.userid !== foundOwner.ownerId) {
-            res.sendStatus(403)
+            res.status(403).json({message: "Forbidden."})
             return
         }
         if (surveyDoc._id == null) {
-            res.sendStatus(404)
+            res.status(404).json({message: "Could not find survey to delete."})
             return
         }
         if (req.role === "admin") {
@@ -538,7 +543,7 @@ router.delete("/:id", auth, async (req, res) => {
                 res.sendStatus(204)
             }
             else {
-                res.sendStatus(404)
+                res.status(404).json({message: "Could not find survey to delete."})
             }
         }
         else {
@@ -557,13 +562,13 @@ router.delete("/:id", auth, async (req, res) => {
                 res.sendStatus(204)
             }
             else {
-                res.sendStatus(500)
+                res.status(500).json({message: "Internal Server Error: Could not remove owner."})
             }
         }
 
     } catch (error) {
         console.log("delete survey error:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 
 })
@@ -623,11 +628,11 @@ router.get("/function/sort", auth, async (req, res) => {
     console.log(me_field)
 
     if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
-        res.sendStatus(400)
+        res.status(400).json({message: "Missing one of the required parameters."})
         return
     }
     if (me_skip < 0 || me_limit < 1 || (me_direction != 1 && me_direction != -1)) {
-        res.sendStatus(422)
+        res.status(422).json({message: "One of the following parameters have an invalid value: limit, skip or direction"})
         return
     }
     try {
@@ -699,7 +704,7 @@ router.get("/function/sort", auth, async (req, res) => {
         res.json(surveys)
     } catch (error) {
         console.log("Error sorting surveys:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -754,12 +759,12 @@ router.post("/function/search/:term", auth, async (req, res) => {
 
     if (me_fields === undefined || me_term === undefined || me_skip === undefined || me_limit === undefined) {
         console.log("fields:", fields, ", term:", me_term, ", skip:", me_skip, ", limit:", me_limit)
-        res.sendStatus(400)
+        res.status(400).json({message: "Missing one of the required parameters."})
         return
     }
     if (me_skip < 0 || me_limit < 1 || (me_direction != 1 && me_direction != -1)) {
         console.log("me_skip:", me_skip, ", me_limit:", me_limit, ", me_direction:", me_direction)
-        res.sendStatus(422)
+        res.status(422).json({message: "One of the following parameters have an invalid value: limit, skip or direction"})
         return
     }
     console.log(me_fields)
@@ -838,7 +843,7 @@ router.post("/function/search/:term", auth, async (req, res) => {
         res.json(surveys)
     } catch (error) {
         console.log("Error searching surveys:", error)
-        res.sendStatus(500)
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 

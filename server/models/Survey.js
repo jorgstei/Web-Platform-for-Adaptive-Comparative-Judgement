@@ -59,7 +59,8 @@ const SurveySchema = new Schema(
         expectedComparisons:{
             type: Number,
             required: true,
-            default: 2
+            min: 1,
+            default: 1
         },
         items: [Item],
         active: {

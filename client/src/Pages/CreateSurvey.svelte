@@ -230,27 +230,38 @@
                 surveyService
                     .postSurvey(info)
                     .then((data) => {
-                        console.log("postSurvey data: ", data);
-                        const survey_link =
+                        if(data.status < 300){
+                            data = data.data;
+                            console.log("postSurvey data: ", data);
+                            const survey_link =
                             window.location.href.split("/admin_board")[0] +
                             "?takeSurvey=1&surveyID=" +
                             data.loc;
-                        let dummy = document.getElementById("dummy");
-                        dummy.value = survey_link;
-                        console.log(dummy.value);
-                        console.log(navigator, navigator.clipboard);
-                        navigator.clipboard.writeText(survey_link).then(() => {
-                            swal(
+                            let dummy = document.getElementById("dummy");
+                            dummy.value = survey_link;
+                            console.log(dummy.value);
+                            console.log(navigator, navigator.clipboard);
+                            navigator.clipboard.writeText(survey_link).then(() => {
+                                swal(
                                 "Successfully created survey!",
                                 "Your link is:\n" +
-                                    survey_link +
-                                    "\n It has been copied to your clipboard for you!",
+                                survey_link +
+                                "\n It has been copied to your clipboard for you!",
                                 "success"
-                            );
-                            navigateWithRefreshToken(
-                                "/admin_board/surveys"
-                            ).then((data) => (userInfo = data));
-                        });
+                                );
+                                navigateWithRefreshToken(
+                                    "/admin_board/surveys"
+                                ).then((data) => (userInfo = data));
+                            });
+                        }
+                        else{
+                            swal(
+                                "Failed to create survey.",
+                                "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                    data.data.message,
+                                "error"
+                            )
+                        }
                     })
                     .catch((err) => {
                         console.log(err);

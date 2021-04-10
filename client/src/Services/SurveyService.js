@@ -63,8 +63,8 @@ export default class SurveyService extends Service{
             withCredentials: true,
             data: survey
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     put(id, survey){

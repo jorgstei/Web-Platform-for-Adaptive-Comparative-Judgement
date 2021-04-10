@@ -62,10 +62,13 @@
     </ListItem>
 
     <Divider />
-    <List nav dense>
-        <ListItemGroup>
+    <List ripple={false} nav dense>
+        <ListItemGroup ripple={false}>
             {#each menuItems as item}
-                <ListItem on:click={() => navigateTo("/admin_board/"+item.to)}>
+                <ListItem ripple={false} on:click={(e) => {
+                            navigateTo("/admin_board/"+item.to);
+                        }
+                    }>
                     <span slot="prepend">
                         <Icon path={item.icon}/>
                     </span>

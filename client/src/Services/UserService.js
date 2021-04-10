@@ -108,7 +108,7 @@ export default class UserService extends Service{
             url: this.path + "/user/function/count",
             withCredentials: true,
         })
-        .then(response => response.data)
+        .then(response => response)
         .catch(error => error.response)
     }
 

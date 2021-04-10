@@ -76,8 +76,8 @@ export default class SurveyService extends Service{
                 data: survey
             }
         )
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
 
@@ -87,8 +87,8 @@ export default class SurveyService extends Service{
             url: this.path + "/survey/item/"+id,
             withCredentials: true
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     deleteSurvey(id){
@@ -97,8 +97,8 @@ export default class SurveyService extends Service{
             url: this.path + "/survey/"+id,
             withCredentials: true,
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     getCount(){
@@ -108,10 +108,10 @@ export default class SurveyService extends Service{
             withCredentials: true,
         })
         .then(response => response.data)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
-    getSurveyToken(surveyID, passphrase){
+    getJudgeToken(surveyID, passphrase){
         return axios({
             method: "post",
             url: this.path.split("api")[0]+"auth/login/judge",
@@ -120,8 +120,8 @@ export default class SurveyService extends Service{
                 passphrase: passphrase
             }
         })        
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     getSorted(field, skip, limit, direction){
@@ -140,7 +140,7 @@ export default class SurveyService extends Service{
             withCredentials: true
         })        
         .then(response => response)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 
     search(data, term){
@@ -150,7 +150,7 @@ export default class SurveyService extends Service{
             data: data
         })        
         .then(response => response)
-        .catch(error => console.log(error))
+        .catch(error => error.response)
     }
 }
 

@@ -95,7 +95,6 @@ router.post("/function/estimate", auth, async (req, res) => {
  * @apiSuccess (200) {String} surveys.surveyQuestion The overarching question the survey is attempting to answer
  * @apiSuccess (200) {String} surveys.purpose TODO: Is this redundant?
  * @apiSuccess (200) {String} surveys.mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
- * @apiSuccess (200) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiSuccess (200) {String} surveys.dateCreated The datetime when this survey was made
  * @apiSuccess (200) {String} surveys.lastEdited The datetime when this survey was last edited
  */
@@ -117,7 +116,6 @@ router.post("/function/estimate", auth, async (req, res) => {
 * @apiSuccess (200) {String} surveyQuestion The overarching question the survey is attempting to answer
 * @apiSuccess (200) {String} purpose TODO: Is this redundant?
 * @apiSuccess (200) {String} mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
-* @apiSuccess (200) {String} accessibility How the survey can be accessed by judges. (code, or link)
 * @apiSuccess (200) {String} dateCreated The datetime when this survey was made
 * @apiSuccess (200) {String} lastEdited The datetime when this survey was last edited
 */
@@ -356,7 +354,6 @@ router.get("/judge/:id", auth, async (req, res) => {
             return
         }
 
-        survey.accessibility = undefined;
         survey.purpose = undefined;
         survey.owners = undefined;
         survey.active = undefined;
@@ -394,7 +391,6 @@ router.get("/judge/:id", auth, async (req, res) => {
  * @apiParam (Body) {String} surveys.surveyQuestion The overarching question the survey is attempting to answer
  * @apiParam (Body) {String} surveys.purpose TODO: Is this redundant?
  * @apiParam (Body) {String} surveys.mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
- * @apiParam (Body) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiParam (Body) {String} surveys.dateCreated The datetime when this survey was made
  * @apiParam (Body) {String} surveys.lastEdited The datetime when this survey was last edited
  * @apiSuccess (200) {String} loc The ID of the newly created survey.
@@ -406,7 +402,7 @@ router.post("/", auth, async (req, res) => {
     console.log("called post one for survey")
     const {
         owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
-        purpose, mediaType, accessibility
+        purpose, mediaType
     } = req.body
     console.log("req.role: ", req.role)
     if (req.role !== "admin" && req.role !== "researcher") {
@@ -421,7 +417,7 @@ router.post("/", auth, async (req, res) => {
         }
         const survey = await Survey.create({
             owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
-            purpose, mediaType, accessibility
+            purpose, mediaType
         })
         if (!survey || !survey._id) {
             throw new Error('Could not create survey.')
@@ -454,7 +450,6 @@ router.post("/", auth, async (req, res) => {
  * @apiParam (Body) {String} surveys.surveyQuestion The overarching question the survey is attempting to answer
  * @apiParam (Body) {String} surveys.purpose TODO: Is this redundant?
  * @apiParam (Body) {String} surveys.mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
- * @apiParam (Body) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiParam (Body) {String} surveys.dateCreated The datetime when this survey was made
  * @apiParam (Body) {String} surveys.lastEdited The datetime when this survey was last edited
  * @apiSuccess (200) 200 OK
@@ -466,7 +461,7 @@ router.put("/:id", auth, async (req, res) => {
     console.log("called put for survey")
     let {
         owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
-        purpose, mediaType, accessibility
+        purpose, mediaType
     } = me(req.body)
     const ownerId = req.userid
     const surveyDoc = await Survey.findOne({ _id: req.params.id })
@@ -502,7 +497,7 @@ router.put("/:id", auth, async (req, res) => {
         const surveyReplaceResult = await Survey.updateOne({ _id: req.params.id },
             {
                 owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
-                purpose, mediaType, accessibility
+                purpose, mediaType
             }
         )
         console.log("surveyReplaceResult:", surveyReplaceResult)
@@ -603,7 +598,6 @@ router.delete("/:id", auth, async (req, res) => {
  * @apiSuccess (200) {String} surveys.surveyQuestion The overarching question the survey is attempting to answer
  * @apiSuccess (200) {String} surveys.purpose TODO: Is this redundant?
  * @apiSuccess (200) {String} surveys.mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
- * @apiSuccess (200) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiSuccess (200) {String} surveys.dateCreated The datetime when this survey was made
  * @apiSuccess (200) {String} surveys.lastEdited The datetime when this survey was last edited
  * @apiSuccess (200) {Number} surveys.itemsCount The number of items
@@ -741,7 +735,6 @@ router.get("/function/sort", auth, async (req, res) => {
  * @apiSuccess (200) {String} surveys.surveyQuestion The overarching question the survey is attempting to answer
  * @apiSuccess (200) {String} surveys.purpose TODO: Is this redundant?
  * @apiSuccess (200) {String} surveys.mediaType The media type used for this survey (f.ex. mix, text, pdf etc.)
- * @apiSuccess (200) {String} surveys.accessibility How the survey can be accessed by judges. (code, or link)
  * @apiSuccess (200) {String} surveys.dateCreated The datetime when this survey was made
  * @apiSuccess (200) {String} surveys.lastEdited The datetime when this survey was last edited
  * @apiPermission AdminOrOwner

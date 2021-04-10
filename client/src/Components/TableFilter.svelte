@@ -17,10 +17,22 @@
     export let data = undefined;
     import { TextField, Button, Icon, Tooltip, Textarea, Select, ListItemGroup, ListItem, Card, CardText, CardActions, Checkbox} from 'svelte-materialify';
     import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel   } from "@mdi/js";
+import swal from "sweetalert";
 
 
     onMount(() => {
-        countFunction().then(res => count = res)
+        countFunction().then(res => {
+            if(res.status < 300){
+                count = res.data
+            }
+            else{
+                swal(
+                    "Error",
+                    "Unable to fetch count.\n"+res.data.message,
+                    "error"
+                )
+            }
+        })
         let table = document.getElementsByClassName("main_table")[0];
         if(table){
             console.log("Table width: ", table.style);
@@ -32,7 +44,7 @@
         filterFunction(filterBy.filterName, currentPage*limit, limit, direction).then(res => 
         {
             if(res == undefined) return;
-            if(res.status === 200){
+            if(res.status < 300){
                 console.log(res.data)
                 data = res.data;
             }

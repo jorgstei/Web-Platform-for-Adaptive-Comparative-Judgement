@@ -91,10 +91,6 @@ const SurveySchema = new Schema(
             type:String,
             default: "text"
         },
-        accessibility:{
-            type: String,
-            default: "codelink"
-        },
     },
     {
         timestamps: {

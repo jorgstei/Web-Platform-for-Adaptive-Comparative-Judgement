@@ -37,6 +37,7 @@
 
     let surveyOptions = [];
 
+    let searchHint = "";
     let oldSearchTerm = "";
     let epochMsAtLastSearch = new Date().getTime();
     let surveyResearchers = [
@@ -187,21 +188,23 @@
                 surveyService
                     .put(surveyID, info)
                     .then((data) => {
-                        console.log("surveyService put data: ", data);
-                        const survey_link =
-                            window.location.href.split("/admin_board")[0] +
-                            "?takeSurvey=1&surveyID=" +
-                            surveyID;
-                        let dummy = document.getElementById("dummy");
-                        dummy.value = survey_link;
-                        console.log(
-                            "Navigator object: ",
-                            navigator,
-                            "\nNavigator.clipboard",
-                            navigator.clipboard
-                        );
+                        if(data.status < 300){
+                            data = data.data;
+                            console.log("surveyService put data: ", data);
+                            const survey_link =
+                                window.location.href.split("/admin_board")[0] +
+                                "?takeSurvey=1&surveyID=" +
+                                surveyID;
+                            let dummy = document.getElementById("dummy");
+                            dummy.value = survey_link;
+                            console.log(
+                                "Navigator object: ",
+                                navigator,
+                                "\nNavigator.clipboard",
+                                navigator.clipboard
+                            );
 
-                        navigator.clipboard
+                            navigator.clipboard
                             .writeText(survey_link)
                             .then(() => {
                                 swal(
@@ -216,6 +219,15 @@
                                 ).then((data) => (userInfo = data));
                             })
                             .catch((err) => {});
+                        }
+                        else{
+                            swal(
+                                "Failed to edit survey.",
+                                "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                    data.data.message,
+                                "error"
+                            )
+                        }
                     })
                     .catch((err) => {
                         console.log(err);
@@ -429,8 +441,17 @@
                 userService
                     .search(search_term, { limit: 5 })
                     .then((result) => {
-                        console.log("Search result: ", result);
-                        searchResults = result.data;
+                        if(result.status < 300){
+                            console.log("Search result: ", result);
+                            searchResults = result.data;
+                            if(searchResults.length == 0){
+                                searchHint = "No results for " + search_term;
+                            }
+                            else{
+                                searchHint = ""
+                            }
+                        }
+
                     })
                     .catch((err) => console.log(err));
             }
@@ -706,6 +727,7 @@
             <div class="centeredInputFieldWrapper">
                 <TextField
                     type="text"
+                    bind:hint={searchHint}
                     on:input={searchForUsers}
                     bind:value={search_term}
                     on:keydown={checkIfAddResearcherByEnter}

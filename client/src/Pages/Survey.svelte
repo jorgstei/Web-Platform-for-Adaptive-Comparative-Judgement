@@ -27,9 +27,19 @@
     let counter = 0;
     let maxCounter = 10;
     surveyService.getRandomPairForSurveyByID(surveyID).then((data) => {
-        console.log("Data from randomPair: ", data.data);
-        randomPair = data.data;
-        maxCounter = data.data.length;
+        if(data.status < 300){
+            data = data.data;
+            console.log("Data from randomPair: ", data.data);
+            randomPair = data.data;
+            maxCounter = data.data.length;
+        }
+        else{
+            swal(
+                "Error",
+                "Something went wrong while fetching the questions. Please try again, and if the problem persists contact an administrator.\nError:"+data.data.message,
+                "error"
+            )
+        }
     });
     
 

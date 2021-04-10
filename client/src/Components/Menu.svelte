@@ -14,19 +14,19 @@
 
     const menuItems = [
         {
-            text:"Profile", icon: mdiAccount, to:"profile"
+            text:"Profile", icon: mdiAccount, to:"profile", requireAdmin: false
         },
         {
-            text:"Invite", icon: mdiAccountPlus, to: "invite_researcher"
+            text:"Invite", icon: mdiAccountPlus, to: "invite_researcher", requireAdmin: true
         },
         {
-            text:"Users", icon: mdiAccountMultiple, to:"researchers"
+            text:"Users", icon: mdiAccountMultiple, to:"researchers", requireAdmin: true
         },
         {
-            text:"Create Survey", icon: mdiBookPlus, to: "create_survey"
+            text:"Create Survey", icon: mdiBookPlus, to: "create_survey", requireAdmin: false
         },
         {
-            text:"Surveys", icon: mdiBookMultiple, to: "surveys"
+            text:"Surveys", icon: mdiBookMultiple, to: "surveys", requireAdmin: false
         },
     ]
     export let userInfo;
@@ -65,15 +65,17 @@
     <List ripple={false} nav dense>
         <ListItemGroup ripple={false}>
             {#each menuItems as item}
-                <ListItem ripple={false} on:click={(e) => {
-                            navigateTo("/admin_board/"+item.to);
-                        }
-                    }>
-                    <span slot="prepend">
-                        <Icon path={item.icon}/>
-                    </span>
-                    {item.text}
-                </ListItem>
+                {#if (item.requireAdmin && userInfo.role === "admin") || !item.requireAdmin}
+                    <ListItem ripple={false} on:click={(e) => {
+                                navigateTo("/admin_board/"+item.to);
+                            }
+                        }>
+                        <span slot="prepend">
+                            <Icon path={item.icon}/>
+                        </span>
+                        {item.text}
+                    </ListItem>
+                {/if}
             {/each}
         </ListItemGroup>
     </List>

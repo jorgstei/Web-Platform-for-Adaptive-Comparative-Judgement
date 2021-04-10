@@ -23,7 +23,7 @@
         </Link>
     </div>
     <div style="width:100%"/>
-    <List nav class="d-flex flex-row justify-self-right" style="float:right; width: 30%" >
+    <List nav class="d-flex flex-row justify-self-right" style="float:right;" >
         <ListItemGroup class="d-flex flex-row" style="text-align: center;">
             <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/")}>
                 {"Home"}

@@ -25,27 +25,33 @@ import swal from "sweetalert";
         if(params.takeSurvey == 1 && params.surveyID != undefined){
             surveyID = params.surveyID;
         }
-        await surveyService.getSurveyToken(surveyID).then(async data => {
-            console.log("Get survey Token data: ", data)
-            if(data.role === "judge"){
-                userInfo = data;
-                await surveyService.getSurveyByIdAsJudge(surveyID)
-                .then((surveyData)=>{
-                    if(surveyData.status == 200){
-                        surveyData = surveyData.data;
-                        surveyID = surveyData._id;
-                        console.log("Survey data from instructions: ", surveyData);
-                        survey = surveyData;
-                    }
-                    else{
-                        swal("Error", "An error occured while getting the survey information. Please retry, and if the problem exists contact an administrator.\nData:"+surveyData.data.message, "error")
-                    }
-                    
-                })
-                .catch(err => {console.log(err)})
+        await surveyService.getJudgeToken(surveyID).then(async data => {
+            if(data.status < 300){
+                data = data.data
+                console.log("Get survey Token data: ", data)
+                if(data.role === "judge"){
+                    userInfo = data;
+                    await surveyService.getSurveyByIdAsJudge(surveyID)
+                    .then((surveyData)=>{
+                        if(surveyData.status < 300){
+                            surveyData = surveyData.data;
+                            surveyID = surveyData._id;
+                            console.log("Survey data from instructions: ", surveyData);
+                            survey = surveyData;
+                        }
+                        else{
+                            swal("Error", "An error occured while getting the survey information. Please retry, and if the problem exists contact an administrator.\nData:"+surveyData.data.message, "error").then(() => navigate("/"))
+                        }
+                        
+                    })
+                    .catch(err => {console.log(err)})
+                }
+            }
+            else{
+                swal("Error", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.\nError: "+data.data.message, "error").then(() => navigate("/"))
             }
         })
-        .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error"));
+        .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error").then(() => navigate("/")))
     })
 
     let showGeneralInfoOverlay = false;

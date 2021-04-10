@@ -18,8 +18,14 @@
     let survey = {};
     onMount(async () => {
         await surveyService.getSurveyByID(surveyID).then((data) => {
-            console.log("onMount survey data with id: " + surveyID, data);
-            survey = data;
+            if(data.status == 200){
+                data = data.data;
+                console.log("onMount survey data with id: " + surveyID, data);
+                survey = data;
+            }
+            else{
+                swal("Error", "Error getting survey data: "+data.data.message+".", "error")
+            }
         });
     });
 
@@ -178,6 +184,7 @@
                 }
             })
             .catch((error) => {
+                console.log(error)
                 swal(
                     "Error",
                     "An error occured when fetching statistics for the survey",

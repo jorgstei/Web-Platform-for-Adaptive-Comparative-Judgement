@@ -477,6 +477,7 @@ router.put("/:id", auth, async (req, res) => {
     //TODO: Allow modifications that do not change items and expectedComparisons
     if(surveyDoc.active && active){
         res.status(403).json({message: "You are not allowed to edit a survey that is active."})
+        return
     }
     const userIsOwner = await surveyDoc.owners.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
     if (req.role !== "admin" && req.role !== "researcher" && !userIsOwner) {

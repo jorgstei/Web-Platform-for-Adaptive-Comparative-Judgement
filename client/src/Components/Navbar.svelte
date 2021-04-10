@@ -4,51 +4,17 @@
     import {AppBar, List, ListItemGroup, ListItem} from "svelte-materialify"
 
     export let userInfo;
-
-    const navigateTo = (to) => navigate(to);
-    let navItems = [
-        {
-            text: "Home", fun: navigateTo, to: "/"
-        },
-        {
-            text: "Board", fun: navigateTo, to: "/admin_board/profile"
-        },
-        {
-            text: "About", fun: navigateTo, to: "/about"
-        },
-        (userInfo == null || userInfo.role === "judge") ? 
-        {
-            text: "Log in", fun: navigateTo, to: "/login"
-        }
-        :
-        {
-            text: "Log out", fun: () => {userService.logout().then(()=>{userInfo=null; navigate("/")})}
-        }
-    ].reverse()
-
-    const setNavItems = () => {
-        navItems = [
-            {
-                text: "Home", fun: navigateTo, to: "/"
-            },
-            {
-                text: "Board", fun: navigateTo, to: "/admin_board"
-            },
-            {
-                text: "About", fun: navigateTo, to: "/about"
-            },
-            (userInfo == null || userInfo.role === "judge") ? 
-            {
-                text: "Log in", fun: navigateTo, to: "/login"
-            }
-            :
-            {
-                text: "Log out", fun: () => {userService.logout().then(()=>{userInfo=null; navigate("/")})}
-            }
-        ].reverse()
+    const logout = () => {
+        userService.logout()
+        .then(()=>{
+            userInfo=null; 
+            navigate("/")
+            console.log("After log out: ", userInfo)
+        })
     }
-    $: userInfo && setNavItems()
+    $: userInfo
 </script>
+
 
 <AppBar class=" d-flex flex-row align-content-right justify-content-right" style="position:fixed;width:100%;">
     <div slot="icon">
@@ -58,12 +24,27 @@
     </div>
     <div style="width:100%"/>
     <List nav class="d-flex flex-row justify-self-right" style="float:right; width: 30%" >
-        <ListItemGroup class="d-flex flex-row-reverse">
-            {#each navItems as item}
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => item.fun(item.to)}>
-                    {item.text}
+        <ListItemGroup class="d-flex flex-row">
+            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/")}>
+                {"Home"}
+            </ListItem>
+            {#if userInfo != null && userInfo.role !== "judge"}
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/admin_board/profile")}>
+                    {"Board"}
                 </ListItem>
-            {/each}
+            {/if}
+            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/about")}>
+                {"About"}
+            </ListItem>
+            {#if userInfo != null && userInfo.role !== "judge"}
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => logout()}>
+                    {"Log out"}
+                </ListItem>
+            {:else}
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/login")}>
+                    {"Log in"}
+                </ListItem>
+            {/if}
         </ListItemGroup>
     </List>
 </AppBar>

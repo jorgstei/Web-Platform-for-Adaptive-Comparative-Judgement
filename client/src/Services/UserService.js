@@ -53,7 +53,7 @@ export default class UserService extends Service{
             url: this.path.split("api")[0]+"auth/logout",
             withCredentials: true
         })
-        .then(response => response.data)
+        .then(response => response)
         .catch(error => error.response)
     }
 

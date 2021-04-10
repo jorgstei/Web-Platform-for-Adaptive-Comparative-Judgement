@@ -23,6 +23,17 @@
 	export let url="";
 	let userInfo = null;
 
+	let refreshToken = () => {
+		userService.refreshToken().then(data => {
+			if(data.status === 200){
+				userInfo = data.data;
+			}
+			else{
+				console.log("RefreshToken failed")
+				userInfo = null;
+			}
+		})
+	}
 	if(userInfo == null){
 		userService.refreshToken().then(data => {
 			if(data.status === 200){
@@ -40,7 +51,7 @@
 </script>
 <MaterialApp>
 	<Router url={url}>
-		<Navbar bind:userInfo={userInfo}></Navbar>
+		<Navbar bind:refreshToken bind:userInfo={userInfo}></Navbar>
 		<div class="pt-16">
 			<Route path="/">
 				<LandingPage bind:surveyID={surveyID}></LandingPage>

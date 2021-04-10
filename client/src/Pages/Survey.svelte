@@ -90,7 +90,14 @@
 
     onMount(() => {
         surveyService.getSurveyByIdAsJudge(surveyID)
-        .then(data=>question=data.surveyQuestion)
+        .then(data=>{
+            if(data.status == 200){
+                question=data.data.surveyQuestion
+            }
+            else{
+                swal("Error", "Could not get survey info. If the problem persists, please contact an administrator.", "error")
+            }
+        })
         .catch(err => swal("Something went wrong..", "Could not get survey info. If the problem persists, please contact an administrator.", "error"));
         let main = document.getElementById("surveyWrapper");
         main.focus();

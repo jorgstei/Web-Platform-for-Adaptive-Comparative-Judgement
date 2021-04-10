@@ -23,7 +23,7 @@ export default class SurveyService extends Service{
             }
         )
         .then(response => response)
-        .catch(response => response)
+        .catch(error => error.response)
     }
 
     getSurveyByID(id){

@@ -474,6 +474,10 @@ router.put("/:id", auth, async (req, res) => {
         res.status(404).json({message: "Could not find survey to update."})
         return
     }
+    //TODO: Allow modifications that do not change items and expectedComparisons
+    if(surveyDoc.active && active){
+        res.status(403).json({message: "You are not allowed to edit a survey that is active."})
+    }
     const userIsOwner = await surveyDoc.owners.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
     if (req.role !== "admin" && req.role !== "researcher" && !userIsOwner) {
         res.status(403).json({message: "Forbidden"})

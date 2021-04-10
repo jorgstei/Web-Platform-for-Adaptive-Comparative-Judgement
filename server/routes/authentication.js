@@ -100,7 +100,7 @@ router.post("/login", async (req, res) => {
                     const now = new Date(Date.now())
                     const exp = new Date(now)
                     exp.setMinutes(exp.getMinutes() + 30)
-                    const expSeconds = exp.getTime() / 1000
+                    const expSeconds = Math.floor(exp.getTime() / 1000)
                     console.log("JWT Expires in seconds: ", expSeconds)
                     const token = jwt.sign(
                         {
@@ -159,7 +159,7 @@ router.post("/refresh-token", async (req, res) => {
                 const now = new Date(Date.now())
                 const exp = new Date(now)
                 exp.setMinutes(exp.getMinutes() + 30)
-                const expSeconds = exp.getTime() / 1000
+                const expSeconds = Math.floor(exp.getTime() / 1000)
                 const newToken = jwt.sign(
                     {
                         exp: expSeconds,
@@ -199,7 +199,7 @@ router.post("/refresh-judge-token", async (req, res) => {
                 const now = new Date(Date.now())
                 const exp = new Date(now)
                 exp.setMinutes(exp.getMinutes() + 30)
-                const expSeconds = exp.getTime() / 1000
+                const expSeconds = Math.floor(exp.getTime() / 1000)
                 const newToken = jwt.sign(
                     {
                         exp: expSeconds,
@@ -234,7 +234,7 @@ router.post("/login/judge", async (req, res) => {
             const now = new Date(Date.now())
             const exp = new Date(now)
             exp.setMinutes(exp.getMinutes() + 30)
-            const expSeconds = exp.getTime() / 1000
+            const expSeconds = Math.floor(exp.getTime() / 1000)
             console.log("JWT Expires in seconds: ", expSeconds)
             const userId = new mongoose.mongo.ObjectId()
             const token = jwt.sign(

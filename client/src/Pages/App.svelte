@@ -24,6 +24,9 @@
 	let userInfo = null;
 
 	let refreshToken = () => {
+		if(userInfo?.role == "judge"){
+			userService.logoutJudge()
+		}
 		userService.refreshToken().then((data) => {
 			if (data.status === 200) {
 				userInfo = data.data;

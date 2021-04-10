@@ -107,7 +107,7 @@ export default class SurveyService extends Service{
             url: this.path + "/survey/function/count",
             withCredentials: true,
         })
-        .then(response => response.data)
+        .then(response => response)
         .catch(error => error.response)
     }
 

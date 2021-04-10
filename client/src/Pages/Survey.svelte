@@ -86,7 +86,6 @@
         if(!completed){
             completed = true
                 setTimeout(async ()=>{
-                userService.logoutJudge().then(() => userInfo = null); 
                 if(navwrap){
                     navwrap.style.display = "initial";
                 }
@@ -96,6 +95,7 @@
             }
             , 5000)
         }
+        userService.logoutJudge().then(() => userInfo = null); 
     }
 
     onMount(() => {

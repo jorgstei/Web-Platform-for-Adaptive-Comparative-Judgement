@@ -3,7 +3,15 @@
     import {userService} from "../Services/UserService";
     import {AppBar, List, ListItemGroup, ListItem} from "svelte-materialify"
 
+    export let refreshToken;
     export let userInfo;
+
+    const navigateWithRefreshToken = (to) => {
+        refreshToken()
+        navigate(to)
+    }
+
+
     const logout = () => {
         userService.logout()
         .then(()=>{
@@ -25,15 +33,15 @@
     <div style="width:100%"/>
     <List nav class="d-flex flex-row justify-self-right" style="float:right;" >
         <ListItemGroup class="d-flex flex-row" style="text-align: center;">
-            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/")}>
+            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/")}>
                 {"Home"}
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/admin_board/profile")}>
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/admin_board/profile")}>
                     {"Board"}
                 </ListItem>
             {/if}
-            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/about")}>
+            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/about")}>
                 {"About"}
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
@@ -41,7 +49,7 @@
                     {"Log out"}
                 </ListItem>
             {:else}
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigate("/login")}>
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/login")}>
                     {"Log in"}
                 </ListItem>
             {/if}

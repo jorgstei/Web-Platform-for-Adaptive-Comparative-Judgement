@@ -32,8 +32,8 @@ export default class SurveyService extends Service{
             url: this.path + "/survey/"+id,
             withCredentials: true
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     getSurveyByUserID(id){
@@ -42,8 +42,8 @@ export default class SurveyService extends Service{
             url: this.path + "/survey/user/"+id,
             withCredentials: true
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     getSurveyByIdAsJudge(id){
@@ -52,8 +52,8 @@ export default class SurveyService extends Service{
             url: this.path + "/survey/judge/"+id,
             withCredentials: true
         })
-        .then(response => response.data)
-        .catch(error => console.log(error))
+        .then(response => response)
+        .catch(error => error.response)
     }
 
     postSurvey(survey){

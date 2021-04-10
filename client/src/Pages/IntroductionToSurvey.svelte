@@ -6,6 +6,7 @@
     
     import { Button, Card, CardText, Overlay, Icon } from 'svelte-materialify';
     import { mdiArrowExpand, mdiArrowCollapse } from "@mdi/js";
+import swal from "sweetalert";
     
 
 
@@ -30,9 +31,15 @@
                 userInfo = data;
                 await surveyService.getSurveyByIdAsJudge(surveyID)
                 .then((surveyData)=>{
-                    surveyID = surveyData._id;
-                    console.log("Survey data from instructions: ", surveyData);
-                    survey = surveyData;
+                    if(surveyData.status == 200){
+                        surveyData = surveyData.data;
+                        surveyID = surveyData._id;
+                        console.log("Survey data from instructions: ", surveyData);
+                        survey = surveyData;
+                    }
+                    else{
+                        swal("Error", "An error occured while getting the survey information. Please retry, and if the problem exists contact an administrator.\nData:"+surveyData.data.message, "error")
+                    }
                     
                 })
                 .catch(err => {console.log(err)})

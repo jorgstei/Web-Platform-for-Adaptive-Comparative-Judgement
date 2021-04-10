@@ -1,6 +1,4 @@
 <script>
-  import Footer from "../Components/Footer.svelte";
-	import Navbar from "../Components/Navbar.svelte";
 </script>
 <main>
   <h1>About this project</h1>

@@ -134,7 +134,7 @@ export default class UserService extends Service{
     search(term, data){
         return axios({
             method: "post",
-            url: "http://localhost:3000/api/user/search/"+term,
+            url: this.path+"/user/search/"+term,
             data: data,
             withCredentials: true
         })

@@ -203,7 +203,7 @@
                             console.log("surveyService put data: ", data);
                             const survey_link =
                                 window.location.href.split("/admin_board")[0] +
-                                "?takeSurvey=1&surveyID=" +
+                                "/survey?takeSurvey=1&surveyID=" +
                                 surveyID;
                             let dummy = document.getElementById("dummy");
                             dummy.value = survey_link;
@@ -257,7 +257,7 @@
                             console.log("postSurvey data: ", data);
                             const survey_link =
                             window.location.href.split("/admin_board")[0] +
-                            "?takeSurvey=1&surveyID=" +
+                            "/survey?takeSurvey=1&surveyID=" +
                             data.loc;
                             let dummy = document.getElementById("dummy");
                             dummy.value = survey_link;

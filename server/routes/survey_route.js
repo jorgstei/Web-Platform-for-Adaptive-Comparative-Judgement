@@ -57,7 +57,7 @@ async function generateUniqueHashCode(data){
 //TODO: document api
 router.post("/function/estimate", auth, async (req, res) => {
     console.log("Called survey/function/estimate")
-    if(req.role !== "admin" && req.role !== "researcher"){
+    if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
         res.status(401).json({message: "Forbidden"})
         return;
     }
@@ -133,7 +133,7 @@ router.post("/function/estimate", auth, async (req, res) => {
 router.get("/", auth, async (req, res) => {
     console.log("Called get all surveys")
     try {
-        if (req.role !== "admin") {
+        if (req.auth["user"].role !== "admin") {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -161,8 +161,7 @@ router.get("/", auth, async (req, res) => {
 router.get("/user/:id", auth, async (req, res) => {
     console.log("Called get all surveys for user")
     try {
-        if (req.role !== "admin" && req.userid !== req.params.id) {
-            console.log("req.role: ", req.role, "req.params.id: ", req.params.id, "req.userid: ", req.userid)
+        if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== req.params.id) {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -190,12 +189,12 @@ router.get("/user/:id", auth, async (req, res) => {
 router.get("/function/count", auth, async (req, res) => {
     console.log("Get count of surveys")
     try {
-        if (req.role !== "admin" && req.role !== "researcher") {
+        if (req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher") {
             res.status(403).json({message: "Forbidden"})
             return
         }
-        const me_userid = me(req.userid)
-        if (req.role === "admin") {
+        const me_userid = me(req.auth["user"].userid)
+        if (req.auth["user"].role === "admin") {
             Survey.countDocuments().then(count => res.json(count))
             return;
         }
@@ -209,14 +208,14 @@ router.get("/function/count", auth, async (req, res) => {
 })
 
 //Get random item pair from survey by id
-router.get("/item/:id", auth, async (req, res) => {
+router.get("/items_to_compare/:id", auth, async (req, res) => {
     console.log("called get random pair from survey by id for item")
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id })
         if (!surveyDoc || surveyDoc._id == null) {
             throw new Error("Could not find survey by id")
         }
-        if (!req.role === "judge" && !req.role === "admin" && !req.userid === surveyDoc.ownerId) {
+        if (!req.auth["judge"].role === "judge" && !req.auth["user"].role === "admin" && !req.auth["user"].userid === surveyDoc.ownerId) {
             res.status(403).json({message: "Forbidden"})
         }
         const expectedComparisons = surveyDoc.expectedComparisons;
@@ -289,8 +288,8 @@ router.get("/:id", auth, async (req, res) => {
     console.log("Called get survey by id")
     try {
         const survey = await Survey.findOne({ _id: req.params.id })
-        const foundOwner = survey.owners.find(owner => owner.ownerId === req.userid)
-        if (req.role !== "admin" && req.userid !== foundOwner.ownerId) {
+        const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"].userid)
+        if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== foundOwner.ownerId) {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -338,9 +337,9 @@ router.get("/judge/:id", auth, async (req, res) => {
             survey = await Survey.findOne({ _id: {$eq: req.params.id} }).select(["-internalDescription", "-title"]);
         }
         console.log("Survey in get by id as judge: ", survey);
-        const foundOwner = survey.owners.find(owner => owner.ownerId === req.userid)
+        const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"].userid)
 
-        if (req.role !== "admin" && req.role !== "judge" && (foundOwner == undefined || req.userid !== foundOwner.ownerId)) {
+        if (req.auth["user"].role !== "admin" && req.auth["judge"].role !== "judge" && (foundOwner == undefined || req.auth["user"].userid !== foundOwner.ownerId)) {
             res.status(403).json({message: "Forbidden"});
             return
         }
@@ -404,8 +403,7 @@ router.post("/", auth, async (req, res) => {
         owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
         purpose, mediaType
     } = req.body
-    console.log("req.role: ", req.role)
-    if (req.role !== "admin" && req.role !== "researcher") {
+    if (req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher") {
         res.status(403).json({message: "Forbidden"})
         return
     }
@@ -463,7 +461,7 @@ router.put("/:id", auth, async (req, res) => {
         owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
         purpose, mediaType
     } = me(req.body)
-    const ownerId = req.userid
+    const ownerId = req.auth["user"].userid
     const surveyDoc = await Survey.findOne({ _id: req.params.id })
     if (surveyDoc._id == null) {
         res.status(404).json({message: "Could not find survey to update."})
@@ -475,7 +473,7 @@ router.put("/:id", auth, async (req, res) => {
         return
     }
     const userIsOwner = await surveyDoc.owners.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
-    if (req.role !== "admin" && req.role !== "researcher" && !userIsOwner) {
+    if (req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher" && !userIsOwner) {
         res.status(403).json({message: "Forbidden"})
         return
     }
@@ -525,8 +523,8 @@ router.delete("/:id", auth, async (req, res) => {
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id })
         console.log(surveyDoc.owners)
-        const foundOwner = surveyDoc.owners.find(owner => owner.ownerId === req.userid)
-        if (req.role !== "admin" && req.userid !== foundOwner.ownerId) {
+        const foundOwner = surveyDoc.owners.find(owner => owner.ownerId === req.auth["user"].userid)
+        if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== foundOwner.ownerId) {
             res.status(403).json({message: "Forbidden."})
             return
         }
@@ -534,7 +532,7 @@ router.delete("/:id", auth, async (req, res) => {
             res.status(404).json({message: "Could not find survey to delete."})
             return
         }
-        if (req.role === "admin") {
+        if (req.auth["user"].role === "admin") {
             //Remember to clean up the assosiated SurveyAnswers
             await SurveyAnswer.deleteMany({ survey_id: surveyDoc._id })
             //Finally clean up the Survey itself
@@ -554,7 +552,7 @@ router.delete("/:id", auth, async (req, res) => {
                     {
                         owners:
                         {
-                            ownerId: req.userid
+                            ownerId: req.auth["user"].userid
                         }
                     }
                 })
@@ -637,7 +635,7 @@ router.get("/function/sort", auth, async (req, res) => {
     try {
         const surveys = await Survey.aggregate(
             [
-                req.role === "admin" ?
+                req.auth["user"].role === "admin" ?
                     {
                         $match: { _id: { $exists: true } }
                     } //Admin should find all, but aggregate requires a pipeline
@@ -645,7 +643,7 @@ router.get("/function/sort", auth, async (req, res) => {
                     {
                         $match:
                         {
-                            "owners.ownerId": req.userid
+                            "owners.ownerId": req.auth["user"].userid
                         }
                     }, //Find surveys where this user has access
                 {
@@ -775,7 +773,7 @@ router.post("/function/search/:term", auth, async (req, res) => {
         }
     })
 
-    const matchWithRole = req.role === "admin" ?
+    const matchWithRole = req.auth["user"].role === "admin" ?
         {
             $match:
             {
@@ -786,7 +784,7 @@ router.post("/function/search/:term", auth, async (req, res) => {
         {
             $match:
             {
-                "owners.ownerId": req.userid,
+                "owners.ownerId": req.auth["user"].userid,
             }
         } //Find surveys where this user has access
 

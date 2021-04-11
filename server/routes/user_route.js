@@ -127,11 +127,11 @@ async function verifyUserRegistration(token, email) {
 router.get("/function/count", auth, async (req, res) => {
     console.log("Get count of users")
     try{
-        if (req.role !== "admin") {
+        if (req.auth["user"].role !== "admin") {
             res.status(403).json({message:"Forbidden"})
             return
         }
-        if(req.role === "admin"){
+        if(req.auth["user"].role === "admin"){
             User.countDocuments().then(count => res.json(count))
             return;
         }
@@ -167,7 +167,7 @@ router.get("/function/sort", auth, async (req, res) => {
         limit: How many documents you want to retrieve, f.ex. 10 as in the case above
         direction: 1 ascending, -1 descending
     */
-    if (req.role !== "admin") {
+    if (req.auth["user"].role !== "admin") {
         res.sendStatus(403)
         return;
     }
@@ -370,7 +370,7 @@ router.patch("/forgotten_password", async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.post("/invite_link", auth, async (req, res) => {
-    if (req.role !== "admin") {
+    if (req.auth["user"].role !== "admin") {
         res.status(403).json({message: "Unauthorized"})
         return
     }
@@ -426,7 +426,7 @@ router.post("/invite_link", auth, async (req, res) => {
 router.get("/", auth, async (req, res) => {
     console.log("Called get all for User")
     try {
-        if (req.role !== "admin") {
+        if (req.auth["user"].role !== "admin") {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -459,7 +459,7 @@ router.get("/", auth, async (req, res) => {
 router.get("/:id", auth, async (req, res) => {
     console.log("Called get user by id")
     try {
-        if (req.role !== "admin" && req.role !== "researcher") {
+        if (req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher") {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -541,7 +541,7 @@ router.post("/", async (req, res) => {
 router.patch("/:id/email", auth, async (req, res) => {
     console.log("User PUT email")
     const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+.[^,\/\\\s@]+/
-    if (req.role !== "admin" && req.userid !== req.params.id) {
+    if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== req.params.id) {
         res.status(403).json({message: "Forbidden"})
         return
     }
@@ -579,9 +579,8 @@ router.patch("/:id/email", auth, async (req, res) => {
  */
 router.patch("/:id/change_password", auth, async (req, res) => {
     console.log("User PATCH password")
-    if (req.userid !== req.params.id) {
+    if (req.auth["user"].userid !== req.params.id) {
         res.status(403).json({error: "Forbidden"})
-        console.log("ID's in patch password: ", req.userid, req.params.id)
         return
     }
     try {
@@ -590,7 +589,7 @@ router.patch("/:id/change_password", auth, async (req, res) => {
             res.status(422).json({error: "Unprocessable Entity"})
             return
         }
-        const userDoc = await User.findOne({ _id: req.userid })
+        const userDoc = await User.findOne({ _id: {$eq: req.auth["user"].userid }})
         const samePassword = compareHash(userDoc.hashed, currentPassword, userDoc.salt)
         if (!samePassword) {
             res.status(403).json({ error: "Password not correct." })
@@ -621,8 +620,8 @@ router.patch("/:id/change_password", auth, async (req, res) => {
  * @apiError (404) {String} message Could not find user.
  */
 router.delete("/:id", auth, async (req, res) => {
-    console.log("Called delete user by id with id: " + req.userid);
-    if (req.role !== "admin" && req.userid !== req.params.id) {
+    console.log("Called delete user by id with userid: " + req.params.id);
+    if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== req.params.id) {
         res.status(403).json({message: "Forbidden"})
         return
     }

@@ -26,7 +26,7 @@
     
     let counter = 0;
     let maxCounter = 10;
-    surveyService.getRandomPairForSurveyByID(surveyID).then((data) => {
+    surveyService.getItemsToCompareBySurveyId(surveyID).then((data) => {
         if(data.status < 300){
             data = data.data;
             console.log("Data from randomPair: ", data.data);

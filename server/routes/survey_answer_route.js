@@ -38,7 +38,7 @@ const router = Router()
 router.get("/", auth, async (req, res) => {
     console.log("Get all SurveyAnswers called")
     try{
-        if(req.role !== "admin" && req.role !== "researcher"){
+        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
             res.sendStatus(403)
             return
         }
@@ -66,11 +66,11 @@ router.get("/", auth, async (req, res) => {
 router.get("/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-        if(req.role !== "admin" && req.role !== "researcher"){
+        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
             res.sendStatus(403)
             return
         }
-        const surveyAnswer = await SurveyAnswer.findOne({_id: req.params.id})
+        const surveyAnswer = await SurveyAnswer.findOne({_id: {$eq: req.params.id}})
         console.log("SurveyAnswer in get by id: ", surveyAnswer)
         if(!surveyAnswer || surveyAnswer._id == null){
             throw new Error("survey_answer_route.js, couldn't get by id")
@@ -96,11 +96,11 @@ router.get("/:id", auth, async (req, res) => {
 router.get("/judge/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-        if(req.role !== "admin" && req.role !== "researcher"){
+        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
             res.sendStatus(403)
             return
         }
-        const surveyAnswers = await SurveyAnswer.find({judgeId: req.params.id})
+        const surveyAnswers = await SurveyAnswer.find({judgeId: {$eq: req.params.id}})
         if(!surveyAnswers){
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
@@ -124,14 +124,12 @@ router.get("/judge/:id", auth, async (req, res) => {
 router.get("/survey/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-        console.log("get all by survey id role: ", req.role)
-        //TODO: Fix this check once we've updated all users to the correct naming
-        if(req.role !== "admin" && req.role !== "researcher" && req.role !== "scientist"){
-            console.log("get all by survey id role: ", req.role)
+
+        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
             res.sendStatus(403)
             return
         }
-        const surveyAnswers = await SurveyAnswer.find({surveyId: req.params.id})
+        const surveyAnswers = await SurveyAnswer.find({surveyId: {$eq: req.params.id}})
         if(!surveyAnswers){
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
@@ -156,7 +154,7 @@ router.post("/", auth, async (req, res) => {
     const surveyAnswer = req.body
     console.log("surveyAnswer instert: ", surveyAnswer)
     console.log("req.role: ", req.role)
-    if(req.role !== "judge"){
+    if(req.auth["judge"].role !== "judge"){
         res.sendStatus(403)
         return
     }
@@ -186,7 +184,7 @@ router.post("/", auth, async (req, res) => {
  */
 router.delete("/:id", auth, async (req, res) => {
     console.log("Delete one SurveyAnswer")
-    const surveyAnswerDoc = await SurveyAnswer.findOne({_id: req.params.id})
+    const surveyAnswerDoc = await SurveyAnswer.findOne({_id: {$eq: req.params.id}})
     if(!surveyAnswerDoc || !surveyAnswerDoc._id){
         res.sendStatus(404)
         return
@@ -198,7 +196,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(404)
         return
     }
-    if(req.role !== "admin" && req.userid !== surveyDoc.ownerId){
+    if(req.auth["user"].role !== "admin" && req.auth["user"].userid !== surveyDoc.ownerId){
         res.sendStatus(403)
         return
     }
@@ -225,7 +223,7 @@ router.delete("/:id", auth, async (req, res) => {
  */
  router.delete("/judge/:id", auth, async (req, res) => {
     console.log("Delete surveyAnswers by judge")
-    const surveyAnswers = await SurveyAnswer.find({judgeId: req.params.id})
+    const surveyAnswers = await SurveyAnswer.find({judgeId: {$eq: req.params.id}})
     if(!surveyAnswers || !surveyAnswers.length > 0){
         res.sendStatus(404)
         return
@@ -237,7 +235,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(404)
         return
     }
-    if(req.role !== "admin" && req.userid !== surveyDoc.ownerId){
+    if(req.auth["user"].role !== "admin" && req.auth["user"].userid !== surveyDoc.ownerId){
         res.sendStatus(403)
         return
     }

@@ -81,10 +81,10 @@ export default class SurveyService extends Service{
     }
 
 
-    getRandomPairForSurveyByID(id){
+    getItemsToCompareBySurveyId(id){
         return axios({
             method: "get",
-            url: this.path + "/survey/item/"+id,
+            url: this.path + "/survey/items_to_compare/"+id,
             withCredentials: true
         })
         .then(response => response)

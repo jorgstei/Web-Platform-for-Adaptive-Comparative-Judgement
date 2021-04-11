@@ -32,37 +32,43 @@ const auth = (req, res, next) => {
         res.sendStatus(401)
         return
     }
-    if (cookies["judge-token"]) {
-        console.log("secret:", cookies["judge-token"], typeof cookies["judge-token"])
-        jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, (err, decoded) => {
-            if (err) {
-                console.log("Judge verify error in auth:",err)
-                res.sendStatus(401)
-            }
-            else {
-                //Set the potentially required feilds contained in the token to the request
-                req.userid = decoded.userid
-                req.role = decoded.role
-                next()
-            }
-        })
-    }
-    else if (cookies["access-token"]) {
-        jwt.verify(cookies["access-token"], process.env.JWTSecret, (err, decoded) => {
-            if (err) {
-                console.log(err)
-                res.sendStatus(401)
-            }
-            else {
-                //Set the potentially required feilds contained in the token to the request
-                req.userid = decoded.userid
-                req.role = decoded.role
-                next()
-            }
-        })
-    }
-    else {
-        res.sendStatus(401)
+    else{
+        req.auth = []
+        if (cookies["judge-token"]) {
+            console.log("secret:", cookies["judge-token"], typeof cookies["judge-token"])
+            jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, (err, decoded) => {
+                if (err) {
+                    console.log("Judge verify error in auth:",err)
+                    res.sendStatus(401)
+                }
+                else {
+                    //Set the potentially required feilds contained in the token to the request
+                    req.auth["judge"] = {userid: decoded.userid, role: decoded.role}
+                    //req.userid = decoded.userid
+                    //req.role = decoded.role
+                }
+            })
+        }
+        if (cookies["access-token"]) {
+            jwt.verify(cookies["access-token"], process.env.JWTSecret, (err, decoded) => {
+                if (err) {
+                    console.log(err)
+                    res.sendStatus(401)
+                }
+                else {
+                    //Set the potentially required feilds contained in the token to the request
+                    req.auth["user"] = {userid: decoded.userid, role: decoded.role}
+                    //req.userid = decoded.userid
+                    //req.role = decoded.role
+                }
+            })
+        }
+        if(req.auth === []){
+            res.sendStatus(401)
+        }
+        else{
+            next()
+        }
     }
 }
 

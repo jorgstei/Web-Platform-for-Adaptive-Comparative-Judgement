@@ -13,40 +13,40 @@
 
 <style>
     .wrapper{
-        width: 80%;
+        width: 50vh;
         margin: auto;
         display: grid;
         grid-template-columns: auto;
-        
+        background-color: rgba(0,0,0,0.5);
     }
     .inputLabel{
         font-size: 1.5em;
         margin: auto;
         text-align: center;
-        color: rgba(200,200,200,1);
+        color: rgba(255,255,255,1);
     }
     .bigInput{
-        width: 40%;
+        width: 50%;
         margin: auto;
         padding: 0.5em 2em;
-        font-size: 1em;
+        font-size: 1.5em;
         text-align: center;
-        background-color: rgba(200, 200, 200, 0.3);
-        border-color: rgba(200, 200, 200, 0.3);
+        background-color: rgba(200, 200, 200, 0.7);
+        border-color: rgba(200, 200, 200, 0.7);
     }
     .bigInput:hover{
         background-color: rgba(150, 150, 150, 0.7);
     }
     .submitBtn{
-        width: 15%;
+        width: 50%;
         margin: auto;
         margin-top: 2em;
         font-size: 1.2em;
-        background-color: rgba(58, 2, 2, 0.05);
-        border-color: rgba(100, 100, 100, 0.05);
-        color: rgba(150,150,150,0.9);
+        background-color: rgba(100, 100, 100, 0.7);
+        border-color: rgba(100, 100, 100, 0.7);
+        color: rgba(255,255,255,0.9);
     }
     .submitBtn:hover{
-        background-color:  rgba(100, 100, 100, 0.3);
+        background-color:  rgba(100, 100, 100, 0.7);
     }
 </style>

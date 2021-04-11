@@ -17,7 +17,7 @@
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>You've been asked to participate in judgement</h2>
+		<h2>If you are here to take judge a survey, please enter your access code into the field below and press "Start reviewing"</h2>
 		<CostumInput onClickFunc={validate} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 	<!--

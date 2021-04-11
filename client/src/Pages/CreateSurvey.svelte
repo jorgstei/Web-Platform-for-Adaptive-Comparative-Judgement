@@ -479,18 +479,13 @@
 
     let purposeItems = [
         { name: "Research", value: "research" },
-        { name: "Grading", value: "grading" },
         { name: "Testing", value: "testing" },
-        { name: "For fun", value: "fun" },
     ];
     let selectedPurpose = "research";
     let mediaTypeItems = [
-        { name: "Mix", value: "mix" },
-        { name: "PDF", value: "pdf" },
         { name: "Text", value: "text" },
-        { name: "Image", value: "image" },
     ];
-    let selectedMediaType = "mix";
+    let selectedMediaType = "text";
 
     let selectedAccessibility = "link";
 
@@ -541,8 +536,6 @@
 
     let optionMediaTypeItems = [
         { name: "Text", value: "text" },
-        { name: "PDF", value: "pdf" },
-        { name: "Image", value: "image" },
     ];
 
     let showSurveyTitleTooltip,

@@ -232,8 +232,9 @@
 
 <div>
 {#if changePassword == true}
-    <div class="d-flex flex-column justify-left align-left">
-        <h3 class="text-h3 mb-2">Change Password</h3>
+<div class="d-flex flex-row justify-center">
+    <div class="d-flex flex-column" style="width:50%;">
+        <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Change Password</h1>
         <div class="d-flex flex-column justify-center align-left">
             <TextField
                 class="ma-2"
@@ -278,6 +279,7 @@
             >
         </div>
     </div>
+</div>
 {:else}
     <div class="d-flex flex-column justify-center align-center" style="padding-top: 10vh;">
         <div class="d-flex flex-column">

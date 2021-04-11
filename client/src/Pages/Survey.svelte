@@ -148,7 +148,7 @@
     {#if counter < maxCounter}
     {#key counter}
     
-    <h1>{question}</h1>
+    <h1 class="text-h3">{question}</h1>
     <div id="container" class="d-flex flex-row ">
         {#if randomPair != null}
         <!--
@@ -178,8 +178,6 @@
                     </CardActions>
                 </Card>
             </div>
-                
-            
             {/if}
         </div>
         {/key}

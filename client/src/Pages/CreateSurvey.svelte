@@ -22,6 +22,8 @@
         CardText,
         CardActions,
         Checkbox,
+        Row,
+        Col,
     } from "svelte-materialify";
     import {
         mdiEyeOff,
@@ -768,7 +770,7 @@
                             <div class="text--primary text-h4">
                                 {researcher.owner_email}
                             </div>
-                            <div class="text--primary">Rights</div>
+                            <div class="text--primary text-h6" style="text-align: left;">Rights:</div>
                         </CardText>
                         <CardActions>
                             <div class="d-flex flex-column justfiy-left">
@@ -798,47 +800,51 @@
             <div class="d-flex mt-4 mb-4 flex-wrap align-content-space-between">
                 {#each surveyOptions as option}
                     <Card
-                        class="d-flex flex-row mb-2"
+                        class="d-flex flex-column mb-2"
                         style="min-width:50%;"
                         hover
                     >
-                        <Button
-                            fab
-                            class="float-right"
-                            on:click={() => removeOption(option)}
-                            ><Icon path={mdiDeleteForever} /></Button
-                        >
-                        <CardText>
-                            <div>Option</div>
-                            <TextField
-                                type={option.mediaType}
-                                bind:value={option.input}
-                                class="mt-4"
-                                style="min-width:100%;"
-                            >
-                                <div slot="append">
-                                    <Tooltip
-                                        top
-                                        bind:active={option.showOptionTooltip}
-                                    >
-                                        <Icon path={mdiInformationOutline} />
-                                        <span slot="tip"
-                                            >Input for your option</span
+                    <Row>
+                        <Col cols={11}>
+                            <CardText>
+                                <div>Option</div>
+                                <TextField
+                                    type={option.mediaType}
+                                    bind:value={option.input}
+                                    class="mt-4"
+                                    style="min-width:100%;"
+                                >
+                                    <div slot="append">
+                                        <Tooltip
+                                            top
+                                            bind:active={option.showOptionTooltip}
                                         >
-                                    </Tooltip>
-                                </div>
-                                Option value
-                            </TextField>
-
-                            <Select
-                                items={optionMediaTypeItems}
-                                bind:value={option.mediaType}
-                                class="mt-4">Media Type</Select
-                            >
-                        </CardText>
-                        <CardActions>
-                            <div class="d-flex flex-column justfiy-left" />
-                        </CardActions>
+                                            <Icon path={mdiInformationOutline} />
+                                            <span slot="tip"
+                                                >Input for your option</span
+                                            >
+                                        </Tooltip>
+                                    </div>
+                                    Option value
+                                </TextField>
+    
+                                <Select
+                                    items={optionMediaTypeItems}
+                                    bind:value={option.mediaType}
+                                    class="mt-4">Media Type</Select
+                                >
+                            </CardText>
+                        </Col>
+                        <Col cols={1}>
+                            <Button
+                                fab
+                                class="float-right"
+                                on:click={() => removeOption(option)}
+                                >
+                                <Icon path={mdiDeleteForever}/>
+                            </Button>
+                        </Col>
+                    </Row>
                     </Card>
                 {/each}
             </div>

@@ -45,9 +45,7 @@
 
     }
 
-    // Checks the validity of fields. Optional third parameter for password 2. Made this way for reusability.
-    const checkValues = (email) => {
-        
+    const checkValues = (email) => {    
         let valuesAreValid = true;
         let errormsg = "";
         console.log("Checking value email:", email);
@@ -56,13 +54,11 @@
             valuesAreValid = false;
             errormsg = "Every field must be filled."
         }
-        //TODO: Make better regex <3
-        // Check that the given mail contains an "@" and ".". Also ensures there are no whitespaces in the email (spaces, tabs, etc.)
-        else if(!/@/.test(email) || !/./.test(email) || /\s/.test(email)){
+        // Checks if it looks like a real email
+        else if(!email_regex.test(email)){
             valuesAreValid = false;
             errormsg = "Your email must contain '@' and '.' and can not have whitespaces."
         }
-        //TODO: Database call to check if email is taken
         return [valuesAreValid, errormsg]
     }
 

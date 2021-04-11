@@ -40,7 +40,7 @@ import swal from "sweetalert";
                             survey = surveyData;
                         }
                         else{
-                            swal("Error", "An error occured while getting the survey information. Please retry, and if the problem exists contact an administrator.\nData:"+surveyData.data.message, "error").then(() => navigate("/"))
+                            swal("Error", "An error occured while getting the survey information. Please retry, and if the problem persists contact an administrator.\nResponse: "+surveyData.data.message, "error").then(() => navigate("/"))
                         }
                         
                     })

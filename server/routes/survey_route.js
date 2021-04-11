@@ -287,7 +287,7 @@ router.get("/items_to_compare/:id", auth, async (req, res) => {
 router.get("/:id", auth, async (req, res) => {
     console.log("Called get survey by id")
     try {
-        const survey = await Survey.findOne({ _id: req.params.id })
+        const survey = await Survey.findOne({ _id: {$eq: req.params.id }})
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"].userid)
         if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== foundOwner.ownerId) {
             res.status(403).json({message: "Forbidden"})
@@ -336,6 +336,11 @@ router.get("/judge/:id", auth, async (req, res) => {
             
             survey = await Survey.findOne({ _id: {$eq: req.params.id} }).select(["-internalDescription", "-title"]);
         }
+        console.log("Survey: ", survey)
+        if (!survey || survey == null || survey?._id === null) {
+            res.status(404).json({message: "Could not find the requested Survey"})
+            return
+        }
         console.log("Survey in get by id as judge: ", survey);
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"].userid)
 
@@ -343,11 +348,7 @@ router.get("/judge/:id", auth, async (req, res) => {
             res.status(403).json({message: "Forbidden"});
             return
         }
-        console.log("Survey: ", survey)
-        if (!survey || survey._id === null) {
-            res.status(404).json({message: "Could not find the requested Survey"})
-            return
-        }
+
         if (!survey.active) {
             res.status(403).json({message: "Survey is not active and therefore cannot be judged."})
             return

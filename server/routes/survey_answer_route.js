@@ -154,7 +154,7 @@ router.post("/", auth, async (req, res) => {
     const surveyAnswer = req.body
     console.log("surveyAnswer instert: ", surveyAnswer)
     console.log("req.role: ", req.role)
-    if(req.auth["judge"].role !== "judge"){
+    if(req.auth["judge"]?.role !== "judge"){
         res.sendStatus(403)
         return
     }

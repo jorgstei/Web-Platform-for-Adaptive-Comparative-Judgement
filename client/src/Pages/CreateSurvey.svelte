@@ -24,6 +24,7 @@
         Checkbox,
         Row,
         Col,
+        Overlay,
     } from "svelte-materialify";
     import {
         mdiEyeOff,
@@ -32,7 +33,31 @@
         mdiInformationOutline,
         mdiPlusCircle,
         mdiFileCancel,
+        mdiAbTesting,
     } from "@mdi/js";
+
+    import PDFViewer from '../Components/PDFViewer.svelte';
+    const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+
+    const classes = {
+    overall: null,
+    controls: null,
+    container: null
+  };
+
+    const options = {
+        // "paged" or "all"
+        display: "paged",
+        // "dark" or "light" or your own
+        theme: "dark"
+    };
+
+    // The current page number
+    let currentPage;
+
+    // To override the text between the forward and back buttons 
+    const pageNumberText = (currentPage, maximumPages) => currentPage + "/" + maximumPages;
+    
 
     export let userInfo;
     export let editing = false;
@@ -101,6 +126,10 @@
                         surveyOptions.push({
                             input: item.data,
                             mediaType: item.type,
+                            inputFieldType: getInputFieldTypeFromMediaType(item.type),
+                            showOptionTooltip: false,
+                            showOptionOverlay: false,
+                            file: "",
                         });
                     }
 
@@ -118,12 +147,18 @@
         surveyOptions.push({
             input: "",
             mediaType: "text",
+            inputFieldType: {type:"text", acceptString:""},
             showOptionTooltip: false,
+            showOptionOverlay: false,
+            file: "",
         });
         surveyOptions.push({
             input: "",
             mediaType: "text",
+            inputFieldType: {type:"text", acceptString:""},
             showOptionTooltip: false,
+            showOptionOverlay: false,
+            file: "",
         });
     }
 
@@ -156,6 +191,10 @@
         };
 
         console.log("CREATE SURVEY INFO OBJ", info);
+        info.items.forEach(item=>{
+            console.log(item);
+            validateFileType(item.data, item.type);
+        })
 
         let [everyFieldFilled, errorMessage] = validateFormInputs(info);
         console.log(errorMessage);
@@ -201,10 +240,7 @@
                         if(data.status < 300){
                             data = data.data;
                             console.log("surveyService put data: ", data);
-                            const survey_link =
-                                window.location.href.split("/admin_board")[0] +
-                                "?takeSurvey=1&surveyID=" +
-                                surveyID;
+                            const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + surveyID;
                             let dummy = document.getElementById("dummy");
                             dummy.value = survey_link;
                             console.log(
@@ -345,6 +381,24 @@
                 comparisonsPerJudge = 100;
             } else if (parsed < 0) {
                 comparisonsPerJudge = 0;
+            }
+        }
+    }
+
+    const validateFileType = (file, expectedFiletype) => {
+        console.log("validating file type with file", {expectedFiletype, file});
+        if(expectedFiletype == "text"){
+            console.log("it was just text");
+            return true;
+        }
+        else{
+            if(expectedFiletype == "pdf"){
+                console.log("file should be pdf");
+                console.log(file.type, file.type === "application/pdf");
+            }
+            else if(expectedFiletype == "image"){
+                console.log("file should be img");
+                console.log(file.type, file.type === "application/image/*");
             }
         }
     }
@@ -557,6 +611,20 @@
         showCancelEditingTooltip
         = false;
 
+
+    const getInputFieldTypeFromMediaType = (mediaType) => {
+        if(mediaType=="pdf"){
+            return {type:"file", acceptString:"application/pdf"};
+        }
+        else if(mediaType=="image"){
+            return {type:"file", acceptString:"image/png, image/jpeg, image/jpeg, image/x-png"};
+        }
+        else{
+            return "text";
+        }
+    }
+
+    
 
     $: surveyResearchers & searchResults;
 </script>
@@ -799,53 +867,80 @@
 
             <div class="d-flex mt-4 mb-4 flex-wrap align-content-space-between">
                 {#each surveyOptions as option}
-                    <Card
-                        class="d-flex flex-column mb-2"
-                        style="min-width:50%;"
-                        hover
-                    >
-                    <Row>
-                        <Col cols={11}>
-                            <CardText>
-                                <div>Option</div>
-                                <TextField
-                                    type={option.mediaType}
-                                    bind:value={option.input}
-                                    class="mt-4"
-                                    style="min-width:100%;"
-                                >
-                                    <div slot="append">
-                                        <Tooltip
-                                            top
-                                            bind:active={option.showOptionTooltip}
-                                        >
-                                            <Icon path={mdiInformationOutline} />
-                                            <span slot="tip"
-                                                >Input for your option</span
+                    <div class="d-flex flex-column mb-2" style="min-width:50%;">
+                        <Card hover>
+                        <Row>
+                            <Col cols={11}>
+                                <CardText>
+                                    <div>Option</div>
+                                    <TextField
+                                        bind:value={option.input}
+                                        on:change={(event)=>{console.log("event was", event)}}
+                                        class="mt-4"
+                                        style="min-width:100%;"
+                                    >
+                                        <div slot="append">
+                                            <Tooltip
+                                                top
+                                                bind:active={option.showOptionTooltip}
                                             >
-                                        </Tooltip>
-                                    </div>
-                                    Option value
-                                </TextField>
-    
-                                <Select
-                                    items={optionMediaTypeItems}
-                                    bind:value={option.mediaType}
-                                    class="mt-4">Media Type</Select
-                                >
-                            </CardText>
-                        </Col>
-                        <Col cols={1}>
-                            <Button
-                                fab
-                                class="float-right"
-                                on:click={() => removeOption(option)}
-                                >
-                                <Icon path={mdiDeleteForever}/>
+                                                <Icon path={mdiInformationOutline} />
+                                                <span slot="tip"
+                                                    >Input for your option</span
+                                                >
+                                            </Tooltip>
+                                        </div>
+                                        Option value
+                                    </TextField>
+        
+                                    <Select
+                                        items={optionMediaTypeItems}
+                                        bind:value={option.mediaType}
+                                        on:change={()=>option.inputFieldType = getInputFieldTypeFromMediaType(option.mediaType)}
+                                        class="mt-4">Media Type</Select
+                                    >
+                                </CardText>
+                            </Col>
+                            <Col cols={1}>
+                                <Button
+                                    fab
+                                    class="float-right"
+                                    on:click={() => removeOption(option)}
+                                    >
+                                    <Icon path={mdiDeleteForever}/>
+                                </Button>
+                                
+                                <Button
+                                    fab
+                                    class="float-right mt-9"
+                                    on:click={()=>{option.showOptionOverlay = true; console.log("clicked on card");}}
+                                    >
+                                    <Icon path={mdiAbTesting}/>
+                                </Button>
+                            </Col>
+                        </Row>
+                        <Overlay
+                            bind:active={option.showOptionOverlay}
+                            opacity={1}
+                            color={"#eee"}
+                            style="cursor:default"
+                        >
+                        
+                            <TextField bind:type={option.inputFieldType.type} bind:accept={option.inputFieldType.acceptString} on:change={(event)=>{console.log(event.target.files[0]); option.file = event.target.files[0]}}>
+                                Content
+                            </TextField>
+                            
+                            <h1 class="text-h4">In overlay with file {option.file.name}</h1>
+                            {#if option.file != ""}
+                                <PDFViewer bind:file={option.file}></PDFViewer>
+                            {/if}
+                            <!--<PDFViewer {pdf} {classes} {options} bind:currentPage {pageNumberText}></PDFViewer>-->
+                            <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOptionOverlay = false; e.stopPropagation();}}>
+                                Close overlay
                             </Button>
-                        </Col>
-                    </Row>
-                    </Card>
+                        </Overlay>
+                        </Card>
+                    </div>
                 {/each}
             </div>
 
@@ -862,6 +957,9 @@
                     input: "",
                     mediaType: "text",
                     showOptionTooltip: false,
+                    showOptionOverlay: false,
+                    inputFieldType: {type:"text", acceptString:""},
+                    file: "",
                 });
                 surveyOptions = surveyOptions;
                 setTimeout(

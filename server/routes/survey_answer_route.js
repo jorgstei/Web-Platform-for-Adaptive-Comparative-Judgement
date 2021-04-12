@@ -38,7 +38,7 @@ const router = Router()
 router.get("/", auth, async (req, res) => {
     console.log("Get all SurveyAnswers called")
     try{
-        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
+        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
             res.sendStatus(403)
             return
         }
@@ -66,7 +66,7 @@ router.get("/", auth, async (req, res) => {
 router.get("/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
+        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
             res.sendStatus(403)
             return
         }
@@ -96,7 +96,7 @@ router.get("/:id", auth, async (req, res) => {
 router.get("/judge/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
+        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
             res.sendStatus(403)
             return
         }
@@ -125,7 +125,7 @@ router.get("/survey/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
 
-        if(req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher"){
+        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
             res.sendStatus(403)
             return
         }
@@ -196,7 +196,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(404)
         return
     }
-    if(req.auth["user"].role !== "admin" && req.auth["user"].userid !== surveyDoc.ownerId){
+    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId){
         res.sendStatus(403)
         return
     }
@@ -235,7 +235,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(404)
         return
     }
-    if(req.auth["user"].role !== "admin" && req.auth["user"].userid !== surveyDoc.ownerId){
+    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId){
         res.sendStatus(403)
         return
     }

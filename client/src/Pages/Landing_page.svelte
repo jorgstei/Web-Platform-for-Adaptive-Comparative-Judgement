@@ -4,20 +4,48 @@
 	import {navigate} from "svelte-routing";
 	import { surveyService } from "../Services/SurveyService";
 	import {navigateWithRefreshToken} from "../Utility/naviagte";
+import swal from "sweetalert";
 
 	export let surveyID;
 
 	let validate = async () => {
 		let code = document.getElementsByClassName("bigInput")[0].value;
-		surveyID = code;
-		navigate("/survey");
+		if(code.length === 6){
+			let codeCheck = await surveyService.getPinIsValid(code);
+			if(codeCheck.status == 200){
+				console.log("Code is valid")
+				surveyID = code;
+				navigate("/survey");
+			}
+			else if(codeCheck.status == 500){
+				swal(
+					"Could not reach server.",
+					"We could not contact the server. Please try again, or contact an administrator if the problem persists.",
+					"error"
+				)
+			}
+			else{
+				swal(
+					"Code is not valid.",
+					"We could not find a survey that matches that code.\nPlease double check that you entered the right one.",
+					"warning"
+				)
+			}
+		}
+		else{
+			swal(
+				"Error in user input.",
+				"Codes must be 6 characters long.",
+				"error"
+			)
+		}
 	}
 </script>
 
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>If you are here to take judge a survey, please enter your access code into the field below and press "Start reviewing"</h2>
+		<h2>If you are here to take a survey, please enter your access code into the field below and press "Start reviewing"</h2>
 		<CostumInput onClickFunc={validate} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 	<!--

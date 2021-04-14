@@ -54,15 +54,19 @@
     <table class="main_table">
         <tr id="table_header">
             {#each tableAttributes as attr}
-                <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>{attr.viewName}</th>
+                {#if attr.viewName !== "id"}
+                    <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>{attr.viewName}</th>
+                {/if}
             {/each}
         </tr>
         {#if tableData != undefined && tableData != null && typeof tableData == "object" && tableData.length != undefined && tableData.length != null}
             {#each tableData as row}
                 <tr class="table_row">
                     {#if row != undefined && row != null && typeof row == "object" && row.length != undefined && row.length != null}
-                        {#each row as datapoint}
-                            <td class="col">{datapoint}</td>
+                        {#each row as datapoint, index}
+                            {#if tableAttributes.findIndex(e=>e.viewName == "id") !== index}
+                                <td class="col">{datapoint}</td>
+                            {/if}
                         {/each}
                     {/if}
                     {#if tableAttributes.findIndex(e => e.viewName === 'data') != -1}
@@ -114,7 +118,7 @@
                                             swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
                                             const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id");
                                             const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
-                                            console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
+                                            //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
                                             tableData.splice(surveyIndex, 1);
                                             surveyActivityStatus.splice(surveyIndex, 1);
                                             userRights.splice(surveyIndex, 1);
@@ -147,7 +151,7 @@
                                             swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
                                             const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id");
                                             const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
-                                            console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
+                                            //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
                                             tableData.splice(surveyIndex, 1);
                                             surveyActivityStatus.splice(surveyIndex, 1);
                                             userRights.splice(surveyIndex, 1);

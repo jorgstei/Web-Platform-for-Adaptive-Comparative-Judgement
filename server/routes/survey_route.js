@@ -371,6 +371,25 @@ router.get("/judge/:id", auth, async (req, res) => {
     }
 })
 
+
+router.get("/function/checkPIN/:PIN", async (req, res) => {
+    console.log("Called check if pin exists as judge");
+    try{
+        const surveyWithPIN = await Survey.findOne({inviteCode: {$eq: req.params.PIN}});
+        if(surveyWithPIN?._id == null){
+            res.status(404).json({message: "There is no survey with that PIN"});
+            return
+        }
+        res.sendStatus(200);
+    }
+    catch (error) {
+        console.log("Error checking whether PIN was valid");
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+
+
 /**
  * @api {post} /api/survey
  * @apiName POSTSurvey

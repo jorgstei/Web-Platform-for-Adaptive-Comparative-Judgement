@@ -2,6 +2,7 @@ const {Router} = require('express')
 const SurveyAnswer = require('../models/SurveyAnswer')
 const {auth} = require("./authentication")
 const Survey = require('../models/Survey')
+const me = require('mongo-escape').escape
 
 const router = Router()
 
@@ -250,5 +251,55 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(500)
     }
 })
+
+
+router.get("/function/count/answers/:surveyid", auth, async (req, res) => {
+    //console.log("Get count of answers called");
+    try {
+        if (req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher") {
+            res.status(403).json({message: "Forbidden"})
+            return
+        }
+        else{
+            SurveyAnswer.countDocuments({surveyId: me(req.params.surveyid)})
+            .then(count => {
+                //console.log("Got answer count:", count);
+                res.json(count)
+            })
+            return;
+        }
+
+    } catch (error) {
+        console.log("Could not count surveyanswers:", error)
+        res.status(500).json({message: "Internal Server Error"})
+    }
+})
+
+router.get("/function/count/judges/:surveyid", auth, async (req, res) => {
+    //console.log("Get count of judges called");
+    try {
+        if (req.auth["user"].role !== "admin" && req.auth["user"].role !== "researcher") {
+            res.status(403).json({message: "Forbidden"})
+            return
+        }
+        else{
+            //SurveyAnswer.find({surveyId:{$eq: req.params.id}}).distinct("judgeId").count().then(count => res.json(count))
+            SurveyAnswer.aggregate([{ $match: { surveyId: me(req.params.surveyid)}}, { $group: { _id: '$judgeId', count: {$sum: 1} } }])
+            .then(result => {
+                //console.log("Got judge count:", result.length);
+                res.json(result.length);
+            })
+            return;
+        }
+
+    } catch (error) {
+        console.log("Could not count judges:", error)
+        res.status(500).json({message: "Internal Server Error"})
+    }
+})
+
+
+
+
 
 module.exports = router

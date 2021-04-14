@@ -41,6 +41,25 @@ export default class SurveyAnswerService extends Service{
         .then(response => response)
         .catch(error => error.response)
     }
+    getAnswerCountBySurveyID(id){
+        return axios({
+            method: "get",
+            url: this.path + "/surveyanswer/function/count/answers/" + id,
+            withCredentials: true,
+        })
+        .then(response => response)
+        .catch(error => error.response)
+    }
+
+    getJudgesCountBySurveyID(id){
+        return axios({
+            method: "get",
+            url: this.path + "/surveyanswer/function/count/judges/" + id,
+            withCredentials: true,
+        })
+        .then(response => response)
+        .catch(error => error.response)
+    }
 
     post(surveyanswer){
         return axios({

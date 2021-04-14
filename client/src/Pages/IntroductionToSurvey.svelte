@@ -3,10 +3,9 @@
     import { navigate } from "svelte-routing";
     import { surveyService } from "../Services/SurveyService";
     import queryString from "query-string";
-    
     import { Button, Card, CardText, Overlay, Icon } from 'svelte-materialify';
     import { mdiArrowExpand, mdiArrowCollapse } from "@mdi/js";
-import swal from "sweetalert";
+    import swal from "sweetalert";
     
 
 
@@ -67,7 +66,7 @@ import swal from "sweetalert";
 
         <div class="d-flex flex-row justify-space-between" style="margin-top: 5vh;">
 
-            <Card style="width:40%;" hover outlined class="grey lighten-4">
+            <Card style="width:40%; cursor: default;" hover outlined class="grey lighten-4">
                 <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showSurveyJudgeInstructions = true; e.stopPropagation();}}>
                     <Icon path={mdiArrowExpand} size="2vw"></Icon>
                 </Button>
@@ -84,7 +83,7 @@ import swal from "sweetalert";
                 bind:active={showSurveyJudgeInstructions}
                 on:click={()=> showSurveyJudgeInstructions = false}>
                 <div style="min-height: 60vh; width: 60vw; margin: auto;" on:click={(e)=>{e.stopPropagation()}}>
-                    <Card class="grey lighten-4" style="min-height: 60vh;">
+                    <Card class="grey lighten-4" style="min-height: 60vh; cursor: default;">
                         <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showSurveyJudgeInstructions = false; e.stopPropagation();}}>
                             <Icon path={mdiArrowCollapse} size="2vw"></Icon>
                         </Button>
@@ -99,7 +98,7 @@ import swal from "sweetalert";
                 </div>
             </Overlay>
             
-            <Card style="width:40%;" hover outlined class="grey lighten-4" >
+            <Card style="width:40%; cursor: default;" hover outlined class="grey lighten-4" >
                 <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showGeneralInfoOverlay = true; e.stopPropagation();}}>
                     <Icon path={mdiArrowExpand} size="2vw"></Icon>
                 </Button>
@@ -123,7 +122,7 @@ import swal from "sweetalert";
                 bind:active={showGeneralInfoOverlay}
                 on:click={()=> showGeneralInfoOverlay = false}>
                 <div style="min-height: 60vh; width: 60vw; margin: auto;" on:click={(e)=>{e.stopPropagation()}}>
-                    <Card class="grey lighten-4" style="min-height: 60vh;">
+                    <Card class="grey lighten-4" style="min-height: 60vh; cursor: default;">
                         <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showGeneralInfoOverlay = false; e.stopPropagation();}}>
                             <Icon path={mdiArrowCollapse} size="2vw"></Icon>
                         </Button>

@@ -827,9 +827,9 @@ import Survey from "./Survey.svelte";
                 </ListItemGroup>
             </div>
 
-            <div class="d-flex mt-4 mb-4 flex-wrap align-content-space-between">
+            <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
                 {#each surveyResearchers as researcher}
-                    <Card style="min-width:50%; cursor: default;" class="mb-2" hover>
+                    <Card style="width:49%; cursor: default; background-color:rgb(225,225,225);" class="mb-2" hover>
                         {#if researcher.ownerId !== userInfo.userid}
                             <Button
                                 fab
@@ -841,10 +841,10 @@ import Survey from "./Survey.svelte";
                         {/if}
                         <CardText>
                             <div>Researcher</div>
-                            <div class="text--primary text-h4">
+                            <div class="text--primary text-h5">
                                 {researcher.owner_email}
                             </div>
-                            <div class="text--primary text-h6" style="text-align: left;">Rights:</div>
+                            <div class="text--primary text-h8" style="text-align:left;">Rights:</div>
                         </CardText>
                         <CardActions>
                             <div class="d-flex flex-column justfiy-left">
@@ -870,11 +870,12 @@ import Survey from "./Survey.svelte";
                 {/each}
             </div>
 
-            <div style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin-bottom: 1em;"></div>
+            <div style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;"></div>
+            <h1 class="text-h4">Items</h1>
             <div class="d-flex flex-row mt-4 mb-4 flex-wrap justify-space-between">
                 {#each surveyOptions as option}
                     <div class="d-flex flex-column mb-2" style="width:49%;">
-                        <Card style="cursor: default;" hover>
+                        <Card style="cursor: default; background-color:rgb(220,220,220);" hover>
                         <Row>
                             <Col cols={11}>
                                 <CardText>
@@ -910,6 +911,7 @@ import Survey from "./Survey.svelte";
                             <Col cols={1}>
                                 <Button
                                     fab
+                                    outlined
                                     class="float-right"
                                     on:click={() => removeOption(option)}
                                     >
@@ -918,6 +920,7 @@ import Survey from "./Survey.svelte";
                                 
                                 <Button
                                     fab
+                                    outlined
                                     class="float-right mt-9"
                                     on:click={()=>{option.showOptionOverlay = true; console.log("clicked on card");}}
                                     >
@@ -949,7 +952,7 @@ import Survey from "./Survey.svelte";
                     </div>
                 {/each}
                 <div class="d-flex flex-column mb-2" style="width:49%;">
-                    <Card style="cursor: default; height:206px;" hover>
+                    <Card style="cursor: default; height:228px; background-color:rgb(225,225,225);" hover>
                         <CardText class="flex-column d-flex justify-space-between">
                             <div class="mb-4">Add item</div>
                             <Button
@@ -968,7 +971,7 @@ import Survey from "./Survey.svelte";
                                 surveyOptions = surveyOptions;
                                 setTimeout(
                                     () => window.scrollTo(0, document.body.scrollHeight),
-                                    100
+                                    400
                                 );
                             }}
                             >

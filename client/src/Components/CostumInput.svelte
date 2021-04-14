@@ -6,7 +6,11 @@
 
 <div class="wrapper">
     <label class="inputLabel" for="inp">{fieldTitle}</label>
-    <input class="bigInput" name="inp" type="text" maxlength=6>
+    <input class="bigInput" name="inp" type="text" maxlength=6 on:keydown={(e)=>{
+        if(e.keyCode == 13){
+            onClickFunc();
+        }
+    }}>
     <button class="submitBtn" on:click={onClickFunc}>{buttonTitle}</button>
 </div>
 

@@ -94,11 +94,10 @@
         userService.logoutJudge().then(() => userInfo = null); 
     }
 
-    onMount(async()=>{
-        
-    })
 
     onMount(async () => {
+        document.getElementsByTagName("body")[0].style.overflowY = "hidden";
+
         let params = queryString.parse(window.location.search);
         if(params.takeSurvey == 1 && params.surveyID != undefined){
             surveyID = params.surveyID;
@@ -188,6 +187,7 @@
     onDestroy(()=>{
         takingSurvey = false;
         showJudgeOverlay = false;
+        document.getElementsByTagName("body")[0].style.overflowY = "scroll";
     })
     
 
@@ -220,7 +220,7 @@
     {#if counter < maxCounter}
     {#key counter}
     
-    <h1 class="text-h4 mb-4">{question}</h1>
+    <h1 class="text-h4" style="margin:3vh 0 2vh 0">{question}</h1>
     <div style="width:75%; margin:auto;">
         <ProgressLinear value={progressPercent} height="10px"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + counter + "/"+maxCounter}</p>

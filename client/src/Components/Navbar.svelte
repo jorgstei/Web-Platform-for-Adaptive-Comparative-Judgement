@@ -33,12 +33,11 @@
     </div>
     
     {#if takingSurvey}
-        <div style="position:fixed; left:48%; top:0;">
-            <Button fab on:click={()=>{showJudgeOverlay = true}}>
-                <Icon path={mdiInformationOutline}></Icon>
+        <div style="position:fixed; right:1vw;">
+            <Button outlined on:click={()=>{showJudgeOverlay = true}}>
+                <Icon size="1.5vw" path={mdiInformationOutline}></Icon>
             </Button>
         </div>
-        
     {:else}
     <div style="width:100%;height:100%;"/>
     <List nav class="d-flex flex-row justify-self-right" style="float:right;" >

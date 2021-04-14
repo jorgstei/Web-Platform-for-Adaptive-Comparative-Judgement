@@ -4,6 +4,7 @@
 	import {navigate} from "svelte-routing";
 	import { surveyService } from "../Services/SurveyService";
 	import {navigateWithRefreshToken} from "../Utility/naviagte";
+	import { onDestroy, onMount } from "svelte";
 	import swal from "sweetalert";
 
 	export let surveyID;
@@ -40,6 +41,14 @@
 			)
 		}
 	}
+	onMount(()=>{
+        document.getElementsByTagName("body")[0].style.overflowY = "hidden";
+		document.getElementsByTagName("body")[0].style.overflowX = "hidden";
+    })
+    onDestroy(()=>{
+        document.getElementsByTagName("body")[0].style.overflowY = "scroll";
+		document.getElementsByTagName("body")[0].style.overflowX = "scroll";
+    })
 </script>
 
 <main>
@@ -48,10 +57,6 @@
 		<h2>If you are here to take a survey, please enter your access code into the field below and press "Start reviewing"</h2>
 		<CostumInput onClickFunc={validate} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
-	<!--
-	<Card title="Yo" w="400px" h="400px" alt="Pillars of creation" img="https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/pillars_of_creation.jpg"></Card>
-	<Card title="Yo" w="400px" h="400px" alt="Førersete" img="https://toonclips.com/600/cartoon-guy-in-a-tireless-car-on-blocks-by-toonaday-538.jpg"></Card>
-	-->
 </main>
 
 

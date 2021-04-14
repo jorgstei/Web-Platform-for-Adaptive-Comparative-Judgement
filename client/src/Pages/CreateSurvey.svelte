@@ -633,6 +633,19 @@ import Survey from "./Survey.svelte";
         }
     }
 
+    const ruleValidateFieldFilled = (v) => {
+        console.log("test result:", v)
+            return (
+                v.length > 0 || "Field is obligatory"
+            );
+    }
+    let fieldFilledRules = [ruleValidateFieldFilled];
+
+    const activateRules = (value) => {
+        console.log("blurred with val", value);
+        value = value;
+    }
+
     
 
     $: surveyResearchers & searchResults;
@@ -680,6 +693,7 @@ import Survey from "./Survey.svelte";
                 autogrow
                 noResize
                 class="text-h5"
+                hint="*Required"
                 bind:value={surveyTitleValue}
                 on:focus={() => console.log("title got focused")}
             >
@@ -701,6 +715,7 @@ import Survey from "./Survey.svelte";
                 autogrow
                 noResize
                 class="text-h5"
+                hint="*Required"
                 bind:value={surveyQuestionValue}
             >
                 <div slot="append">
@@ -720,6 +735,7 @@ import Survey from "./Survey.svelte";
                 rows={4}
                 autogrow
                 class="text-h6"
+                hint="*Required"
                 bind:value={judgeInstructionsValue}
             >
                 <div slot="append">
@@ -864,8 +880,8 @@ import Survey from "./Survey.svelte";
                                 <CardText>
                                     <div>Item</div>
                                     <TextField
+                                        hint="*Required"
                                         bind:value={option.input}
-                                        on:change={(event)=>{console.log("event was", event)}}
                                         class="mt-4"
                                         style="min-width:100%;"
                                     >

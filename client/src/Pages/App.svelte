@@ -47,13 +47,15 @@
 		});
 	}
 	let surveyID;
+	let takingSurvey = false;
+	let showJudgeOverlay;
 
 	$: userInfo;
 </script>
 
 <MaterialApp>
 	<Router {url}>
-		<Navbar bind:refreshToken bind:userInfo />
+		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 		<div class="pt-14">
 			<Route path="/">
 				<LandingPage bind:surveyID />
@@ -94,7 +96,7 @@
 		</Route>
 
 		<Route path="take_survey">
-			<Survey bind:surveyID bind:userInfo />
+			<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 		</Route>
 	</Router>
 	<SvelteToast options={{ reversed: true, intro: { y: 192 } }} />

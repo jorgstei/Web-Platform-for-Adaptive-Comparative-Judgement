@@ -4,7 +4,7 @@
 	import {navigate} from "svelte-routing";
 	import { surveyService } from "../Services/SurveyService";
 	import {navigateWithRefreshToken} from "../Utility/naviagte";
-import swal from "sweetalert";
+	import swal from "sweetalert";
 
 	export let surveyID;
 
@@ -15,7 +15,7 @@ import swal from "sweetalert";
 			if(codeCheck.status == 200){
 				console.log("Code is valid")
 				surveyID = code;
-				navigate("/survey");
+				navigate("/take_survey");
 			}
 			else if(codeCheck.status == 500){
 				swal(

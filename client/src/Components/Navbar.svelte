@@ -1,10 +1,13 @@
 <script>
     import {Link, navigate} from "svelte-routing";
     import {userService} from "../Services/UserService";
-    import {AppBar, List, ListItemGroup, ListItem} from "svelte-materialify"
+    import {AppBar, List, ListItemGroup, ListItem, Icon, Button} from "svelte-materialify"
+    import { mdiInformationOutline } from "@mdi/js";
 
     export let refreshToken;
     export let userInfo;
+    export let takingSurvey;
+    export let showJudgeOverlay;
 
     const navigateWithRefreshToken = (to) => {
         refreshToken()
@@ -24,12 +27,19 @@
 </script>
 
 
-<AppBar class=" d-flex flex-row align-content-right justify-content-right" style="position:fixed;width:100%;">
-    <div slot="icon">
-        <Link to="/">
-            <img src="/img/Compair.svg" style="width:100%; height: auto;" alt="Compair logo"/>
-        </Link>
+<AppBar class=" d-flex flex-row align-content-right justify-content-right" style="position:fixed;width:100%; padding:0;">
+    <div slot="icon" style="height:150%; width:auto; cursor: pointer;" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
+        <img src="/img/Compair.svg" style="width:100%; height: 100%;" alt="Compair logo"/>
     </div>
+    
+    {#if takingSurvey}
+        <div style="position:fixed; left:48%; top:0;">
+            <Button fab on:click={()=>{showJudgeOverlay = true}}>
+                <Icon path={mdiInformationOutline}></Icon>
+            </Button>
+        </div>
+        
+    {:else}
     <div style="width:100%;height:100%;"/>
     <List nav class="d-flex flex-row justify-self-right" style="float:right;" >
         <ListItemGroup class="d-flex flex-row" style="text-align: center;">
@@ -53,8 +63,10 @@
                     {"Log in"}
                 </ListItem>
             {/if}
+            
         </ListItemGroup>
     </List>
+    {/if}
 </AppBar>
 
 <style>

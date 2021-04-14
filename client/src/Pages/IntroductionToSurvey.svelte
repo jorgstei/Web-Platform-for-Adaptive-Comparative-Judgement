@@ -7,51 +7,13 @@
     import { mdiArrowExpand, mdiArrowCollapse } from "@mdi/js";
     import swal from "sweetalert";
     
-
-
-    export let userInfo;
-    export let surveyID;
-    console.log("SurveyID from IntroductionToSurvey.svelte: ", surveyID);
+    export let showJudgeOverlay;
+    export let survey;
+    console.log("Survey from IntroductionToSurvey.svelte: ", survey);
     let navwrap = document.getElementById("navWrapper");
     if(navwrap){
         navwrap.style.display = "none";
     }
-
-    let survey = {judgeInstructions: "Loading...", surveyQuestion: "Loading...", expectedComparisons:"..."};
-
-    onMount(async()=>{
-        let params = queryString.parse(window.location.search);
-        if(params.takeSurvey == 1 && params.surveyID != undefined){
-            surveyID = params.surveyID;
-        }
-        await surveyService.getJudgeToken(surveyID).then(async data => {
-            if(data.status < 300){
-                data = data.data
-                console.log("Get survey Token data: ", data)
-                if(data.role === "judge"){
-                    userInfo = data;
-                    await surveyService.getSurveyByIdAsJudge(surveyID)
-                    .then((surveyData)=>{
-                        if(surveyData.status < 300){
-                            surveyData = surveyData.data;
-                            surveyID = surveyData._id;
-                            console.log("Survey data from instructions: ", surveyData);
-                            survey = surveyData;
-                        }
-                        else{
-                            swal("Error", "An error occured while getting the survey information. Please retry, and if the problem persists contact an administrator.\nResponse: "+surveyData.data.message, "error").then(() => navigate("/"))
-                        }
-                        
-                    })
-                    .catch(err => {console.log(err)})
-                }
-            }
-            else{
-                swal("Error", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.\nError: "+data.data.message, "error").then(() => navigate("/"))
-            }
-        })
-        .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error").then(() => navigate("/")))
-    })
 
     let showGeneralInfoOverlay = false;
     let showSurveyJudgeInstructions = false;
@@ -147,19 +109,18 @@
         </div>
         
         <Button outlined style="width: 30%; height: 5vh; margin-top: 10vh;" class="align-self-center" 
-            on:click={() => {navigate("/take_survey")}}
-        >Take survey</Button>
+            on:click={() => {showJudgeOverlay = false}}
+        >Continue</Button>
     </div>
     
     
-    
-    
+
 </main>
 
 <style>
     main {
         text-align: center;
         margin: auto;
-        width: 80%;
+        width: 100%;
     }
 </style>

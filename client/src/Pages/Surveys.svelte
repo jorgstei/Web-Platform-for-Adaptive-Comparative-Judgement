@@ -44,7 +44,7 @@
         },
         {
             fieldName: "inviteCode",
-            viewName: "code"
+            viewName: "PIN"
         },
         
         {

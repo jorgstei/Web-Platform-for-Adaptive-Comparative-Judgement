@@ -16,7 +16,7 @@
     import PDFItem from '../Components/SurveyComponents/PDFItem.svelte';
     import PDFView from '../Components/PDFView.svelte';
     import AboutProject from "./AboutProject.svelte";
-    import { mdiExpandAllOutline } from "@mdi/js";
+    import { mdiFullscreen } from "@mdi/js";
 
 
     export let userInfo;
@@ -281,7 +281,7 @@
                         {#if randomPair[counter].left.type == "text"}
                             <div class="text--primary text-h4">{randomPair[counter].left.data}</div>
                         {:else if randomPair[counter].left.type == "pdf"}
-                            <div style="float: right; cursor:pointer;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiExpandAllOutline}></Icon></div>
+                            <div style="float: right; cursor:pointer;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="80%"></PDFView>
 
                             <Overlay
@@ -306,7 +306,7 @@
                         {#if randomPair[counter].right.type == "text"}
                             <div class="text--primary text-h4">{randomPair[counter].right.data}</div>
                         {:else if randomPair[counter].right.type == "pdf"}
-                            <div style="float: right; cursor:pointer;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiExpandAllOutline}></Icon></div>
+                            <div style="float: right; cursor:pointer;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="80%"></PDFView>
 
 

@@ -13,7 +13,7 @@
   
   export let userInfo;
 
-  let allowLeavePageWithoutWarning;
+  export let allowLeavePageWithoutWarning;
   let warningOnLeaveFunc;
 
   $: userInfo;

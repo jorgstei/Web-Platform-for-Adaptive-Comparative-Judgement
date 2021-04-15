@@ -8,20 +8,62 @@
     export let userInfo;
     export let takingSurvey;
     export let showJudgeOverlay;
+    export let allowLeavePageWithoutWarning = true;
+    let warningOnLeaveFunc = (link)=> {
+        swal({
+            title: "Are you sure?",
+            text:
+                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
+            icon: "warning",
+            dangerMode: true,
+            buttons: ["Take me back!", "Discard"],
+        }).then((willDiscard) => {
+            if (willDiscard) {
+                navigate(link);
+            }
+        })
+    }
 
     const navigateWithRefreshToken = (to) => {
         refreshToken()
-        navigate(to)
+        if(!allowLeavePageWithoutWarning){
+            warningOnLeaveFunc(to);
+        }
+        else{
+            navigate(to);
+        }
     }
 
 
     const logout = () => {
-        userService.logout()
-        .then(()=>{
-            userInfo=null; 
-            navigate("/")
-            console.log("After log out: ", userInfo)
-        })
+        if(!allowLeavePageWithoutWarning){
+            swal({
+            title: "Are you sure?",
+            text:
+                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
+            icon: "warning",
+            dangerMode: true,
+            buttons: ["Nevermind", "Discard"],
+            })
+            .then((willDiscard) => {
+                if (willDiscard) {
+                    userService.logout()
+                    .then(()=>{
+                        userInfo=null; 
+                        navigate("/")
+                        console.log("After log out: ", userInfo)
+                    })
+                }
+            })
+        }
+        else{
+            userService.logout()
+            .then(()=>{
+                userInfo=null; 
+                navigate("/")
+                console.log("After log out: ", userInfo)
+            })
+        }
     }
     $: userInfo
 </script>

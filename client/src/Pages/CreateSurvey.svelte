@@ -318,112 +318,128 @@
                 );
                 return;
             }
-            console.log(surveyService);
-            if (editing) {
-                surveyService
-                    .put(surveyID, info)
-                    .then((data) => {
-                        if(data.status < 300){
-                            data = data.data;
-                            console.log("surveyService put data: ", data);
-                            const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + surveyID;
-                            let dummy = document.getElementById("dummy");
-                            dummy.value = survey_link;
-                            console.log(
-                                "Navigator object: ",
-                                navigator,
-                                "\nNavigator.clipboard",
-                                navigator.clipboard
-                            );
+            swal({
+                title: "Does everything look good?",
+                text:
+                    "You currently have " + info.items.length + " items, " + info.expectedComparisons + " comparisons per judge.\n" +
+                    "The questions is '" + info.surveyQuestion + "'.\n" + 
+                    "If something is not right, please return and fix it first.",
+                icon: "warning",
+                buttons: ["Take me back!", "Publish changes"],
+            })
+            .then(willPublish => {
+                if(!willPublish){
+                    return
+                }
+                else{
+                    console.log(surveyService);
+                    if (editing) {
+                        surveyService
+                            .put(surveyID, info)
+                            .then((data) => {
+                                if(data.status < 300){
+                                    data = data.data;
+                                    console.log("surveyService put data: ", data);
+                                    const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + surveyID;
+                                    let dummy = document.getElementById("dummy");
+                                    dummy.value = survey_link;
+                                    console.log(
+                                        "Navigator object: ",
+                                        navigator,
+                                        "\nNavigator.clipboard",
+                                        navigator.clipboard
+                                    );
 
-                            navigator.clipboard
-                            .writeText(survey_link)
-                            .then(() => {
+                                    navigator.clipboard
+                                    .writeText(survey_link)
+                                    .then(() => {
+                                        swal(
+                                            "Successfully updated survey!",
+                                            "Your link is:\n" +
+                                                survey_link +
+                                                "\n It has been copied to your clipboard for you!",
+                                            "success"
+                                        );
+                                        navigateWithRefreshToken(
+                                            "/admin_board/surveys"
+                                        ).then((data) => (userInfo = data));
+                                    })
+                                    .catch((err) => {});
+                                }
+                                else{
+                                    swal(
+                                        "Failed to edit survey.",
+                                        "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                            data.data.message,
+                                        "error"
+                                    )
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
                                 swal(
-                                    "Successfully updated survey!",
-                                    "Your link is:\n" +
+                                    "Failed to edit survey.",
+                                    "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                        err,
+                                    "error"
+                                );
+                            });
+                    } else {
+                        info.items = []
+                        surveyService
+                            .postSurvey(info)
+                            .then(async (data) => {
+                                if(data.status < 300){
+                                    data = data.data;
+                                    let itemFileResponses = []
+                                    submitButtonFunctions.forEach(e => {
+                                        itemFileResponses.push(e.func(data.loc))
+                                    })
+                                    await Promise.all(itemFileResponses)
+                                    .catch(error => console.error("Error when posting item files:", error))
+                                    console.log("postSurvey data: ", data);
+                                    const survey_link =
+                                    window.location.href.split("/admin_board")[0] +
+                                    "?takeSurvey=1&surveyID=" +
+                                    data.loc;
+                                    let dummy = document.getElementById("dummy");
+                                    dummy.value = survey_link;
+                                    console.log(dummy.value);
+                                    console.log(navigator, navigator.clipboard);
+                                    navigator.clipboard.writeText(survey_link).then(() => {
+                                        swal(
+                                        "Successfully created survey!",
+                                        "Your link is:\n" +
                                         survey_link +
                                         "\n It has been copied to your clipboard for you!",
-                                    "success"
-                                );
-                                navigateWithRefreshToken(
-                                    "/admin_board/surveys"
-                                ).then((data) => (userInfo = data));
+                                        "success"
+                                        );
+                                        navigateWithRefreshToken(
+                                            "/admin_board/surveys"
+                                        ).then((data) => (userInfo = data));
+                                    });
+                                }
+                                else{
+                                    swal(
+                                        "Failed to create survey.",
+                                        "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                            data.data.message,
+                                        "error"
+                                    )
+                                }
                             })
-                            .catch((err) => {});
-                        }
-                        else{
-                            swal(
-                                "Failed to edit survey.",
-                                "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                    data.data.message,
-                                "error"
-                            )
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        swal(
-                            "Failed to edit survey.",
-                            "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                err,
-                            "error"
-                        );
-                    });
-            } else {
-                info.items = []
-                surveyService
-                    .postSurvey(info)
-                    .then(async (data) => {
-                        if(data.status < 300){
-                            data = data.data;
-                            let itemFileResponses = []
-                            submitButtonFunctions.forEach(e => {
-                                itemFileResponses.push(e.func(data.loc))
-                            })
-                            await Promise.all(itemFileResponses)
-                            .catch(error => console.error("Error when posting item files:", error))
-                            console.log("postSurvey data: ", data);
-                            const survey_link =
-                            window.location.href.split("/admin_board")[0] +
-                            "?takeSurvey=1&surveyID=" +
-                            data.loc;
-                            let dummy = document.getElementById("dummy");
-                            dummy.value = survey_link;
-                            console.log(dummy.value);
-                            console.log(navigator, navigator.clipboard);
-                            navigator.clipboard.writeText(survey_link).then(() => {
+                            .catch((err) => {
+                                console.log(err);
                                 swal(
-                                "Successfully created survey!",
-                                "Your link is:\n" +
-                                survey_link +
-                                "\n It has been copied to your clipboard for you!",
-                                "success"
+                                    "Failed to create survey.",
+                                    "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                        err,
+                                    "error"
                                 );
-                                navigateWithRefreshToken(
-                                    "/admin_board/surveys"
-                                ).then((data) => (userInfo = data));
                             });
-                        }
-                        else{
-                            swal(
-                                "Failed to create survey.",
-                                "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                    data.data.message,
-                                "error"
-                            )
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        swal(
-                            "Failed to create survey.",
-                            "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                err,
-                            "error"
-                        );
-                    });
-            }
+                    }
+                }
+            })  
         }
     };
 
@@ -973,6 +989,7 @@
                             </TextField>
                             
                             {#if option.mimeType == "application/pdf"}
+                                {console.log("pdf view gets ", option.data, URL.createObjectURL(option.data))}
                                 <PDFView iframeId="preview" width="70vh" height="70vh" src={URL.createObjectURL(option.data)}></PDFView>
                             {/if}
                             <!--<PDFViewer {pdf} {classes} {options} bind:currentPage {pageNumberText}></PDFViewer>-->

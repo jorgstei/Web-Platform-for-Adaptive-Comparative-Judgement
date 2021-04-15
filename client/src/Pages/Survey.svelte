@@ -11,6 +11,11 @@
     import { Button, Card, CardText, Overlay, Icon, CardActions, ProgressLinear } from 'svelte-materialify';
     import { fade, fly } from 'svelte/transition';
     import queryString from "query-string";
+    import { surveyItemFileService } from "../Services/SurveyItemFileService";
+    import { nodeBufferToFile } from "../Utility/nodeBufferToBlobURL";
+    import PDFItem from '../Components/SurveyComponents/PDFItem.svelte';
+    import PDFView from '../Components/PDFView.svelte';
+    import AboutProject from "./AboutProject.svelte";
 
 
     export let userInfo;
@@ -29,13 +34,11 @@
     }
 
 
-    let randomPair = null;
+    let randomPair = [];
     
     let counter = 0;
     let maxCounter = 10;
     let progressPercent = 100*counter/maxCounter;
-
-    
 
     let leftChoiceClicked = () => {
         const answer = 
@@ -96,24 +99,27 @@
 
 
     onMount(async () => {
+        console.log("in onmount in survey")
         document.getElementsByTagName("body")[0].style.overflowY = "hidden";
 
         let params = queryString.parse(window.location.search);
         if(params.takeSurvey == 1 && params.surveyID != undefined){
             surveyID = params.surveyID;
         }
+        console.log("Getting judge token")
         await surveyService.getJudgeToken(surveyID).then(async data => {
             if(data.status < 300){
                 data = data.data
                 console.log("Get survey Token data: ", data)
                 if(data.role === "judge"){
                     userInfo = data;
+                    console.log("surveyid in survey, getting survey as judge", surveyID);
                     await surveyService.getSurveyByIdAsJudge(surveyID)
                     .then((surveyData)=>{
                         if(surveyData.status < 300){
                             surveyData = surveyData.data;
                             surveyID = surveyData._id;
-                            console.log("Survey data from instructions: ", surveyData);
+                            console.log("Survey data from onMount in survey: ", surveyData);
                             question = surveyData.surveyQuestion;
                             survey = surveyData;
                         }
@@ -131,33 +137,62 @@
         })
         .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error").then(() => navigate("/")))
 
-        surveyService.getSurveyByIdAsJudge(surveyID)
-        .then(data=>{
-            if(data.status == 200){
-                question=data.data.surveyQuestion
-            }
-            else{
-                swal("Error", "Could not get survey info. If the problem persists, please contact an administrator.", "error")
-            }
-        })
-        .catch(err => swal("Something went wrong..", "Could not get survey info. If the problem persists, please contact an administrator.", "error"));
-
-        surveyService.getItemsToCompareBySurveyId(surveyID).then((data) => {
-            if(data.status < 300){
-                data = data.data;
-                console.log("Data from randomPair: ", data.data);
-                randomPair = data.data;
-                maxCounter = data.data.length;
-            }
-            else{
-                swal(
-                    "Error",
-                    "Something went wrong while fetching the questions. Please try again, and if the problem persists contact an administrator.\nError:"+data.data.message,
-                    "error"
-                )
-            }
-        });
-
+        console.log("Getting items with surveyID", surveyID);
+        if(surveyID != undefined){
+            surveyService.getItemsToCompareBySurveyId(surveyID)
+            .then((data) => {
+                if(data.status < 300){
+                    data = data.data;
+                    console.log("Data from randomPair: ", data);
+                    maxCounter = data.data.length;
+                    data.data.forEach(async (item) => {
+                        console.log("item:", item);
+                        let left = {};
+                        let right = {};
+                        if(item.left.type=="pdf"){
+                            console.log("left issapdf", item);
+                            left.type= "pdf";
+                            left._id = item.left._id;
+                            await surveyItemFileService.get(item.left.data)
+                            .then(res => {
+                                console.log("got res from fileservice", res);
+                                left.data = URL.createObjectURL(nodeBufferToFile(res.data.data.data, "application/pdf"));
+                            })
+                        }
+                        else{
+                            left = item.left;
+                        }
+                        if(item.right.type=="pdf"){
+                            console.log("right issapdf", item);
+                            right.type= "pdf";
+                            await surveyItemFileService.get(item.right.data)
+                            .then(res => {
+                                console.log("got res from fileservice", res);
+                                right._id = item.right._id;
+                                right.data = URL.createObjectURL(nodeBufferToFile(res.data.data.data, "application/pdf"));
+                            })
+                        }
+                        else{
+                            right = item.right;
+                        }
+                        randomPair.push({"left": left, "right": right});
+                        console.log("pushed to randompair", randomPair);
+                    });
+                    randomPair = randomPair;
+                    
+                }
+                else{
+                    console.log("swaling")
+                    swal(
+                        "Error",
+                        "Something went wrong while fetching the questions. Please try again, and if the problem persists contact an administrator.\nError:"+data.data.message,
+                        "error"
+                    )
+                }
+                console.log("hello?")
+            })
+            .catch(err => swal("Could not get survey items.", "Error:\n" + err, "error"));
+        }
         takingSurvey = true;
         showJudgeOverlay = true;
 
@@ -223,7 +258,7 @@
     <h1 class="text-h4" style="margin:3vh 0 2vh 0">{question}</h1>
     <div style="width:75%; margin:auto;">
         <ProgressLinear value={progressPercent} height="10px"></ProgressLinear>
-        <p class="text-h6" style="text-align:center">{"Comparison " + counter + "/"+maxCounter}</p>
+        <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
 
     <div id="container" class="d-flex flex-row ">
@@ -237,11 +272,21 @@
             <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
 
         </Overlay>
-        {#if randomPair != null}
+        <!--
+
+            {#if aPDFTest != null}
+                <PDFView src={aPDFTest} iframeId="preview" width="70vh" height="70vh"></PDFView>
+            {/if}
+        -->
+        {#if randomPair.length != 0}
             <div class="cardWrapper" in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center;">
-                        <div class="text--primary text-h4">{randomPair[counter].left.data}</div>
+                    <CardText style="text-align: center; height:60vh;">
+                        {#if randomPair[counter].left.type == "text"}
+                            <div class="text--primary text-h4">{randomPair[counter].left.data}</div>
+                        {:else if randomPair[counter].left.type == "pdf"}
+                            <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="80%"></PDFView>
+                        {/if}
                     </CardText>
     
                     <CardActions>
@@ -251,8 +296,12 @@
             </div>
             <div class="cardWrapper" in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center;">
-                        <div class="text--primary text-h4">{randomPair[counter].right.data}</div>
+                    <CardText style="text-align: center; height:60vh">
+                        {#if randomPair[counter].right.type == "text"}
+                            <div class="text--primary text-h4">{randomPair[counter].right.data}</div>
+                        {:else if randomPair[counter].right.type == "pdf"}
+                            <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="80%"></PDFView>
+                        {/if}
                     </CardText>
                     
                     <CardActions>

@@ -93,11 +93,9 @@
 		</div>
 	</Router>
 	<Router {url}>
-		<Route path="survey">
-			<IntroductionToSurvey bind:surveyID bind:userInfo />
-		</Route>
 
-		<Route path="take_survey">
+
+		<Route path="survey">
 			<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 		</Route>
 	</Router>

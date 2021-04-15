@@ -5,6 +5,7 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import replace from "@rollup/plugin-replace"
+import copy from "rollup-plugin-copy"
 
 const production = !process.env.ROLLUP_WATCH;
 console.log("PRODUCTION: ", production)
@@ -67,6 +68,11 @@ export default {
 			dedupe: ['svelte']
 		}),
 		commonjs(),
+		copy({
+			targets: [
+				{src: "src/Utility/pdf-js", dest: "public"}
+			]
+		}),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
@@ -74,7 +80,7 @@ export default {
 
 		// Watch the `public` directory and refresh the
 		// browser on changes when not in production
-		!production && livereload({watch: 'public'}),
+		!production && livereload({watch: 'public/build'}),
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify

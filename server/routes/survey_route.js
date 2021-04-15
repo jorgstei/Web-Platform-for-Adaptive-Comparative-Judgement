@@ -1,6 +1,7 @@
-const { Router, response } = require('express')
+const { Router } = require('express')
 const Survey = require('../models/Survey')
 const SurveyAnswer = require("../models/SurveyAnswer")
+const SurveyItemFile = require("../models/SurveyItemFile")
 const { auth } = require("./authentication")
 const me = require('mongo-escape').escape
 const escapeStringRegexp = require('escape-string-regexp')
@@ -840,6 +841,33 @@ router.post("/function/search/:term", auth, async (req, res) => {
         res.json(surveys)
     } catch (error) {
         console.log("Error searching surveys:", error)
+        res.status(500).json({message: "Internal Server Error"})
+    }
+})
+
+router.post("/function/upload_item/", auth, async (req, res) => {
+    if(!req.auth["user"]?.role === "admin" && !req.auth["user"]?.role === "researcher"){
+        res.status(403).json({message: "Forbidden"})
+        return
+    }
+    try {
+        const fileName = req.files?.file?.name?.replace("..", "")
+        if(req.files?.file == undefined || req.files?.file == null || req.files?.file?.truncated == true){
+            res.status(422).json({message: "Filesize too large for file: " + fileName+".\nMax supported filesize is 16MB"})
+            return
+        }
+        SurveyItemFile.create({
+            surveyId: "Testing",
+            data: req.files.file.data,
+            fileName: fileName,
+            mimeType: req.files.file.mimetype
+        })
+        .then((file) => {
+            console.log("Successfully created file:",file)
+            res.status(201).json({loc: file._id})
+        })
+    } catch (error) {
+        console.log(error)
         res.status(500).json({message: "Internal Server Error"})
     }
 })

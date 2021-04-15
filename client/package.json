@@ -13,6 +13,7 @@
     "@rollup/plugin-replace": "^2.4.1",
     "@smui/select": "^2.0.0-beta.1",
     "rollup": "^2.37.1",
+    "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^7.0.0",
@@ -26,13 +27,15 @@
     "axios": "^0.21.1",
     "file-saver": "^2.0.5",
     "js-sha512": "^0.8.0",
-    "pdf.svelte": "^0.1.0",
+    "pdfjs-dist": "^2.7.570",
+    "pdfobject": "^2.2.5",
     "query-string": "^6.13.8",
     "sirv-cli": "^1.0.0",
     "svelte-materialify": "^0.3.9",
     "svelte-pdf": "^1.0.9",
     "svelte-routing": "^1.5.0",
     "sveltedoc-parser": "^4.1.0",
-    "sweetalert": "^2.1.2"
+    "sweetalert": "^2.1.2",
+    "uuid": "^8.3.2"
   }
 }

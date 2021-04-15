@@ -46,6 +46,9 @@
                 {"Home"}
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/test")}>
+                    {"Test"}
+                </ListItem>
                 <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/admin_board/profile")}>
                     {"Board"}
                 </ListItem>

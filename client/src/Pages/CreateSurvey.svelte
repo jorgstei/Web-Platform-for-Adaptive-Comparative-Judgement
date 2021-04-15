@@ -1,4 +1,5 @@
 <script>
+    import {v4 as uuidv4} from 'uuid'
     import OptionBox from "../Components/OptionBox.svelte";
     import ResearcherBox from "../Components/ResearcherBox.svelte";
     import SearchDropdown from "../Components/SearchDropdown.svelte";
@@ -36,8 +37,10 @@
         mdiAbTesting,
     } from "@mdi/js";
 
-    import PDFViewer from '../Components/PDFViewer.svelte';
     import Survey from "./Survey.svelte";
+    import TextItem from '../Components/SurveyComponents/TextItem.svelte';
+    import PDFItem from '../Components/SurveyComponents/PDFItem.svelte';
+    import PDFView from '../Components/PDFView.svelte';
 
 
     export let allowLeavePageWithoutWarning;
@@ -84,6 +87,8 @@
     export let userInfo;
     export let editing = false;
 
+    //An array of functions to run when we press submit/edit survey. Remember to remove the corresponding function when removing the item that added the function
+    let submitButtonFunctions = []
     let surveyOptions = [];
 
     /*
@@ -109,6 +114,73 @@
 
     let searchResults = [];
     let surveyID = null;
+    
+    /*
+        tag: String, user friendly name for the item, f.ex. filename, or whatever the user decides it to be
+        mediaType: String, user friendly view of the mimetype (application/pdf -> pdf f.ex.)
+        mimeType: String, the mimetype of the data (application/pdf, application/jpg etc.)
+        data: Mixed, String for mediaType text, File for other types
+        showOverlay: Boolean, used by card to toggle fullscreen/preview of the item
+        showTooltip: Boolean, used by card to show info about the component f.ex. when hovering an (i) icon
+    */
+    const addSurveyOption = (tag, mediaType, mimeType, data, showOverlay, showTooltip) => {
+        const uuid = uuidv4()
+        data = {
+            tag: tag,
+            mediaType: mediaType,
+            mimeType: mimeType,
+            data: data,
+            showOverlay: showOverlay,
+            showTooltip: showTooltip,
+            uuid: uuid
+        }
+        surveyOptions.push(data)
+        console.log("mytag surveyOptions in addSurveyOption:",surveyOptions)
+        
+        submitButtonFunctions.push(
+            {
+                addtype: "surveyItem",
+                uuid: uuid,
+                func: (surveyId) => {
+                    let foundObject = surveyOptions.find(e => {
+                        console.log("mytag push e.uuid:",e.uuid,", uuid:",uuid)
+                        return e.uuid == uuid
+                    })
+                    if(foundObject != null && foundObject != undefined){
+                        return surveyService.uploadFile(foundObject.data, surveyId)
+                    }
+                    else{
+                        console.error("Failed to find surveyOption to upload")
+                        return Promise.reject(new Error("Could not find data to upload"))
+                    }
+                }
+            }
+        )
+        console.log("submitButtonFunctions",submitButtonFunctions)
+    }
+
+    const removeSurveyOption = (option) => {
+        console.log("Trying to remove item: ", option)
+        const index = surveyOptions.findIndex(e => e == option)
+        if(index > -1){
+            const submitFunctionIndex = submitButtonFunctions.findIndex(e => {
+                console.log("mytag findFunction e.uuid:",e.uuid,", uuid:",option.uuid)
+                return e.uuid == option.uuid
+            })
+            console.log("Trying to remove item, submitFunction: ", submitButtonFunctions[submitFunctionIndex])
+            if(submitFunctionIndex > -1) {
+                submitButtonFunctions.splice(submitFunctionIndex, 1)
+            }
+            else{
+                console.error("Unable to find submitButtonFunction even though surveyObject exists")
+            }
+            surveyOptions.splice(index, 1)
+        }
+        else{
+            console.error("Tried removing surveyOption but could not find it in array.")
+        }
+        surveyOptions = surveyOptions
+    }
 
     if (editing) {
         let params = queryString.parse(window.location.search);
@@ -137,6 +209,7 @@
                             : 2;
 
                     surveyResearchers = [];
+                    //TODO: Change this to a await Promise.all style fetch
                     for (let i = 0; i < data.owners.length; i++) {
                         let owner = await userService.getUserByID(
                             data.owners[i].ownerId
@@ -150,14 +223,7 @@
                     console.log("compobj:", data.items);
                     for (const item of data.items) {
                         console.log("optionbox", data);
-                        surveyOptions.push({
-                            input: item.data,
-                            mediaType: item.type,
-                            inputFieldType: getInputFieldTypeFromMediaType(item.type),
-                            showOptionTooltip: false,
-                            showOptionOverlay: false,
-                            file: "",
-                        });
+                        addSurveyOption("tag", item.type, getInputFieldTypeFromMediaType(item.type), item.data, false, false)
                     }
 
                     surveyOptions = surveyOptions;
@@ -171,22 +237,8 @@
             });
         });
     } else {
-        surveyOptions.push({
-            input: "",
-            mediaType: "text",
-            inputFieldType: {type:"text", acceptString:""},
-            showOptionTooltip: false,
-            showOptionOverlay: false,
-            file: "",
-        });
-        surveyOptions.push({
-            input: "",
-            mediaType: "text",
-            inputFieldType: {type:"text", acceptString:""},
-            showOptionTooltip: false,
-            showOptionOverlay: false,
-            file: "",
-        });
+        addSurveyOption("text"+surveyOptions.length, "text", getInputFieldTypeFromMediaType("text"), "", false, false)
+        addSurveyOption("text"+surveyOptions.length, "text", getInputFieldTypeFromMediaType("text"), "", false, false)
     }
 
     const textAreaAdjust = (e) => {
@@ -227,10 +279,12 @@
         };
 
         console.log("CREATE SURVEY INFO OBJ", info);
+        /*
         info.items.forEach(item=>{
             console.log(item);
-            validateFileType(item.data, item.type);
+            validateFileType(item.data, item.mediaType);
         })
+        */
 
         let [everyFieldFilled, errorMessage] = validateFormInputs(info);
         console.log(errorMessage);
@@ -317,11 +371,18 @@
                         );
                     });
             } else {
+                info.items = []
                 surveyService
                     .postSurvey(info)
-                    .then((data) => {
+                    .then(async (data) => {
                         if(data.status < 300){
                             data = data.data;
+                            let itemFileResponses = []
+                            submitButtonFunctions.forEach(e => {
+                                itemFileResponses.push(e.func(data.loc))
+                            })
+                            await Promise.all(itemFileResponses)
+                            .catch(error => console.error("Error when posting item files:", error))
                             console.log("postSurvey data: ", data);
                             const survey_link =
                             window.location.href.split("/admin_board")[0] +
@@ -606,25 +667,7 @@
                 "warning"
             );
         } else {
-            let deleteIndex = surveyOptions.findIndex((e) => {
-                let allKeysMatch = true;
-                for (const key in e) {
-                    if (option[key] !== e[key]) {
-                        allKeysMatch = false;
-                    }
-                }
-                return allKeysMatch;
-            });
-            console.log(
-                "Found index: ",
-                deleteIndex,
-                "which corresponds to object:",
-                surveyOptions[deleteIndex]
-            );
-            if (deleteIndex >= 0) {
-                surveyOptions.splice(deleteIndex, 1);
-                surveyOptions = surveyOptions;
-            }
+            removeSurveyOption(option)
         }
     };
 
@@ -647,12 +690,12 @@
         = false;
 
 
-    const getInputFieldTypeFromMediaType = (mediaType) => {
+    function getInputFieldTypeFromMediaType(mediaType) {
         if(mediaType=="pdf"){
-            return {type:"file", acceptString:"application/pdf"};
+            return "application/pdf";
         }
         else if(mediaType=="image"){
-            return {type:"file", acceptString:"image/png, image/jpeg, image/jpeg, image/x-png"};
+            return "image/png, image/jpeg, image/jpeg, image/x-png";
         }
         else{
             return "text";
@@ -901,80 +944,42 @@
             <div class="d-flex flex-row mt-4 mb-4 flex-wrap justify-space-between">
                 {#each surveyOptions as option}
                     <div class="d-flex flex-column mb-2" style="width:49%;">
-                        <Card style="cursor: default; background-color:rgb(220,220,220);" hover>
-                        <Row>
-                            <Col cols={11}>
-                                <CardText>
-                                    <div>Item</div>
-                                    <TextField
-                                        hint="*Required"
-                                        bind:value={option.input}
-                                        class="mt-4"
-                                        style="min-width:100%;"
-                                    >
-                                        <div slot="append">
-                                            <Tooltip
-                                                top
-                                                bind:active={option.showOptionTooltip}
-                                            >
-                                                <Icon path={mdiInformationOutline} />
-                                                <span slot="tip"
-                                                    >Item text</span
-                                                >
-                                            </Tooltip>
-                                        </div>
-                                        Item value
-                                    </TextField>
-        
-                                    <Select
-                                        items={optionMediaTypeItems}
-                                        bind:value={option.mediaType}
-                                        on:change={()=>option.inputFieldType = getInputFieldTypeFromMediaType(option.mediaType)}
-                                        class="mt-4">Media Type</Select
-                                    >
-                                </CardText>
-                            </Col>
-                            <Col cols={1}>
-                                <Button
-                                    fab
-                                    outlined
-                                    class="float-right"
-                                    on:click={() => removeOption(option)}
-                                    >
-                                    <Icon path={mdiDeleteForever}/>
-                                </Button>
-                                
-                                <Button
-                                    fab
-                                    outlined
-                                    class="float-right mt-9"
-                                    on:click={()=>{option.showOptionOverlay = true; console.log("clicked on card");}}
-                                    >
-                                    <Icon path={mdiAbTesting}/>
-                                </Button>
-                            </Col>
-                        </Row>
+                        {#if option.mediaType == "text"}
+                            <TextItem bind:option={option} bind:optionMediaTypeItems
+                                functionObject={{
+                                    getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
+                                    removeOption: removeOption
+                                }}
+                            >
+                            </TextItem>
+                        {:else if option.mediaType == "pdf"}
+                            <PDFItem  bind:option={option} bind:optionMediaTypeItems
+                            functionObject={{
+                                getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
+                                removeOption: removeOption
+                            }}
+                            >
+                            </PDFItem>
+                        {/if}
                         <Overlay
-                            bind:active={option.showOptionOverlay}
+                            bind:active={option.showOverlay}
                             opacity={1}
                             color={"#eee"}
                             style="cursor:default"
                         >
                         
-                            <TextField bind:type={option.inputFieldType.type} bind:accept={option.inputFieldType.acceptString} on:change={(event)=>{console.log(event.target.files[0]); option.file = event.target.files[0]}}>
-                                Content
+                            <TextField type={"text"} accept={"application/text"} bind:value={option.tag}>
+                                Item Tag
                             </TextField>
                             
-                            <h1 class="text-h4">In overlay with file {option.file.name}</h1>
-                            {#if option.file != ""}
-                                <PDFViewer bind:file={option.file}></PDFViewer>
+                            {#if option.mimeType == "application/pdf"}
+                                <PDFView iframeId="preview" width="70vh" height="70vh" src={URL.createObjectURL(option.data)}></PDFView>
                             {/if}
                             <!--<PDFViewer {pdf} {classes} {options} bind:currentPage {pageNumberText}></PDFViewer>-->
-                            <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOptionOverlay = false; e.stopPropagation();}}>
+                            <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
                                 Close overlay
                             </Button>
                         </Overlay>
-                        </Card>
                     </div>
                 {/each}
                 <div class="d-flex flex-column mb-2" style="width:49%;">
@@ -986,14 +991,7 @@
                             style="min-width:110px; min-height:110px;"
                             class="align-self-center"
                             on:click={() => {
-                                surveyOptions.push({
-                                    input: "",
-                                    mediaType: "text",
-                                    showOptionTooltip: false,
-                                    showOptionOverlay: false,
-                                    inputFieldType: {type:"text", acceptString:""},
-                                    file: "",
-                                });
+                                addSurveyOption(selectedMediaType+surveyOptions.length, selectedMediaType, getInputFieldTypeFromMediaType(selectedMediaType), "", false, false)
                                 surveyOptions = surveyOptions;
                                 setTimeout(
                                     () => window.scrollTo(0, document.body.scrollHeight),

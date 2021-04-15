@@ -17,9 +17,6 @@
     const removeUnwantedToolbars = (iframe) => {
         console.log("Ready")
         iframe = iframe.target
-        console.log(iframe)
-        console.log(iframe.contentWindow)
-        console.log(iframe.contentWindow.document)
         iframe.contentWindow.document.querySelector("#sidebarContainer").hidden = true
         iframe.contentWindow.document.querySelector("#secondaryToolbar").hidden = true
         iframe.contentWindow.document.querySelector("#sidebarToggle").hidden = true
@@ -31,7 +28,6 @@
     }
 
     onMount(() => {
-        console.log("testing3")
         iframeId = iframeId == undefined ? "PDFView"+src : iframeId
         let iframe = document.getElementById(iframeId)
         iframe.addEventListener("load", (e) => removeUnwantedToolbars(e))

@@ -718,6 +718,11 @@ router.get("/function/sort", auth, async (req, res) => {
                 { $skip: me_skip },
                 { $limit: me_limit },
             ]
+        ).collation(                
+            { 
+                locale: "en_US",
+                numericOrdering: true
+            }
         )
         res.json(surveys)
     } catch (error) {
@@ -864,7 +869,7 @@ router.post("/function/search/:term", auth, async (req, res) => {
     }
 })
 
-router.post("/function/upload_item/", auth, async (req, res) => {
+router.post("/function/upload_item/:id", auth, async (req, res) => {
     if(!req.auth["user"]?.role === "admin" && !req.auth["user"]?.role === "researcher"){
         res.status(403).json({message: "Forbidden"})
         return
@@ -876,14 +881,27 @@ router.post("/function/upload_item/", auth, async (req, res) => {
             return
         }
         SurveyItemFile.create({
-            surveyId: "Testing",
+            surveyId: me(req.params.id),
             data: req.files.file.data,
             fileName: fileName,
             mimeType: req.files.file.mimetype
         })
         .then((file) => {
             console.log("Successfully created file:",file)
-            res.status(201).json({loc: file._id})
+            Survey.updateOne({_id: me(req.params.id)}, 
+                {
+                    $push: {
+                        items: {
+                            type: file.mimeType.split("/")[1],
+                            data: file._id
+                        }
+                    }
+                }
+            )
+            .then(updateOneResult => {
+                console.log(updateOneResult)
+                res.status(201).json({loc: file._id})
+            })
         })
     } catch (error) {
         console.log(error)

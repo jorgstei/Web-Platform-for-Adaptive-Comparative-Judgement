@@ -35,6 +35,7 @@
     "svelte-pdf": "^1.0.9",
     "svelte-routing": "^1.5.0",
     "sveltedoc-parser": "^4.1.0",
-    "sweetalert": "^2.1.2"
+    "sweetalert": "^2.1.2",
+    "uuid": "^8.3.2"
   }
 }

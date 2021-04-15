@@ -3,7 +3,9 @@
     import { userService } from "../Services/UserService";
     import swal from 'sweetalert';
     import {navigate} from "svelte-routing"
-    let showErrorField = false;
+    import { Icon, Tooltip, TextField, Button } from 'svelte-materialify';
+    import {pwResearcherRequirement, pwAdminRequirement} from '../Utility/passwordRequirement'
+    import {mdiInformationOutline, mdiEyeOff, mdiEye} from "@mdi/js";
 
     let params = queryString.parse(window.location.search);
     if(params.token == null || params.token == undefined){
@@ -14,13 +16,7 @@
     }
 
     const register = () => {
-        const firstName = document.getElementById("firstName").value;
-        const lastName = document.getElementById("lastName").value;
-        const email = document.getElementById("email").value;
-        const pw1 = document.getElementById("pw1").value;
-        const pw2 = document.getElementById("pw2").value;
         const errorField = document.getElementById("errorField");
-        
         let [formIsValid, errormsg] = checkValues(firstName, lastName, email,pw1,pw2);
         if(formIsValid){
             errorField.innerHTML = "";
@@ -48,6 +44,23 @@
         }
 
     }
+    
+    function ruleValidatePasswordComplexity(v) {
+        if (params.role == "researcher") {
+            return (
+                pwResearcherRequirement.test(v) ||
+                "Must be minimum 8 characters long."
+            );
+        } else {
+            return (
+                pwAdminRequirement.test(v) ||
+                "Must be minimum 12 characters long"
+            );
+        }
+    }
+
+    const validatePasswordFields = [ruleValidatePasswordComplexity];
+
 
     // Checks the validity of fields. Optional third parameter for password 2.
     const checkValues = (firstName, lastName, email, pw1, pw2=pw1) => {
@@ -81,13 +94,13 @@
             valuesAreValid = false;
             errormsg = "Passwords need to match."
         }
-        else if(params.role === "admin" && !pwAdminRegex.test(pw1)){
+        else if(params.role === "admin" && !pwAdminRequirement.test(pw1)){
             valuesAreValid = false;
-            errormsg = "Password must be 10 characters long, include a Uppercase letter, lowercase letter and a number";
+            errormsg = "Password must be 12 characters long.";
         }
-        else if(params.role === "researcher" && !pwResearcherRegex.test(pw1)){
+        else if(params.role === "researcher" && !pwAdminRequirement.test(pw1)){
             valuesAreValid = false;
-            errormsg = "Password must be 8 characters long, include a character (a-z or A-Z) and a number";
+            errormsg = "Password must be 8 characters long.";
         }
         return [valuesAreValid, errormsg]
     }
@@ -98,30 +111,86 @@
         }
     }
 
+    let firstName, lastName, email, pw1, pw2 = "";
+
+    let showEmailTooltip, showPw1, showPw2, showErrorField = false;
 
 </script>
 
-
+<!--
 <div class="wrapper">
     <h1>Register your account!</h1>
-
-    <label class="inputLabel" for="firstName">First name</label>
-    <input id="firstName" class="inputfield" name="firstName" type="text" on:keydown={registerOnEnterPress}>
-
-    <label class="inputLabel" for="lastName">Last name</label>
-    <input id="lastName" class="inputfield" name="lastName" type="text" on:keydown={registerOnEnterPress}>
-
-    <label class="inputLabel" for="email">Email</label>
-    <input id="email" class="inputfield" name="email" type="text" on:keydown={registerOnEnterPress}>
     
-    <label class="inputLabel" for="pw1">Password</label>
-    <input id="pw1" class="inputfield" name="pw1" type="password" on:keydown={registerOnEnterPress}>
 
-    <label class="inputLabel" for="pw2">Repeat password</label>
-    <input id="pw2" class="inputfield" name="pw2" type="password" on:keydown={registerOnEnterPress}>
-
-    <button class="submitBtn" on:click={register}>Register user</button>
+        <label class="inputLabel" for="firstName">First name</label>
+        <input id="firstName" class="inputfield" name="firstName" type="text" on:keydown={registerOnEnterPress}>
+    
+        <label class="inputLabel" for="lastName">Last name</label>
+        <input id="lastName" class="inputfield" name="lastName" type="text" on:keydown={registerOnEnterPress}>
+    
+        <label class="inputLabel" for="email">Email</label>
+        <input id="email" class="inputfield" name="email" type="text" on:keydown={registerOnEnterPress}>
+        
+        <label class="inputLabel" for="pw1">Password</label>
+        <input id="pw1" class="inputfield" name="pw1" type="password" on:keydown={registerOnEnterPress}>
+    
+        <label class="inputLabel" for="pw2">Repeat password</label>
+        <input id="pw2" class="inputfield" name="pw2" type="password" on:keydown={registerOnEnterPress}>
+    
+        <button class="submitBtn" on:click={register}>Register user</button>
+    
     <p id="errorField"></p>
+</div>
+-->
+
+<div class="d-flex flex-row justify-center">
+    <div class="d-flex flex-column">
+        <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Register your account!</h1>
+        <TextField class="ma-2" hint="*Required" bind:value={firstName} on:keydown={registerOnEnterPress}>First name</TextField>
+        <TextField class="ma-2" hint="*Required" bind:value={lastName} on:keydown={registerOnEnterPress}>Last name</TextField>
+        <TextField class="ma-2" hint="*Required" bind:value={email} on:keydown={registerOnEnterPress}>
+            <div slot="append">
+                <Tooltip
+                    top
+                    bind:active={showEmailTooltip}
+                >
+                    <Icon path={mdiInformationOutline} />
+                    <span slot="tip">
+                        Must match the mail you were invited from.
+                    </span>
+                </Tooltip>
+            </div>
+            Email
+        </TextField>
+        <TextField
+                class="ma-2"
+                hint="*Required"
+                rules={validatePasswordFields}
+                bind:value={pw1}
+                type={showPw1 ? "text" : "password"}
+                on:keydown={registerOnEnterPress}
+            >
+            Password
+                <div slot="append" on:click={() => (showPw1 = !showPw1)}>
+                    <Icon path={showPw1 ? mdiEyeOff : mdiEye} />
+                </div>
+            </TextField>
+            <TextField
+                class="ma-2"
+                hint="*Required"
+                rules={validatePasswordFields}
+                bind:value={pw2}
+                type={showPw2 ? "text" : "password"}
+                on:keydown={registerOnEnterPress}
+            >
+                Repeat password
+                <div slot="append" on:click={() => (showPw2 = !showPw2)}>
+                    <Icon path={showPw2 ? mdiEyeOff : mdiEye} />
+                </div>
+            </TextField>
+        <Button class="ma-2 mt-6" outlined on:click={register}>Register user</Button>
+        <p id="errorField" class="align-self-center"></p>
+    </div>
 </div>
 
 

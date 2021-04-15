@@ -4,26 +4,59 @@
 	import {navigate} from "svelte-routing";
 	import { surveyService } from "../Services/SurveyService";
 	import {navigateWithRefreshToken} from "../Utility/naviagte";
+	import { onDestroy, onMount } from "svelte";
+	import swal from "sweetalert";
 
 	export let surveyID;
 
 	let validate = async () => {
 		let code = document.getElementsByClassName("bigInput")[0].value;
-		surveyID = code;
-		navigate("/survey");
+		if(code.length === 6){
+			let codeCheck = await surveyService.getPinIsValid(code);
+			if(codeCheck.status == 200){
+				console.log("Code is valid")
+				surveyID = code;
+				navigate("/take_survey");
+			}
+			else if(codeCheck.status == 500){
+				swal(
+					"Could not reach server.",
+					"We could not contact the server. Please try again, or contact an administrator if the problem persists.",
+					"error"
+				)
+			}
+			else{
+				swal(
+					"Code is not valid.",
+					"We could not find a survey that matches that code.\nPlease double check that you entered the right one.",
+					"warning"
+				)
+			}
+		}
+		else{
+			swal(
+				"Error in user input.",
+				"Codes must be 6 characters long.",
+				"error"
+			)
+		}
 	}
+	onMount(()=>{
+        document.getElementsByTagName("body")[0].style.overflowY = "hidden";
+		document.getElementsByTagName("body")[0].style.overflowX = "hidden";
+    })
+    onDestroy(()=>{
+        document.getElementsByTagName("body")[0].style.overflowY = "scroll";
+		document.getElementsByTagName("body")[0].style.overflowX = "scroll";
+    })
 </script>
 
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>If you are here to take judge a survey, please enter your access code into the field below and press "Start reviewing"</h2>
+		<h2>If you are here to take a survey, please enter your access code into the field below and press "Start reviewing"</h2>
 		<CostumInput onClickFunc={validate} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
-	<!--
-	<Card title="Yo" w="400px" h="400px" alt="Pillars of creation" img="https://www.nasa.gov/sites/default/files/styles/full_width_feature/public/thumbnails/image/pillars_of_creation.jpg"></Card>
-	<Card title="Yo" w="400px" h="400px" alt="Førersete" img="https://toonclips.com/600/cartoon-guy-in-a-tireless-car-on-blocks-by-toonaday-538.jpg"></Card>
-	-->
 </main>
 
 

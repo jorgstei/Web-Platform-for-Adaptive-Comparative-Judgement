@@ -39,7 +39,7 @@
     ];
     let linearRanking = null;
     let allJudgesHeaders = [
-        { fieldName: "", viewName: "id" },
+        { fieldName: "", viewName: "judge id" },
         { fieldName: "", viewName: "answers" },
         { fieldName: "", viewName: "agree" },
         { fieldName: "", viewName: "infit" },
@@ -407,8 +407,9 @@
         currentContentView;
 </script>
 
+<h1 class="text-h1 ma-2" style="font-size: 5rem;">{survey.title}</h1>
+<br>
 <div class="d-flex flex-column align-center">
-    <h1 id="title">{survey.title}</h1>
     {#if surveyStatistics != null}
         <div style="border:1px solid #aaa; width:60%; margin-bottom:4vh;">
             <Row class="align-start" noGutters style="width:1+0%;">
@@ -457,9 +458,9 @@
                 element={csvDownloadLinearRankingButton}
             />
         {:else}
-            <h3>
-                This survey is yet to be answered. Come back once you've
-                gathered some participants, or taken the test yourself!
+            <h3 class="text-h5">
+                This survey is yet to be answered enough for us to analyze. <br>
+                Come back once you've gathered some participants, or taken the test yourself!
             </h3>
         {/if}
     {:else if currentContentView == "rawdata"}
@@ -530,8 +531,7 @@
         font-size: 1.7rem;
     }
     #title {
-        width: -moz-fit-content;
-        width: fit-content;
+
         margin: auto;
         margin-bottom: 3vh;
     }

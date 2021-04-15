@@ -228,6 +228,11 @@
             login();
         }
     };
+    const changeThePasswordOnEnterPress = (e) => {
+        if(e.keyCode == 13){
+            changeThePassword();
+        }
+    }
 </script>
 
 <div>
@@ -241,6 +246,7 @@
                 hint="*Required"
                 bind:value={oldPw}
                 type={oldPasswordShow ? "text" : "password"}
+                on:keydown={changeThePasswordOnEnterPress}
             >
                 Old Password
                 <div
@@ -256,6 +262,7 @@
                 rules={validatePasswordFields}
                 bind:value={newPw1}
                 type={newPw1Show ? "text" : "password"}
+                on:keydown={changeThePasswordOnEnterPress}
             >
                 New Password
                 <div slot="append" on:click={() => (newPw1Show = !newPw1Show)}>
@@ -268,6 +275,7 @@
                 rules={validatePasswordFields}
                 bind:value={newPw2}
                 type={newPw2Show ? "text" : "password"}
+                on:keydown={changeThePasswordOnEnterPress}
             >
                 New Password Repeated
                 <div slot="append" on:click={() => (newPw2Show = !newPw2Show)}>
@@ -288,13 +296,14 @@
                 Log in below to see your surveys, and continue making new ones.
             </h2>
             <div class="d-flex flex-column justify-center align-left">
-                <TextField class="ma-2" rules={[validateEmail]} bind:value={email}>
+                <TextField class="ma-2" rules={[validateEmail]} bind:value={email} on:keydown={loginOnEnterPress}>
                     Email
                 </TextField>
                 <TextField
                     class="ma-2"
                     bind:value={newPw1}
                     type={newPw1Show ? "text" : "password"}
+                    on:keydown={loginOnEnterPress}
                 >
                     Password
                     <div slot="append" on:click={() => (newPw1Show = !newPw1Show)}>

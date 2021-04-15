@@ -37,6 +37,7 @@
     } from "@mdi/js";
 
     import PDFViewer from '../Components/PDFViewer.svelte';
+import Survey from "./Survey.svelte";
     const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
     const classes = {
@@ -169,6 +170,15 @@
                 ? e.target.scrollHeight + "px"
                 : "12vh";
     };
+    const getAmountOfUniqueComparisons = (arrayLength) => {
+        let toAdd = 1;
+        let amountOfUniqueComparisons = 0;
+        while (toAdd < arrayLength) {
+            amountOfUniqueComparisons += toAdd;
+            toAdd++;
+        }
+        return amountOfUniqueComparisons;
+    }
 
     const sendForm = () => {
         let optionsData = [];
@@ -205,12 +215,8 @@
                 "error"
             );
         } else {
-            let amountOfUniqueComparisons = 0;
-            let toAdd = 1;
-            while (toAdd < info.items.length) {
-                amountOfUniqueComparisons += toAdd;
-                toAdd++;
-            }
+            let amountOfUniqueComparisons = getAmountOfUniqueComparisons(info.items.length);
+            
             if (amountOfUniqueComparisons < parseInt(info.expectedComparisons)) {
                 swal(
                     "Invalid input",
@@ -374,11 +380,14 @@
         console.log("validating expected comparisons with input", input);
         if (isNaN(parsed) && input !== "") {
             console.log("validateExpectedComparisons invalid input:", input);
-            e.target.value = 2;
+            e.target.value = 1;
             return;
         } else if (typeof parsed == "number") {
-            if (parsed > 100) {
-                comparisonsPerJudge = 100;
+            
+            const max = getAmountOfUniqueComparisons(surveyOptions.length);
+            console.log("parsed is: ", parsed, "max is", max);
+            if (parsed > max) {
+                comparisonsPerJudge = max;
             } else if (parsed < 0) {
                 comparisonsPerJudge = 0;
             }
@@ -624,6 +633,19 @@
         }
     }
 
+    const ruleValidateFieldFilled = (v) => {
+        console.log("test result:", v)
+            return (
+                v.length > 0 || "Field is obligatory"
+            );
+    }
+    let fieldFilledRules = [ruleValidateFieldFilled];
+
+    const activateRules = (value) => {
+        console.log("blurred with val", value);
+        value = value;
+    }
+
     
 
     $: surveyResearchers & searchResults;
@@ -666,10 +688,12 @@
                 </Button>
             {/if}
             <Textarea
-                style="margin-top: 2vh;"
-                rows={2}
+                style="margin-top: 2vh; line-height: 20px;"
+                rows={1}
+                autogrow
                 noResize
                 class="text-h5"
+                hint="*Required"
                 bind:value={surveyTitleValue}
                 on:focus={() => console.log("title got focused")}
             >
@@ -677,9 +701,9 @@
                     <Tooltip top bind:active={showSurveyTitleTooltip}>
                         <Icon path={mdiInformationOutline} />
                         <span slot="tip"
-                            >A title for what you're researching. Will not be
-                            shown to the judges. e.g. 'Preference of snacks'</span
-                        >
+                            >A title for what you're researching. Will not be shown to the judges.<br>
+                            For example: 'Preference of snacks'
+                        </span>
                     </Tooltip>
                 </div>
                 Survey title
@@ -687,18 +711,20 @@
 
             <Textarea
                 style="margin-top: 2vh;"
-                rows={2}
+                rows={1}
+                autogrow
                 noResize
                 class="text-h5"
+                hint="*Required"
                 bind:value={surveyQuestionValue}
             >
                 <div slot="append">
                     <Tooltip top bind:active={showSurveyQuestionTooltip}>
                         <Icon path={mdiInformationOutline} />
                         <span slot="tip"
-                            >The question the judges will answer. Will be shown
-                            to judges. e.g. 'Which snack do you prefer?'</span
-                        >
+                            >The question the judges will answer. Will be shown to judges.<br>
+                            For example: 'Which snack do you prefer?'
+                        </span>
                     </Tooltip>
                 </div>
                 Survey question
@@ -709,6 +735,7 @@
                 rows={4}
                 autogrow
                 class="text-h6"
+                hint="*Required"
                 bind:value={judgeInstructionsValue}
             >
                 <div slot="append">
@@ -717,10 +744,9 @@
                         bind:active={showSurveyJudgeInstructionsTooltip}
                     >
                         <Icon path={mdiInformationOutline} />
-                        <span slot="tip"
-                            >A field for extra info you want to give the judge
-                            before they answer your survey</span
-                        >
+                        <span slot="tip">
+                            Extra info you want to give the judges before they answer your survey.
+                        </span>
                     </Tooltip>
                 </div>
                 Judge instructions
@@ -739,57 +765,36 @@
                         bind:active={showSurveyInternalDescriptionTooltip}
                     >
                         <Icon path={mdiInformationOutline} />
-                        <span slot="tip"
-                            >An internal description of the survey. Will not be
-                            shown to judges</span
-                        >
+                        <span slot="tip">
+                            An internal description of the survey.<br>
+                            Will only be shown to co-researchers.
+                        </span>
                     </Tooltip>
                 </div>
                 Survey description
             </Textarea>
 
-            <div class="d-flex flex-rows" style="margin-top: 4vh;">
-                <div style="min-width: 33%;">
-                    <Select mandatory items={purposeItems} bind:value={selectedPurpose}
-                        >Purpose</Select
-                    >
+            <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">
+                <div style="min-width: 30%;">
+                    <Select mandatory items={purposeItems} bind:value={selectedPurpose}>
+                        Purpose
+                    </Select>
                 </div>
-                <div style="min-width: 34%;">
+                <div style="min-width: 30%;">
                     <Select mandatory
                         items={mediaTypeItems}
-                        bind:value={selectedMediaType}>Media Type</Select
-                    >
+                        bind:value={selectedMediaType}>Media Type
+                    </Select>
                 </div>
 
-                <div style="min-width: 33%;">
-                    <Select mandatory items={activeItems} bind:value={selectedActiveLevel}
-                        >Active</Select
-                    >
+                <div style="min-width: 30%;">
+                    <Select mandatory items={activeItems} bind:value={selectedActiveLevel}>
+                        Active
+                    </Select>
                 </div>
             </div>
 
-            <div class="centeredInputFieldWrapper">
-                <TextField
-                    type="number"
-                    on:input={validateExpectedComparisons}
-                    bind:value={comparisonsPerJudge}
-                >
-                    <div slot="append">
-                        <Tooltip
-                            top
-                            bind:active={showSurveyComparisonsPerJudgeTooltip}
-                        >
-                            <Icon path={mdiInformationOutline} />
-                            <span slot="tip"
-                                >How many comparisons you want each judge to
-                                perform</span
-                            >
-                        </Tooltip>
-                    </div>
-                    Expected comparisons per judge
-                </TextField>
-            </div>
-
+            <h1 class="text-h4 ma-8" style="text-align:center;">Search for and add co-researchers</h1>
             <div class="centeredInputFieldWrapper">
                 <TextField
                     type="text"
@@ -805,8 +810,9 @@
                         >
                             <Icon path={mdiInformationOutline} />
                             <span slot="tip">
-                                Search for researchers by name or email. Type
-                                in at least 3 characters to get results automatically, or just press enter to search.
+                                Search for researchers by name or email.<br>
+                                Type in at least 3 characters to get results automatically.<br>
+                                Optionally, hit enter after a single character to search.
                             </span>
                         </Tooltip>
                     </div>
@@ -821,9 +827,9 @@
                 </ListItemGroup>
             </div>
 
-            <div class="d-flex mt-4 mb-4 flex-wrap align-content-space-between">
+            <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
                 {#each surveyResearchers as researcher}
-                    <Card style="min-width:50%" class="mb-2" hover>
+                    <Card style="width:49%; cursor: default; background-color:rgb(225,225,225);" class="mb-2" hover>
                         {#if researcher.ownerId !== userInfo.userid}
                             <Button
                                 fab
@@ -835,47 +841,48 @@
                         {/if}
                         <CardText>
                             <div>Researcher</div>
-                            <div class="text--primary text-h4">
+                            <div class="text--primary text-h5">
                                 {researcher.owner_email}
                             </div>
-                            <div class="text--primary text-h6" style="text-align: left;">Rights:</div>
+                            <div class="text--primary text-h8" style="text-align:left;">Rights:</div>
                         </CardText>
                         <CardActions>
                             <div class="d-flex flex-column justfiy-left">
                                 <Checkbox
-                                    bind:checked={researcher.rights
-                                        .manageMembers}
-                                    disabled={researcher.ownerId ==
-                                        userInfo.userid}
-                                    >Manage members</Checkbox
-                                >
+                                    bind:checked={researcher.rights.manageMembers}
+                                    disabled={researcher.ownerId == userInfo.userid}>
+                                    Manage members
+                                </Checkbox>
                                 <Checkbox
                                     bind:checked={researcher.rights.editSurvey}
-                                    disabled={researcher.ownerId ==
-                                        userInfo.userid}>Edit survey</Checkbox
-                                >
+                                    disabled={researcher.ownerId ==userInfo.userid}>
+                                    Edit survey
+                                </Checkbox>
                                 <Checkbox
                                     bind:checked={researcher.rights.viewResults}
                                     disabled={researcher.ownerId ==
-                                        userInfo.userid}>View results</Checkbox
-                                >
+                                    userInfo.userid}>
+                                    View results
+                                </Checkbox>
                             </div>
                         </CardActions>
                     </Card>
                 {/each}
             </div>
 
-            <div class="d-flex mt-4 mb-4 flex-wrap align-content-space-between">
+            <div style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;"></div>
+            <h1 class="text-h4">Items</h1>
+            <div class="d-flex flex-row mt-4 mb-4 flex-wrap justify-space-between">
                 {#each surveyOptions as option}
-                    <div class="d-flex flex-column mb-2" style="min-width:50%;">
-                        <Card hover>
+                    <div class="d-flex flex-column mb-2" style="width:49%;">
+                        <Card style="cursor: default; background-color:rgb(220,220,220);" hover>
                         <Row>
                             <Col cols={11}>
                                 <CardText>
-                                    <div>Option</div>
+                                    <div>Item</div>
                                     <TextField
+                                        hint="*Required"
                                         bind:value={option.input}
-                                        on:change={(event)=>{console.log("event was", event)}}
                                         class="mt-4"
                                         style="min-width:100%;"
                                     >
@@ -886,11 +893,11 @@
                                             >
                                                 <Icon path={mdiInformationOutline} />
                                                 <span slot="tip"
-                                                    >Input for your option</span
+                                                    >Item text</span
                                                 >
                                             </Tooltip>
                                         </div>
-                                        Option value
+                                        Item value
                                     </TextField>
         
                                     <Select
@@ -904,6 +911,7 @@
                             <Col cols={1}>
                                 <Button
                                     fab
+                                    outlined
                                     class="float-right"
                                     on:click={() => removeOption(option)}
                                     >
@@ -912,6 +920,7 @@
                                 
                                 <Button
                                     fab
+                                    outlined
                                     class="float-right mt-9"
                                     on:click={()=>{option.showOptionOverlay = true; console.log("clicked on card");}}
                                     >
@@ -942,39 +951,65 @@
                         </Card>
                     </div>
                 {/each}
+                <div class="d-flex flex-column mb-2" style="width:49%;">
+                    <Card style="cursor: default; height:228px; background-color:rgb(225,225,225);" hover>
+                        <CardText class="flex-column d-flex justify-space-between">
+                            <div class="mb-4">Add item</div>
+                            <Button
+                            fab
+                            style="min-width:110px; min-height:110px;"
+                            class="align-self-center"
+                            on:click={() => {
+                                surveyOptions.push({
+                                    input: "",
+                                    mediaType: "text",
+                                    showOptionTooltip: false,
+                                    showOptionOverlay: false,
+                                    inputFieldType: {type:"text", acceptString:""},
+                                    file: "",
+                                });
+                                surveyOptions = surveyOptions;
+                                setTimeout(
+                                    () => window.scrollTo(0, document.body.scrollHeight),
+                                    400
+                                );
+                            }}
+                            >
+                                <Icon path={mdiPlusCircle} size="110px"/>
+                            </Button>
+                        </CardText>
+                    </Card>
+                </div>
+            </div>
+            <div class="centeredInputFieldWrapper">
+                <TextField
+                    type="number"
+                    on:input={validateExpectedComparisons}
+                    bind:value={comparisonsPerJudge}
+                >
+                    <div slot="append">
+                        <Tooltip
+                            top
+                            bind:active={showSurveyComparisonsPerJudgeTooltip}
+                        >
+                            <Icon path={mdiInformationOutline} />
+                            <span slot="tip">
+                                How many comparisons you want each judge to perform.<br>
+                                Minimum value is 1.<br>
+                                The maximum value is based on the amount of unique combinations of items in the survey.<br>
+                                Current max is {getAmountOfUniqueComparisons(surveyOptions.length)}
+                            </span>
+                        </Tooltip>
+                    </div>
+                    Expected comparisons per judge
+                </TextField>
             </div>
 
-            <Button outlined id="submitButton" on:click={sendForm}
-                >Submit</Button
+            <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={sendForm}
+                >Submit survey</Button
             >
             <input type="text" id="dummy" />
         </div>
-        <Button
-            fab
-            style="right: 2vw; bottom:7vh; position: fixed; min-width:4vw; min-height:4vw;"
-            on:click={() => {
-                surveyOptions.push({
-                    input: "",
-                    mediaType: "text",
-                    showOptionTooltip: false,
-                    showOptionOverlay: false,
-                    inputFieldType: {type:"text", acceptString:""},
-                    file: "",
-                });
-                surveyOptions = surveyOptions;
-                setTimeout(
-                    () => window.scrollTo(0, document.body.scrollHeight),
-                    100
-                );
-            }}
-        >
-            <Tooltip top bind:active={showAddOptionTooltip}>
-            
-                <Icon path={mdiPlusCircle} size="3vw" />
-                <span slot="tip">Add option</span>
-            </Tooltip>
-
-        </Button>
 </div>
 
 <style>

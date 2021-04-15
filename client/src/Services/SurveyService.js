@@ -56,6 +56,16 @@ export default class SurveyService extends Service{
         .catch(error => error.response)
     }
 
+    getPinIsValid(pin){
+        return axios({
+            method: "get",
+            url: this.path + "/survey/function/checkPIN/" + pin,
+            withCredentials: false
+        })
+        .then(response => response)
+        .catch(error => error.response)
+    }
+
     postSurvey(survey){
         return axios({
             method: "post",

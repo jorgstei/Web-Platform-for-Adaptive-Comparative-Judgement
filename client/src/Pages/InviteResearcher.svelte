@@ -64,7 +64,7 @@
 
     const registerOnEnterPress = (e) => {
         if(e.keyCode == 13){
-            register();
+            register(selectedValue, txtValue);
         }
     }
 
@@ -72,7 +72,7 @@
         {name: "Researcher", value: "researcher"},
         {name: "Admin", value: "admin"}
     ]
-    let selectedValue;
+    let selectedValue = "researcher";
     let txtValue;
 
 </script>
@@ -82,8 +82,8 @@
 <div class="d-flex flex-row justify-center">
     <div class="d-flex flex-column">
         <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Invite Researcher</h1>
-        <Select class="ma-2" hint="*Required" items={selectItems} bind:value={selectedValue}>Role</Select>
-        <TextField class="ma-2" hint="*Required" bind:value={txtValue}>Email</TextField>
+        <Select mandatory class="ma-2" hint="*Required" items={selectItems} bind:value={selectedValue}>Role</Select>
+        <TextField class="ma-2" hint="*Required" bind:value={txtValue} on:keydown={registerOnEnterPress}>Email</TextField>
         <Button class="ma-2 mt-6" outlined on:click={()=>{register(selectedValue, txtValue)}}>Register user</Button>
         <p id="errorField"></p>
     </div>

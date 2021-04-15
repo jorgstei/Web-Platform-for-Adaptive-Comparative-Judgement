@@ -483,7 +483,8 @@ router.put("/:id", auth, async (req, res) => {
         purpose, mediaType
     } = me(req.body)
     const ownerId = req.auth["user"].userid
-    const surveyDoc = await Survey.findOne({ _id: req.params.id })
+    const me_id = me(req.params.id)
+    const surveyDoc = await Survey.findOne({ _id: me_id })
     if (surveyDoc._id == null) {
         res.status(404).json({message: "Could not find survey to update."})
         return
@@ -515,7 +516,7 @@ router.put("/:id", auth, async (req, res) => {
         }
         const surveyReplaceResult = await Survey.updateOne({ _id: req.params.id },
             {
-                owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+                owners, inviteCode, expectedComparisons, active, title, internalDescription, judgeInstructions, surveyQuestion,
                 purpose, mediaType
             }
         )
@@ -875,7 +876,9 @@ router.post("/function/upload_item/:id", auth, async (req, res) => {
         return
     }
     try {
+        const tag = me(req.query.tag)
         const fileName = req.files?.file?.name?.replace("..", "")
+        console.log("Find me: ", req.files)
         if(req.files?.file == undefined || req.files?.file == null || req.files?.file?.truncated == true){
             res.status(422).json({message: "Filesize too large for file: " + fileName+".\nMax supported filesize is 16MB"})
             return
@@ -883,6 +886,7 @@ router.post("/function/upload_item/:id", auth, async (req, res) => {
         SurveyItemFile.create({
             surveyId: me(req.params.id),
             data: req.files.file.data,
+            tag: tag,
             fileName: fileName,
             mimeType: req.files.file.mimetype
         })

@@ -18,29 +18,73 @@
     } from "@mdi/js";
     import { surveyItemFileService } from "../../Services/SurveyItemFileService";
     import { nodeBufferToBlobURL, nodeBufferToFile } from "../../Utility/nodeBufferToBlobURL";
+    import { onMount } from "svelte";
+    import PDFView from "../PDFView.svelte"
 
 
     export let option;
     export let optionMediaTypeItems;
     export let functionObject;
+    
+    let uploadLabelText = "Choose File"
+    let view = undefined
+
+    onMount(() => {
+        let uploadBtn = document.getElementById("pdfupload-btn-"+option.uuid)
+        if(!uploadBtn){
+            console.error("mytag unable to get uploadBtn")
+        }
+        uploadLabelText = option.fileName == "" ? "Choose File" : option.fileName
+    })
 
     function onFileSelected(e){
+        view = undefined
         if(e?.target?.files[0]){
+            let fileReader = new FileReader()
+            fileReader.readAsArrayBuffer(e.target.files[0])
+            fileReader.onloadend = (reader) => {
+                /*let tempArray = new Uint8Array(reader.target.result)
+                let newArray = []
+                for(let a in tempArray){
+                    newArray.push(tempArray[a])
+                }
+                option.data = newArray
+                */
+                console.log("mytag3 reader:", reader)
+                console.log("mytag3 option.data from file reader:", option.data)
+            }
+            fileReader.onerror = (error) => {
+                console.error("mytag3 error reading file: ", error)
+            }
             option.data = e.target.files[0]
-            option.tag = option.tag == "" ? e.target.files[0].name : option.tag
+
+            option.editedArr["data"] = "data";
+            option.editedArr["fileName"] = "fileName";
+            option.fileName = e.target.files[0].name
+            uploadLabelText = e.target.files[0].name
+            if(option.tag == ""){
+                option.tag = e.target.files[0].name
+                option.editedArr["tag"] = "tag"
+            }
+            view = URL.createObjectURL(e.target.files[0])
+
             option = option
             console.log("File selected: ", option.data)
+        }
+        else{
+            uploadLabelText = "Choose File"
         }
     }
 
     async function showOverlay(){
         const objectIdRegex = /^[0-9a-fA-F]{24}$/
-        //If option.data is a valid objectID we must assume we should fetch the complete data from server
-        if(typeof(option.data) == "string" && option.data.match(objectIdRegex)){
-            await surveyItemFileService.get(option.data).then(response => {
+        //If option._id is a valid objectID we must assume we should fetch the complete data from server
+        if(view == undefined && typeof(option._id) == "string" && option._id.match(objectIdRegex)){
+            await surveyItemFileService.get(option._id).then(response => {
                 if(response.status < 300){
                     console.log(response.data)
-                    option.data = nodeBufferToFile(response.data.data.data, "application/pdf")
+                    view = URL.createObjectURL(nodeBufferToFile(response.data.data.data, "application/pdf"))
+                    console.log("mytag3 view ready")
                 }
                 else{
                     console.error("Couldn't get PDF object from server")
@@ -58,10 +102,11 @@
             <CardText>
                 <div>Item</div>
                 <input type="file" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden/>
-                <label class="labelBtn" for="pdfupload-btn-{option.uuid}">Choose File</label>
+                <label class="labelBtn" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
                 <TextField
                     hint="*Required"
                     bind:value={option.tag}
+                    on:change={() => {console.log("edited pdf tag");option.editedArr["tag"] = "tag"}}
                     class="mt-4"
                     style="min-width:100%;"
                 >
@@ -108,6 +153,23 @@
         </Col>
     </Row>
 </Card>
+<Overlay
+bind:active={option.showOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default"
+>
+    <TextField type={"text"} accept={"application/text"} bind:value={option.tag}>
+        Item Tag
+    </TextField>
+    {#if view != undefined}
+        <PDFView iframeId="preview" width="70vh" height="70vh" src={view}></PDFView>
+        <!--<PDFViewer {pdf} {classes} {options} bind:currentPage {pageNumberText}></PDFViewer>-->
+        <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
+            Close overlay
+        </Button>
+    {/if}
+</Overlay>
 
 <style>
     .labelBtn{

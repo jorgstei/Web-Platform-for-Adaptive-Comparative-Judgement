@@ -53,7 +53,7 @@ server.use(cors({
     ],
     credentials: true
 }))
-server.use(bodyParser.json())
+server.use(bodyParser.json({limit: "16mb"}))
 
 server.use(cookieParser())
 

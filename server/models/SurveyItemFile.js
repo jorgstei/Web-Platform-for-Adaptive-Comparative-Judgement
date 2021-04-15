@@ -12,6 +12,11 @@ const SurveyItemFileSchema = new Schema(
         },
         fileName: {
             type: String,
+            required: false,
+            default: ""
+        },
+        tag: {
+            type: String,
             required: true
         },
         mimeType: {

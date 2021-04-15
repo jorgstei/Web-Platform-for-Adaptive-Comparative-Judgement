@@ -164,7 +164,7 @@ export default class SurveyService extends Service{
         .catch(error => error.response)
     }
 
-    uploadFile(file, surveyId){
+    uploadFile(file, surveyId, tag){
         let formData = new FormData()
         formData.append('file', file)
         console.log("uploadFile file:", file)
@@ -172,7 +172,7 @@ export default class SurveyService extends Service{
         return axios({
             method: "post",
             data: formData,
-            url: this.path + "/survey/function/upload_item/"+surveyId,
+            url: this.path + "/survey/function/upload_item/"+surveyId+"/?tag="+tag,
             headers: {
                 "Content-Type": "multipart/form-data"
             },

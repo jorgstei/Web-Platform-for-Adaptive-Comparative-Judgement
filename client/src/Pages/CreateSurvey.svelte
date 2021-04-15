@@ -41,6 +41,7 @@
     import TextItem from '../Components/SurveyComponents/TextItem.svelte';
     import PDFItem from '../Components/SurveyComponents/PDFItem.svelte';
     import PDFView from '../Components/PDFView.svelte';
+import { surveyItemFileService } from '../Services/SurveyItemFileService';
 
 
     export let allowLeavePageWithoutWarning;
@@ -123,16 +124,20 @@
         showOverlay: Boolean, used by card to toggle fullscreen/preview of the item
         showTooltip: Boolean, used by card to show info about the component f.ex. when hovering an (i) icon
     */
-    const addSurveyOption = (tag, mediaType, mimeType, data, showOverlay, showTooltip) => {
+    const addSurveyOption = (tag, mediaType, mimeType, data, showOverlay, showTooltip, created=true, editedArr=[], fileName="") => {
         const uuid = uuidv4()
         data = {
             tag: tag,
+            fileName: fileName,
             mediaType: mediaType,
             mimeType: mimeType,
             data: data,
+            _id: data,
             showOverlay: showOverlay,
             showTooltip: showTooltip,
-            uuid: uuid
+            uuid: uuid,
+            created: created,
+            editedArr: editedArr
         }
         surveyOptions.push(data)
         console.log("mytag surveyOptions in addSurveyOption:",surveyOptions)
@@ -143,11 +148,32 @@
                 uuid: uuid,
                 func: (surveyId) => {
                     let foundObject = surveyOptions.find(e => {
-                        console.log("mytag push e.uuid:",e.uuid,", uuid:",uuid)
                         return e.uuid == uuid
                     })
                     if(foundObject != null && foundObject != undefined){
-                        return surveyService.uploadFile(foundObject.data, surveyId)
+                        console.log("mytag foundObject.editedArr: ", foundObject.editedArr)
+                        if(foundObject.created == false && Object.keys(foundObject.editedArr).length == 0){
+                            console.log("mytag not created, no editedArr",foundObject)
+                            return Promise.resolve()
+                        }
+                        else if(foundObject != null && foundObject != undefined && foundObject.created == true){
+                            console.log("mytag created: ",foundObject)
+                            return surveyService.uploadFile(foundObject.data, surveyId, foundObject.tag)
+                        }
+                        else if(foundObject != null && foundObject != undefined && Object.keys(foundObject.editedArr).length > 0){
+                            console.log("mytag editedArr: ",foundObject)
+                            let promises = [];
+                            for(let fieldName in foundObject.editedArr){
+                                console.log("mytag2, patching with: ", fieldName, " value: ", foundObject[fieldName])
+                                promises.push(surveyItemFileService.patch(fieldName, foundObject[fieldName], foundObject._id))
+                            }
+                            
+                            return promises;
+                        }
+                        else{
+                            console.error("mytag DOING ABSOLUTELY NOTHING")
+                            return Promise.reject(new Error("Could not find data to upload"))
+                        }
                     }
                     else{
                         console.error("Failed to find surveyOption to upload")
@@ -156,6 +182,7 @@
                 }
             }
         )
+        surveyOptions = surveyOptions
         console.log("submitButtonFunctions",submitButtonFunctions)
     }
 
@@ -164,15 +191,24 @@
         const index = surveyOptions.findIndex(e => e == option)
         if(index > -1){
             const submitFunctionIndex = submitButtonFunctions.findIndex(e => {
-                console.log("mytag findFunction e.uuid:",e.uuid,", uuid:",option.uuid)
                 return e.uuid == option.uuid
             })
-            console.log("Trying to remove item, submitFunction: ", submitButtonFunctions[submitFunctionIndex])
             if(submitFunctionIndex > -1) {
                 submitButtonFunctions.splice(submitFunctionIndex, 1)
             }
             else{
                 console.error("Unable to find submitButtonFunction even though surveyObject exists")
+            }
+            const _id = surveyOptions[index]._id
+            if(surveyOptions[index].created == false){
+                submitButtonFunctions.push(
+                    {
+                        addtype: "deleteSurveyItem",
+                        func: () => {
+                            return surveyItemFileService.delete(_id)
+                        }
+                    }
+                )
             }
             surveyOptions.splice(index, 1)
         }
@@ -221,9 +257,17 @@
                     surveyResearchers = surveyResearchers;
 
                     console.log("compobj:", data.items);
-                    for (const item of data.items) {
+                    for (let item of data.items) {
                         console.log("optionbox", data);
-                        addSurveyOption("tag", item.type, getInputFieldTypeFromMediaType(item.type), item.data, false, false)
+                        surveyItemFileService.getView(item.data).then(result => {
+                            if(result.status < 300){
+                                item = {...item, ...result.data}
+                                addSurveyOption(item.tag, item.type, getInputFieldTypeFromMediaType(item.type), item.data, false, false, false, undefined, item.fileName)
+                            }
+                            else{
+                                console.error("Couldn't load view of item.")
+                            }
+                        })
                     }
 
                     surveyOptions = surveyOptions;
@@ -237,8 +281,8 @@
             });
         });
     } else {
-        addSurveyOption("text"+surveyOptions.length, "text", getInputFieldTypeFromMediaType("text"), "", false, false)
-        addSurveyOption("text"+surveyOptions.length, "text", getInputFieldTypeFromMediaType("text"), "", false, false)
+        addSurveyOption("text"+surveyOptions.length, "text", getInputFieldTypeFromMediaType("text"), "", false, false, true)
+        addSurveyOption("text"+surveyOptions.length, "text", getInputFieldTypeFromMediaType("text"), "", false, false, true)
     }
 
     const textAreaAdjust = (e) => {
@@ -258,7 +302,7 @@
         return amountOfUniqueComparisons;
     }
 
-    const sendForm = () => {
+    const sendForm = async () => {
         let optionsData = [];
 
         surveyOptions.forEach((e) => {
@@ -320,6 +364,18 @@
             }
             console.log(surveyService);
             if (editing) {
+                info.items = []
+                let itemFileResponses = []
+                submitButtonFunctions.forEach(e => {
+                    let eFuncResponse = e.func(surveyID)
+                    if(typeof(eFuncResponse) == "object" && eFuncResponse.length != 0){
+                        itemFileResponses = itemFileResponses.concat(eFuncResponse)
+                    }
+                    else{
+                        itemFileResponses.push()
+                    }
+                })
+                await Promise.all(itemFileResponses)
                 surveyService
                     .put(surveyID, info)
                     .then((data) => {
@@ -379,7 +435,13 @@
                             data = data.data;
                             let itemFileResponses = []
                             submitButtonFunctions.forEach(e => {
-                                itemFileResponses.push(e.func(data.loc))
+                                let eFuncResponse = e.func(data.loc)
+                                if(typeof(eFuncResponse) == "object" && eFuncResponse.length != 0){
+                                    itemFileResponses = itemFileResponses.concat(eFuncResponse)
+                                }
+                                else{
+                                    itemFileResponses.push()
+                                }
                             })
                             await Promise.all(itemFileResponses)
                             .catch(error => console.error("Error when posting item files:", error))
@@ -961,25 +1023,6 @@
                             >
                             </PDFItem>
                         {/if}
-                        <Overlay
-                            bind:active={option.showOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default"
-                        >
-                        
-                            <TextField type={"text"} accept={"application/text"} bind:value={option.tag}>
-                                Item Tag
-                            </TextField>
-                            
-                            {#if option.mimeType == "application/pdf"}
-                                <PDFView iframeId="preview" width="70vh" height="70vh" src={URL.createObjectURL(option.data)}></PDFView>
-                            {/if}
-                            <!--<PDFViewer {pdf} {classes} {options} bind:currentPage {pageNumberText}></PDFViewer>-->
-                            <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
-                                Close overlay
-                            </Button>
-                        </Overlay>
                     </div>
                 {/each}
                 <div class="d-flex flex-column mb-2" style="width:49%;">

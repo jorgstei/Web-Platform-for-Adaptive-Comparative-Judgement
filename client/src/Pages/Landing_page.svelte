@@ -16,7 +16,7 @@
 			if(codeCheck.status == 200){
 				console.log("Code is valid")
 				surveyID = code;
-				navigate("/take_survey");
+				navigate("/survey");
 			}
 			else if(codeCheck.status == 500){
 				swal(

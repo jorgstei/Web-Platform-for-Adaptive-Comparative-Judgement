@@ -93,8 +93,6 @@
 		</div>
 	</Router>
 	<Router {url}>
-
-
 		<Route path="survey">
 			<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 		</Route>

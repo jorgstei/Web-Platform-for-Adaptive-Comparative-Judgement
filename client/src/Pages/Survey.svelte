@@ -16,6 +16,7 @@
     import PDFItem from '../Components/SurveyComponents/PDFItem.svelte';
     import PDFView from '../Components/PDFView.svelte';
     import AboutProject from "./AboutProject.svelte";
+    import { mdiExpandAllOutline } from "@mdi/js";
 
 
     export let userInfo;
@@ -106,14 +107,12 @@
         if(params.takeSurvey == 1 && params.surveyID != undefined){
             surveyID = params.surveyID;
         }
-        console.log("Getting judge token")
         await surveyService.getJudgeToken(surveyID).then(async data => {
             if(data.status < 300){
                 data = data.data
                 console.log("Get survey Token data: ", data)
                 if(data.role === "judge"){
                     userInfo = data;
-                    console.log("surveyid in survey, getting survey as judge", surveyID);
                     await surveyService.getSurveyByIdAsJudge(surveyID)
                     .then((surveyData)=>{
                         if(surveyData.status < 300){
@@ -137,7 +136,6 @@
         })
         .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error").then(() => navigate("/")))
 
-        console.log("Getting items with surveyID", surveyID);
         if(surveyID != undefined){
             surveyService.getItemsToCompareBySurveyId(surveyID)
             .then((data) => {
@@ -146,16 +144,13 @@
                     console.log("Data from randomPair: ", data);
                     maxCounter = data.data.length;
                     data.data.forEach(async (item) => {
-                        console.log("item:", item);
                         let left = {};
                         let right = {};
                         if(item.left.type=="pdf"){
-                            console.log("left issapdf", item);
                             left.type= "pdf";
                             left._id = item.left._id;
                             await surveyItemFileService.get(item.left.data)
                             .then(res => {
-                                console.log("got res from fileservice", res);
                                 left.data = URL.createObjectURL(nodeBufferToFile(res.data.data.data, "application/pdf"));
                             })
                         }
@@ -163,11 +158,9 @@
                             left = item.left;
                         }
                         if(item.right.type=="pdf"){
-                            console.log("right issapdf", item);
                             right.type= "pdf";
                             await surveyItemFileService.get(item.right.data)
                             .then(res => {
-                                console.log("got res from fileservice", res);
                                 right._id = item.right._id;
                                 right.data = URL.createObjectURL(nodeBufferToFile(res.data.data.data, "application/pdf"));
                             })
@@ -182,14 +175,12 @@
                     
                 }
                 else{
-                    console.log("swaling")
                     swal(
                         "Error",
                         "Something went wrong while fetching the questions. Please try again, and if the problem persists contact an administrator.\nError:"+data.data.message,
                         "error"
                     )
                 }
-                console.log("hello?")
             })
             .catch(err => swal("Could not get survey items.", "Error:\n" + err, "error"));
         }
@@ -237,7 +228,7 @@
         if(nodeToCheck.classList.contains("cardWrapper")){
             nodeToCheck = nodeToCheck.childNodes[0];
         }
-        console.log(e.target, nodeToCheck, nodeToCheck.classList);
+        //console.log(e.target, nodeToCheck, nodeToCheck.classList);
         if(nodeToCheck.classList.contains("elevation-8")){
             nodeToCheck.classList.add("elevation-20");
             nodeToCheck.classList.remove("elevation-8");
@@ -249,6 +240,9 @@
             e.stopPropagation();
         }
     }
+
+    let showLeftItemOverlay = false;
+    let showRightItemOverlay = false;
 
 </script>
 <main id="surveyWrapper" tabindex="0">
@@ -269,9 +263,11 @@
             style="cursor:default"
         >
         
-            <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
+        <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
 
         </Overlay>
+
+        
         <!--
 
             {#if aPDFTest != null}
@@ -285,7 +281,17 @@
                         {#if randomPair[counter].left.type == "text"}
                             <div class="text--primary text-h4">{randomPair[counter].left.data}</div>
                         {:else if randomPair[counter].left.type == "pdf"}
+                            <div style="float: right; cursor:pointer;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiExpandAllOutline}></Icon></div>
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="80%"></PDFView>
+
+                            <Overlay
+                            bind:active={showLeftItemOverlay}
+                            opacity={1}
+                            color={"#eee"}
+                            style="cursor:default;">
+                                <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
+                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+                            </Overlay>
                         {/if}
                     </CardText>
     
@@ -300,7 +306,18 @@
                         {#if randomPair[counter].right.type == "text"}
                             <div class="text--primary text-h4">{randomPair[counter].right.data}</div>
                         {:else if randomPair[counter].right.type == "pdf"}
+                            <div style="float: right; cursor:pointer;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiExpandAllOutline}></Icon></div>
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="80%"></PDFView>
+
+
+                            <Overlay
+                            bind:active={showRightItemOverlay}
+                            opacity={1}
+                            color={"#eee"}
+                            style="cursor:default;">
+                                <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100vw" height="90vh"></PDFView>
+                                <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
+                            </Overlay>
                         {/if}
                     </CardText>
                     

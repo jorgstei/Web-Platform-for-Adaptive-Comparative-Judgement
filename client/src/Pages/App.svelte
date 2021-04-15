@@ -70,7 +70,7 @@
 			</Route>
 
 			<Route path="create_survey">
-				<CreateSurvey bind:userInfo />
+				<CreateSurvey bind:userInfo/>
 			</Route>
 
 			<Route path="about">

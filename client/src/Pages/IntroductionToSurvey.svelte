@@ -1,8 +1,4 @@
 <script>
-    import { onDestroy, onMount } from "svelte";
-    import { navigate } from "svelte-routing";
-    import { surveyService } from "../Services/SurveyService";
-    import queryString from "query-string";
     import { Button, Card, CardText, Overlay, Icon } from 'svelte-materialify';
     import { mdiArrowExpand, mdiArrowCollapse } from "@mdi/js";
     import swal from "sweetalert";

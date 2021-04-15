@@ -8,10 +8,12 @@
     import { surveyAnswerService } from "../Services/SurveyAnswerService";
 
     export let userInfo;
+    export let allowLeavePageWithoutWarning;
+    allowLeavePageWithoutWarning = true;
 
     let loadingData = true;
     
-    const tableFilterParams = {
+    let tableFilterParams = {
         countFunction: () => surveyService.getCount(),
         limit: 10,
         direction: 1,
@@ -172,7 +174,8 @@
 {#if data2DArray}
     <div class="d-flex flex-column justify-content-center">
         <Table
-            bind:filterBy
+            bind:dir = {tableFilterParams.direction}
+            bind:filterBy={filterBy}
             bind:tableData={data2DArray}
             bind:userInfo
             itemName = "survey"
@@ -183,7 +186,7 @@
                 await surveyService.deleteSurvey(id);
             }}
         />
-        <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+        <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} bind:direction={tableFilterParams.direction} {...tableFilterParams} />
     </div>
 {/if}
 

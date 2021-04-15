@@ -6,7 +6,7 @@
     import { surveyService } from "../Services/SurveyService";
     import { navigate } from "svelte-routing";
     import queryString from "query-string";
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { userService } from "../Services/UserService";
     import { navigateWithRefreshToken } from "../Utility/naviagte";
     import {
@@ -37,7 +37,28 @@
     } from "@mdi/js";
 
     import PDFViewer from '../Components/PDFViewer.svelte';
-import Survey from "./Survey.svelte";
+    import Survey from "./Survey.svelte";
+
+
+    export let allowLeavePageWithoutWarning;
+    export let warningOnLeaveFunc;
+    allowLeavePageWithoutWarning = false;
+
+    warningOnLeaveFunc = (link)=> {
+        swal({
+            title: "Are you sure?",
+            text:
+                "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
+            icon: "warning",
+            dangerMode: true,
+            buttons: ["Take me back!", "Discard"],
+        }).then((willDiscard) => {
+            if (willDiscard) {
+                navigate("/admin_board/"+ link);
+            }
+        })
+    }
+
     const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
     const classes = {
@@ -65,6 +86,11 @@ import Survey from "./Survey.svelte";
 
     let surveyOptions = [];
 
+    /*
+    window.onbeforeunload = function() {
+        return "Do you really want to leave our brilliant application?";
+    };
+    */
     let searchHint = "";
     let oldSearchTerm = "";
     let epochMsAtLastSearch = new Date().getTime();
@@ -820,7 +846,7 @@ import Survey from "./Survey.svelte";
                 </TextField>
                 <ListItemGroup class="blue-text">
                     {#each searchResults as result}
-                        <ListItem on:click={() => addResearcher(result)}
+                        <ListItem style="border: 0.1em solid #aaa; border-top:none;" on:click={() => addResearcher(result)}
                             >{result.email}</ListItem
                         >
                     {/each}

@@ -15,9 +15,9 @@
     export let count = 0;
     export let direction = 1;
     export let data = undefined;
-    import { TextField, Button, Icon, Tooltip, Textarea, Select, ListItemGroup, ListItem, Card, CardText, CardActions, Checkbox} from 'svelte-materialify';
-    import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel   } from "@mdi/js";
-import swal from "sweetalert";
+    import {Select} from 'svelte-materialify';
+    import { mdiChevronDown } from "@mdi/js";
+    import swal from "sweetalert";
 
 
     onMount(() => {
@@ -60,7 +60,8 @@ import swal from "sweetalert";
 
     function updatedFilterBy(){
         if(oldFilterBy.filterName === filterBy.filterName){
-            direction = (direction == 1) ? -1 : 1
+            direction = (direction == 1) ? -1 : 1;
+            direction = direction;
         }
         oldFilterBy.filterName = filterBy.filterName;
         oldFilterBy.counter = filterBy.counter;

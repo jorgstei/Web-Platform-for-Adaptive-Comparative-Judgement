@@ -7,6 +7,8 @@
     import { userService } from "../Services/UserService";
 
     export let userInfo = null;
+    export let allowLeavePageWithoutWarning;
+    allowLeavePageWithoutWarning = true;
 
     let numberOfSurveys = undefined
     onMount(() => {

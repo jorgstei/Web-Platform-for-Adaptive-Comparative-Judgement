@@ -20,7 +20,7 @@
         filterFunction: (a, b, c, d) => surveyService.getSorted(a, b, c, d),
     };
     let filterBy = {
-        filterName: "_id",
+        filterName: "title",
         counter: 0,
     };
     console.log("in surveys");

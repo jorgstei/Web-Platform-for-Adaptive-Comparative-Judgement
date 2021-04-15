@@ -67,9 +67,9 @@
                     <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>
                         {attr.viewName}
                         {#if dir==1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
-                            <Icon path={mdiChevronDown} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
-                        {:else if dir==-1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
                             <Icon path={mdiChevronUp} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
+                        {:else if dir==-1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
+                            <Icon path={mdiChevronDown} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
                         {:else if attr.fieldName != ""}
                             <Icon path={mdiUnfoldMoreHorizontal } size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
                         {/if}

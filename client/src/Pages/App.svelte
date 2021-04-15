@@ -23,6 +23,8 @@
 	export let url = "";
 	let userInfo = null;
 
+	let allowLeavePageWithoutWarning = true;
+
 	let refreshToken = () => {
 		if(userInfo?.role == "judge"){
 			userService.logoutJudge()
@@ -55,7 +57,7 @@
 
 <MaterialApp>
 	<Router {url}>
-		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
+		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning/>
 		<div class="pt-14">
 			<Route path="/">
 				<LandingPage bind:surveyID />
@@ -86,16 +88,12 @@
 			</Route>
 
 			<Route path="admin_board/*">
-				<AdminBoard bind:userInfo />
+				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning/>
 			</Route>
 		</div>
 	</Router>
 	<Router {url}>
 		<Route path="survey">
-			<IntroductionToSurvey bind:surveyID bind:userInfo />
-		</Route>
-
-		<Route path="take_survey">
 			<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 		</Route>
 	</Router>

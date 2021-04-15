@@ -16,7 +16,7 @@
 			if(codeCheck.status == 200){
 				console.log("Code is valid")
 				surveyID = code;
-				navigate("/take_survey");
+				navigate("/survey");
 			}
 			else if(codeCheck.status == 500){
 				swal(
@@ -55,7 +55,7 @@
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
 		<h2>If you are here to take a survey, please enter your access code into the field below and press "Start reviewing"</h2>
-		<CostumInput onClickFunc={validate} fieldTitle="Your access code:" buttonTitle="Start reviewing"></CostumInput>
+		<CostumInput onClickFunc={validate} fieldTitle="Your PIN code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 </main>
 

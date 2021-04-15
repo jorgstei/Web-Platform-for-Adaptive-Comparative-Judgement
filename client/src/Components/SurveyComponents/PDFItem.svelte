@@ -101,8 +101,8 @@
         <Col cols={11}>
             <CardText>
                 <div>Item</div>
-                <input type="file" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden/>
-                <label class="labelBtn" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
+                <input type="file" accept="application/pdf" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden/>
+                <label class="labelBtn" for="pdfupload-btn-{option.uuid}">Choose File</label>
                 <TextField
                     hint="*Required"
                     bind:value={option.tag}

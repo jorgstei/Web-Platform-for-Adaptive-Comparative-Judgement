@@ -4,7 +4,7 @@
     import { toast } from "@zerodevx/svelte-toast";
     import { Link } from "svelte-routing";
     import { attr } from "svelte/internal";
-    import { mdiChevronDown, mdiChevronUp, mdiUnfoldMoreHorizontal, mdiPoll, mdiShare } from "@mdi/js";
+    import { mdiChevronDown, mdiChevronUp, mdiUnfoldMoreHorizontal, mdiPoll, mdiShare, mdiFileEditOutline, mdiDelete, mdiSquareEditOutline } from "@mdi/js";
     import {Icon, Button } from 'svelte-materialify';
 
     export let filterBy = undefined;
@@ -67,9 +67,9 @@
                     <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>
                         {attr.viewName}
                         {#if dir==1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
-                            <Icon path={mdiChevronDown} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
-                        {:else if dir==-1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
                             <Icon path={mdiChevronUp} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
+                        {:else if dir==-1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
+                            <Icon path={mdiChevronDown} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
                         {:else if attr.fieldName != ""}
                             <Icon path={mdiUnfoldMoreHorizontal } size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
                         {/if}
@@ -89,22 +89,23 @@
                     {/if}
                     {#if tableAttributes.findIndex(e => e.viewName === 'data') != -1}
                         {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].viewResults}
-                            <td class="col"><Link to={"survey_data/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><Icon path={mdiPoll} ></Icon></Link></td>
+                            <td class="col" title="See the data for this survey." style="cursor:pointer;"><Link to={"survey_data/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><Icon path={mdiPoll}></Icon></Link></td>
                         {:else}
-                        <td class="col disabledLink"><Icon title="You are not allowed to view the results of this survey." alt="You cant access survey data image" path={mdiPoll} style="color: red; cursor: not-allowed;" disabled></Icon></td>
+                        <td class="col disabledLink"  title="You are not allowed to view the results of this survey."><Icon alt="You cant access survey data image" path={mdiPoll} style="color: red; cursor: not-allowed;" disabled></Icon></td>
                         {/if}
                     {/if}
                     {#if tableAttributes.findIndex(e => e.viewName === 'edit') != -1}
                         {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].editSurvey}
-                        <td class="col"><Link to={"edit_survey/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><img title="Edit survey" class="small_icon" src="https://p.kindpng.com/picc/s/154-1541056_edit-edit-icon-svg-hd-png-download.png" alt="Edit survey button"></Link></td>
+                        <td class="col" title="Edit survey"><Link to={"edit_survey/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><Icon path={mdiSquareEditOutline}></Icon></Link></td>
                         {:else}
-                        <td class="col disabledLink"><img title="You are not allowed to edit this survey" class="small_icon" src="../img/disabled_edit.jpg" alt="You cant edit survey image"></td>
+                        <td class="col disabledLink" title="You are not allowed to edit this survey"><Icon path={mdiSquareEditOutline} style="color: red; cursor: not-allowed;" disabled></Icon></td>
                         {/if}
                     {/if}
                 
                     {#if tableAttributes.findIndex(e => e.viewName === 'share') != -1}
                         {#if surveyActivityStatus[tableData.findIndex(e=>e==row)] === true}
-                            <td class="col" style="cursor: pointer;" on:click={()=>{
+                            <td class="col" style="cursor: pointer;" title="Copy link to survey to clipboard."
+                            on:click={()=>{
                                 navigator.clipboard.writeText(window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + row[tableAttributes.findIndex(e=>e.viewName=="id")])
                                 .then(()=>{
                                     toast.push("Link to the survey has been copied to your clipboard!", {duration: 2000});
@@ -120,8 +121,7 @@
 
                     {#if tableAttributes.findIndex(e => e.viewName === 'delete') != -1}
                         {#if userRights != undefined && userRights != null && userRights.length > 0 && userRights[tableData.findIndex(e=>e==row)].editSurvey}
-                        <td class="col">
-                            <img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
+                        <td class="col" title="Delete survey." style="cursor:pointer;"
                             on:click={()=>{
                                 let content_id = row[tableAttributes.findIndex(e=>e.viewName=="id")]; 
                                 swal({
@@ -151,10 +151,10 @@
                                     }
                                 });
                             }}>
+                            <Icon path={mdiDelete}></Icon>
                         </td>
                         {:else if userInfo != undefined && userInfo != null && userInfo.role === "admin"}
-                        <td class="col">
-                            <img class="small_icon" src="https://image.flaticon.com/icons/png/512/542/542724.png" alt="Delete option button" 
+                        <td class="col" title="Delete survey." style="cursor:pointer;"
                             on:click={()=>{
                                 let content_id = row[tableAttributes.findIndex(e=>e.viewName=="id")];
                                 swal({
@@ -185,9 +185,12 @@
                                     }
                                 });
                             }}>
+                            <Icon path={mdiDelete}></Icon>
+                            
                         </td>
                         {:else}
-                            <td class="col disabledLink"><img class="small_icon" src="../img/disabled_delete.png" alt="Delete option button"></td>
+                        <td class="col" title="You do not have permission to delete this survey.">
+                            <Icon path={mdiDelete} style="color:red; cursor: not-allowed;" disabled></Icon>
                         {/if}
                     {/if} 
                 </tr> 

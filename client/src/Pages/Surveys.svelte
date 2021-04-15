@@ -6,6 +6,7 @@
     import TableFilter from "../Components/TableFilter.svelte";
     import { Overlay, ProgressCircular } from 'svelte-materialify';
     import { surveyAnswerService } from "../Services/SurveyAnswerService";
+    
 
     export let userInfo;
     export let allowLeavePageWithoutWarning;
@@ -20,7 +21,7 @@
         filterFunction: (a, b, c, d) => surveyService.getSorted(a, b, c, d),
     };
     let filterBy = {
-        filterName: "_id",
+        filterName: "dateCreated",
         counter: 0,
     };
     console.log("in surveys");
@@ -43,7 +44,7 @@
         },
         {
             fieldName: "inviteCode",
-            viewName: "code"
+            viewName: "PIN"
         },
         
         {

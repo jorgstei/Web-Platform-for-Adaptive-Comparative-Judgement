@@ -362,130 +362,142 @@ import { surveyItemFileService } from '../Services/SurveyItemFileService';
                 );
                 return;
             }
-            console.log(surveyService);
-            if (editing) {
-                info.items = []
-                let itemFileResponses = []
-                submitButtonFunctions.forEach(e => {
-                    let eFuncResponse = e.func(surveyID)
-                    if(typeof(eFuncResponse) == "object" && eFuncResponse.length != 0){
-                        itemFileResponses = itemFileResponses.concat(eFuncResponse)
-                    }
-                    else{
-                        itemFileResponses.push()
-                    }
-                })
-                await Promise.all(itemFileResponses)
-                surveyService
-                    .put(surveyID, info)
-                    .then((data) => {
-                        if(data.status < 300){
-                            data = data.data;
-                            console.log("surveyService put data: ", data);
-                            const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + surveyID;
-                            let dummy = document.getElementById("dummy");
-                            dummy.value = survey_link;
-                            console.log(
-                                "Navigator object: ",
-                                navigator,
-                                "\nNavigator.clipboard",
-                                navigator.clipboard
-                            );
+            
+            swal({
+                title: "Does everything look good?",
+                text:
+                    "You currently have " + info.items.length + " items, " + info.expectedComparisons + " comparisons per judge.\n" +
+                    "The questions is '" + info.surveyQuestion + "'.\n" + 
+                    "If something is not right, please return and fix it first.",
+                icon: "warning",
+                buttons: ["Take me back!", "Publish changes"],
+            })
+            .then(async willPublish => {
+                if(!willPublish){
+                    return
+                }
+                else{
+                    console.log(surveyService);
+                    console.log(surveyService);
+                    if (editing) {
+                        info.items = []
+                        let itemFileResponses = []
+                        submitButtonFunctions.forEach(e => {
+                            let eFuncResponse = e.func(surveyID)
+                            if(typeof(eFuncResponse) == "object" && eFuncResponse.length != 0){
+                                itemFileResponses = itemFileResponses.concat(eFuncResponse)
+                            }
+                            else{
+                                itemFileResponses.push()
+                            }
+                        })
+                        await Promise.all(itemFileResponses)
+                        surveyService
+                            .put(surveyID, info)
+                            .then((data) => {
+                                if(data.status < 300){
+                                    data = data.data;
+                                    console.log("surveyService put data: ", data);
+                                    const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + surveyID;
+                                    let dummy = document.getElementById("dummy");
+                                    dummy.value = survey_link;
+                                    console.log(
+                                        "Navigator object: ",
+                                        navigator,
+                                        "\nNavigator.clipboard",
+                                        navigator.clipboard
+                                    );
 
-                            navigator.clipboard
-                            .writeText(survey_link)
-                            .then(() => {
-                                swal(
-                                    "Successfully updated survey!",
-                                    "Your link is:\n" +
-                                        survey_link +
-                                        "\n It has been copied to your clipboard for you!",
-                                    "success"
-                                );
-                                navigateWithRefreshToken(
-                                    "/admin_board/surveys"
-                                ).then((data) => (userInfo = data));
-                            })
-                            .catch((err) => {});
-                        }
-                        else{
-                            swal(
-                                "Failed to edit survey.",
-                                "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                    data.data.message,
-                                "error"
-                            )
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        swal(
-                            "Failed to edit survey.",
-                            "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                err,
-                            "error"
-                        );
-                    });
-            } else {
-                info.items = []
-                surveyService
-                    .postSurvey(info)
-                    .then(async (data) => {
-                        if(data.status < 300){
-                            data = data.data;
-                            let itemFileResponses = []
-                            submitButtonFunctions.forEach(e => {
-                                let eFuncResponse = e.func(data.loc)
-                                if(typeof(eFuncResponse) == "object" && eFuncResponse.length != 0){
-                                    itemFileResponses = itemFileResponses.concat(eFuncResponse)
+                                    navigator.clipboard
+                                    .writeText(survey_link)
+                                    .then(() => {
+                                        swal(
+                                            "Successfully updated survey!",
+                                            "Your link is:\n" +
+                                                survey_link +
+                                                "\n It has been copied to your clipboard for you!",
+                                            "success"
+                                        );
+                                        navigateWithRefreshToken(
+                                            "/admin_board/surveys"
+                                        ).then((data) => (userInfo = data));
+                                    })
+                                    .catch((err) => {});
                                 }
                                 else{
-                                    itemFileResponses.push()
+                                    swal(
+                                        "Failed to edit survey.",
+                                        "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                            data.data.message,
+                                        "error"
+                                    )
                                 }
                             })
-                            await Promise.all(itemFileResponses)
-                            .catch(error => console.error("Error when posting item files:", error))
-                            console.log("postSurvey data: ", data);
-                            const survey_link =
-                            window.location.href.split("/admin_board")[0] +
-                            "?takeSurvey=1&surveyID=" +
-                            data.loc;
-                            let dummy = document.getElementById("dummy");
-                            dummy.value = survey_link;
-                            console.log(dummy.value);
-                            console.log(navigator, navigator.clipboard);
-                            navigator.clipboard.writeText(survey_link).then(() => {
+                            .catch((err) => {
+                                console.log(err);
                                 swal(
-                                "Successfully created survey!",
-                                "Your link is:\n" +
-                                survey_link +
-                                "\n It has been copied to your clipboard for you!",
-                                "success"
+                                    "Failed to edit survey.",
+                                    "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                        err,
+                                    "error"
                                 );
-                                navigateWithRefreshToken(
-                                    "/admin_board/surveys"
-                                ).then((data) => (userInfo = data));
                             });
-                        }
-                        else{
-                            swal(
-                                "Failed to create survey.",
-                                "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                    data.data.message,
-                                "error"
-                            )
-                        }
-                    })
-                    .catch((err) => {
-                        console.log(err);
-                        swal(
-                            "Failed to create survey.",
-                            "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                                err,
-                            "error"
-                        );
-                    });
-            }
+                    } else {
+                        info.items = []
+                        surveyService
+                            .postSurvey(info)
+                            .then(async (data) => {
+                                if(data.status < 300){
+                                    data = data.data;
+                                    let itemFileResponses = []
+                                    submitButtonFunctions.forEach(e => {
+                                        itemFileResponses.push(e.func(data.loc))
+                                    })
+                                    await Promise.all(itemFileResponses)
+                                    .catch(error => console.error("Error when posting item files:", error))
+                                    console.log("postSurvey data: ", data);
+                                    const survey_link =
+                                    window.location.href.split("/admin_board")[0] +
+                                    "?takeSurvey=1&surveyID=" +
+                                    data.loc;
+                                    let dummy = document.getElementById("dummy");
+                                    dummy.value = survey_link;
+                                    console.log(dummy.value);
+                                    console.log(navigator, navigator.clipboard);
+                                    navigator.clipboard.writeText(survey_link).then(() => {
+                                        swal(
+                                        "Successfully created survey!",
+                                        "Your link is:\n" +
+                                        survey_link +
+                                        "\n It has been copied to your clipboard for you!",
+                                        "success"
+                                        );
+                                        navigateWithRefreshToken(
+                                            "/admin_board/surveys"
+                                        ).then((data) => (userInfo = data));
+                                    });
+                                }
+                                else{
+                                    swal(
+                                        "Failed to create survey.",
+                                        "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                            data.data.message,
+                                        "error"
+                                    )
+                                }
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                                swal(
+                                    "Failed to create survey.",
+                                    "Please try again, and contact an administator if it still doesn't work. Error:\n" +
+                                        err,
+                                    "error"
+                                );
+                            });
+                    }
+                }
+            })  
         }
     };
 

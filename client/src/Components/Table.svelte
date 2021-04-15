@@ -4,7 +4,11 @@
     import { toast } from "@zerodevx/svelte-toast";
     import { Link } from "svelte-routing";
     import { attr } from "svelte/internal";
+    import { mdiChevronDown, mdiChevronUp, mdiUnfoldMoreHorizontal, mdiPoll, mdiShare } from "@mdi/js";
+    import {Icon, Button } from 'svelte-materialify';
+
     export let filterBy = undefined;
+    export let dir = 1;
     export let tableTitle = undefined;
     // The attributes "data", "edit", "share", "delete" have predefined behaviors. Please be careful with how you use these.
     export let tableAttributes = ["full name", "email", "joined on", "id", "share", "delete"];
@@ -45,6 +49,11 @@
         const firstChar = str.charAt(0).toUpperCase();
         return firstChar + str.substring(1,str.length);
     }
+
+    console.log("refresh")
+    let logDir = ()=> console.log("Dir is: ", dir);
+
+    $:dir && logDir();
     
 </script>
 <div class="container">
@@ -55,7 +64,16 @@
         <tr id="table_header">
             {#each tableAttributes as attr}
                 {#if attr.viewName !== "id"}
-                    <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>{attr.viewName}</th>
+                    <th class={attr.fieldName === "" ? "col" : "col-sortable"} title={attr.fieldName === "" ? "" : "Click to sort or reverse sort."} on:click={(e) => updateFilterBy(e, attr)}>
+                        {attr.viewName}
+                        {#if dir==1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
+                            <Icon path={mdiChevronDown} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
+                        {:else if dir==-1 && attr.fieldName != "" && attr.fieldName == filterBy.filterName}
+                            <Icon path={mdiChevronUp} size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
+                        {:else if attr.fieldName != ""}
+                            <Icon path={mdiUnfoldMoreHorizontal } size="20px" style="float: right;"on:click={(e) => updateFilterBy(e, attr)}></Icon>
+                        {/if}
+                    </th>
                 {/if}
             {/each}
         </tr>
@@ -71,9 +89,9 @@
                     {/if}
                     {#if tableAttributes.findIndex(e => e.viewName === 'data') != -1}
                         {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].viewResults}
-                        <td class="col"><Link to={"survey_data/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><img title="View the results of this survey" class="small_icon" src="https://png.pngtree.com/element_our/20190601/ourlarge/pngtree-file-download-icon-image_1344466.jpg" alt="Survey data link"></Link></td>
+                            <td class="col"><Link to={"survey_data/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><Icon path={mdiPoll} ></Icon></Link></td>
                         {:else}
-                        <td class="col disabledLink"><img title="You are not allowed to view the results of this survey." class="small_icon" src="../img/disabled_download.jpg" alt="You cant access survey data image"></td>
+                        <td class="col disabledLink"><Icon title="You are not allowed to view the results of this survey." alt="You cant access survey data image" path={mdiPoll} style="color: red; cursor: not-allowed;" disabled></Icon></td>
                         {/if}
                     {/if}
                     {#if tableAttributes.findIndex(e => e.viewName === 'edit') != -1}
@@ -86,16 +104,17 @@
                 
                     {#if tableAttributes.findIndex(e => e.viewName === 'share') != -1}
                         {#if surveyActivityStatus[tableData.findIndex(e=>e==row)] === true}
-                            <td class="col"><img title="Copy the judge link to your clipboard." class="small_icon" src="https://w7.pngwing.com/pngs/592/864/png-transparent-computer-icons-icon-design-cut-copy-and-paste-taobao-clothing-promotional-copy-text-rectangle-emoticon-thumbnail.png" alt="Share link button" 
-                            on:click={()=>{
+                            <td class="col" style="cursor: pointer;" on:click={()=>{
                                 navigator.clipboard.writeText(window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + row[tableAttributes.findIndex(e=>e.viewName=="id")])
                                 .then(()=>{
                                     toast.push("Link to the survey has been copied to your clipboard!", {duration: 2000});
                                 })
                                 .catch(err=> console.log(err));
-                            }}></td>
+                            }}> 
+                                <Icon path={mdiShare}></Icon>
+                            </td>
                         {:else}
-                            <td class="col disabledLink"><img title="The survey must be made active in order for judges to start answering it." class="small_icon" src="../img/disabled_share.png" alt="Share link button"></td>
+                            <td class="col disabledLink" title="The survey must be made active in order for judges to start answering it."><Icon path={mdiShare}  alt="Share link button" style="color:red; cursor: not-allowed;" disabled ></Icon></td>
                         {/if}
                     {/if}
 

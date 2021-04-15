@@ -5,13 +5,30 @@
     ListItemGroup,
     NavigationDrawer,
     ListItem,
-    Avatar,
     Icon,
     Divider,
     Button,
     } from 'svelte-materialify';
-    import { mdiAccount, mdiAccountMultiple, mdiAccountPlus, mdiBook, mdiBookMultiple, mdiBookPlus, mdiArrowLeftBoldCircleOutline, mdiArrowRightBoldCircleOutline, mdiArrowLeftDropCircleOutline, mdiArrowRightDropCircleOutline, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
+    import { mdiAccount, mdiAccountMultiple, mdiAccountPlus, mdiBookMultiple, mdiBookPlus, mdiChevronLeft, mdiChevronRight} from "@mdi/js";
 
+    
+    export let userInfo;
+    export let allowLeavePageWithoutWarning = true;
+    export let warningOnLeaveFunc = (link)=> {
+        swal({
+            title: "Are you sure?",
+            text:
+                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
+            icon: "warning",
+            dangerMode: true,
+            buttons: ["Nevermind", "Discard"],
+        }).then((willDiscard) => {
+            if (willDiscard) {
+                navigate("/admin_board/"+ link);
+            }
+        })
+    }
+    console.log("allow and func in menu", allowLeavePageWithoutWarning, warningOnLeaveFunc);
     const menuItems = [
         {
             text:"Profile", icon: mdiAccount, to:"profile", requireAdmin: false
@@ -29,7 +46,6 @@
             text:"Surveys", icon: mdiBookMultiple, to: "surveys", requireAdmin: false
         },
     ]
-    export let userInfo;
     console.log("in menu", userInfo)
     
     
@@ -67,8 +83,13 @@
             {#each menuItems as item}
                 {#if (item.requireAdmin && userInfo.role === "admin") || !item.requireAdmin}
                     <ListItem ripple={false} on:click={(e) => {
+                            if(allowLeavePageWithoutWarning){
                                 navigateTo("/admin_board/"+item.to);
                             }
+                            else{
+                                warningOnLeaveFunc(item.to)
+                            }      
+                        }
                         }>
                         <span slot="prepend">
                             <Icon path={item.icon}/>

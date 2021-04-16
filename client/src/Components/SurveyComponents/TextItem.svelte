@@ -36,7 +36,7 @@
 
 </script>
 
-<Card style="cursor: default; background-color:rgb(220,220,220);" hover>
+<Card style="cursor: default; background-color:rgb(235,235,235);" hover>
     <Row>
         <Col cols={11}>
             <CardText>

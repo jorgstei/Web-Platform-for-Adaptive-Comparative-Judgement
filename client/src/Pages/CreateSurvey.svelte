@@ -347,8 +347,8 @@
     });
   } else {
     addSurveyOption(
-      "text" + surveyOptions.length,
-      "text",
+      "tag" + surveyOptions.length,
+      "plain",
       getInputFieldTypeFromMediaType("text"),
       "",
       false,
@@ -356,8 +356,8 @@
       true
     );
     addSurveyOption(
-      "text" + surveyOptions.length,
-      "text",
+      "tag" + surveyOptions.length,
+      "plain",
       getInputFieldTypeFromMediaType("text"),
       "",
       false,
@@ -789,14 +789,10 @@
   ];
   let selectedPurpose = "research";
   let mediaTypeItems = [
-    { name: "Mix", value: "mix" },
-    { name: "PDF", value: "pdf" },
     { name: "Text", value: "plain" },
-    { name: "Image", value: "image" },
+    { name: "PDF", value: "pdf" },
   ];
-  let selectedMediaType = "mix";
-
-  let selectedAccessibility = "link";
+  let selectedMediaType = "plain";
 
   let activeItems = [
     { name: "Yes", value: "1" },
@@ -1047,7 +1043,7 @@
     <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
       {#each surveyResearchers as researcher}
         <Card
-          style="width:49%; cursor: default; background-color:rgb(225,225,225);"
+          style="width:49%; cursor: default; background-color:rgb(235,235,235);"
           class="mb-2"
           hover
         >
@@ -1098,9 +1094,9 @@
       style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;"
     />
     <h1 class="text-h4">Items</h1>
-    <div class="d-flex flex-row mt-4 mb-4 flex-wrap justify-space-between">
+    <div class="d-flex flex-column mt-4 mb-4 align-center">
       {#each surveyOptions as option}
-        <div class="d-flex flex-column mb-2" style="width:49%;">
+        <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
           {#if option.mediaType == "plain"}
             <TextItem
               bind:option
@@ -1122,9 +1118,9 @@
           {/if}
         </div>
       {/each}
-      <div class="d-flex flex-column mb-2" style="width:49%;">
+      <div class="d-flex flex-column mb-2"style="width:95%; margin: auto;">
         <Card
-          style="cursor: default; height:228px; background-color:rgb(225,225,225);"
+          style="cursor: default; height:228px; background-color:rgb(235,235,235);"
           hover
         >
           <CardText class="flex-column d-flex justify-space-between">

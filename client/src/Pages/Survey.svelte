@@ -13,9 +13,8 @@
     import queryString from "query-string";
     import { surveyItemFileService } from "../Services/SurveyItemFileService";
     import { nodeBufferToFile } from "../Utility/nodeBufferToBlobURL";
-    import PDFItem from '../Components/SurveyComponents/PDFItem.svelte';
+    import TextView from '../Components/TextView.svelte';
     import PDFView from '../Components/PDFView.svelte';
-    import AboutProject from "./AboutProject.svelte";
     import { mdiFullscreen } from "@mdi/js";
 
 
@@ -278,8 +277,8 @@
             <div class="cardWrapper" in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
                     <CardText style="text-align: center; height:60vh;">
-                        {#if randomPair[counter].left.type == "text"}
-                            <div class="text--primary text-h4">{randomPair[counter].left.data}</div>
+                        {#if randomPair[counter].left.type == "plain"}
+                            <TextView textID={randomPair[counter].left.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].left.type == "pdf"}
                             <div style="float: right; cursor:pointer;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="80%"></PDFView>
@@ -303,8 +302,8 @@
             <div class="cardWrapper" in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
                     <CardText style="text-align: center; height:60vh">
-                        {#if randomPair[counter].right.type == "text"}
-                            <div class="text--primary text-h4">{randomPair[counter].right.data}</div>
+                        {#if randomPair[counter].right.type == "plain"}
+                            <TextView textID={randomPair[counter].right.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].right.type == "pdf"}
                             <div style="float: right; cursor:pointer;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="80%"></PDFView>

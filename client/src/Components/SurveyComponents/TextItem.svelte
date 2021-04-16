@@ -21,8 +21,17 @@
     export let optionMediaTypeItems;
     export let functionObject;
 
+    let view = option.data
+
     function onChangeMediaType(e) {
         option.mimeType = functionObject.getInputFieldTypeFromMediaType(option.mediaType)
+        option.editedArr["mimeType"] = "mimeType"
+    }
+
+    function onChangeData(e) {
+        option.editedArr["data"] = "data"
+        option.data = new File([view], "rawtext.txt", {type: "text/plain"})
+        console.log("Changed text option.data: ", option.data)
     }
 
 </script>
@@ -34,7 +43,8 @@
                 <div>Item</div>
                 <TextField
                     hint="*Required"
-                    bind:value={option.data}
+                    bind:value={view}
+                    on:change={onChangeData}
                     class="mt-4"
                     style="min-width:100%;"
                 >

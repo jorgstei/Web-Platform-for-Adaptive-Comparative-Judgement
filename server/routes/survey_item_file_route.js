@@ -89,6 +89,7 @@ router.patch("/:id", auth, async (req, res) => {
 router.post("/:id", auth, async (req, res) => {
     const me_fieldName = "data"
     let me_value = req?.files?.value?.data
+    console.log("file upload: ", me_value)
     const me_id = me(req.params.id)
     SurveyItemFile.updateOne({_id: me_id}, {$set: {[me_fieldName]: me_value}})
     .then(updateResult => {

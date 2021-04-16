@@ -21,7 +21,7 @@ export default class SurveyItemFileService extends Service{
     }
 
     patch(fieldName, value, itemId){
-        console.log("mytag called patch with: ", fieldName, " ", value, " ", itemId)
+        console.log("mytag called patch with: fieldName: ", fieldName, ", value: ", value, ", id: ", itemId)
 
         //Special exception for data as servside requires a post to handle file uploads/large data
         if(fieldName == "data"){
@@ -29,7 +29,7 @@ export default class SurveyItemFileService extends Service{
             formData.append("value", value)
             return axios({
                 method: "post",
-                headers: {'Content-Type': 'multipart/form-data' },
+                headers: {'content-type': 'multipart/form-data' },
                 url: this.path + "/surveyitemfile/"+itemId,
                 data: formData,
                 withCredentials: true

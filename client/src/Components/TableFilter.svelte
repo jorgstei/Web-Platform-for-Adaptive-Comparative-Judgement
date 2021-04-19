@@ -3,6 +3,9 @@
     import { surveyService } from "../Services/SurveyService";
     import { toast } from "@zerodevx/svelte-toast";
     import {userService} from "../Services/UserService";
+    import swal from "sweetalert";
+    import { mdiChevronDown } from "@mdi/js";
+    import {Select} from 'svelte-materialify';
 
     export let loadingData = false;
     export let userInfo = undefined;
@@ -15,9 +18,11 @@
     export let count = 0;
     export let direction = 1;
     export let data = undefined;
-    import {Select} from 'svelte-materialify';
-    import { mdiChevronDown } from "@mdi/js";
-    import swal from "sweetalert";
+
+
+    //This variable is only used due to a problem of updatedFilterBy running twice on load
+    //No idea what causes this (one init call, one update call)
+    let initted = false;
 
 
     onMount(() => {
@@ -59,6 +64,10 @@
     }
 
     function updatedFilterBy(){
+        if(!initted){
+            initted = true;
+            return
+        }
         if(oldFilterBy.filterName === filterBy.filterName){
             direction = (direction == 1) ? -1 : 1;
             direction = direction;

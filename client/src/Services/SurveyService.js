@@ -17,7 +17,7 @@ export default class SurveyService extends Service{
         return axios(
             {
                 method: "post",
-                url: this.path + "/survey/function/estimate",//processs.envv.estimateServicePath,
+                url: this.path + "/survey/function/estimate",
                 data: data,
                 withCredentials: true
             }

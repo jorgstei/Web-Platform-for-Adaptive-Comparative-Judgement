@@ -108,7 +108,7 @@
                             on:click={()=>{
                                 navigator.clipboard.writeText(window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + row[tableAttributes.findIndex(e=>e.viewName=="id")])
                                 .then(()=>{
-                                    toast.push("Link to the survey has been copied to your clipboard!", {duration: 2000});
+                                    toast.push("A link to the survey has been copied to your clipboard!", {duration: 4000});
                                 })
                                 .catch(err=> console.log(err));
                             }}> 

@@ -17,7 +17,7 @@
     let tableFilterParams = {
         countFunction: () => surveyService.getCount(),
         limit: 10,
-        direction: 1,
+        direction: -1,
         filterFunction: (a, b, c, d) => surveyService.getSorted(a, b, c, d),
     };
     let filterBy = {

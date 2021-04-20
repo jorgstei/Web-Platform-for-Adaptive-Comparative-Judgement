@@ -21,14 +21,14 @@
     export let userInfo;
     export let surveyID;
     export let takingSurvey;
-    export let showJudgeOverlay;
+    export let showJudgeOverlay = false;
 
     console.log("In survey with surveyid", surveyID);
     let question = "";
     let completed = false
     let navwrap = document.getElementById("navWrapper");
 
-    let survey = {judgeInstructions: "Loading...", surveyQuestion: "Loading...", expectedComparisons:"..."};
+    let survey;
     if(navwrap){
         navwrap.style.display = "none";
     }
@@ -99,9 +99,10 @@
 
 
     onMount(async () => {
-        console.log("in onmount in survey")
-        document.getElementsByTagName("body")[0].style.overflowY = "hidden";
-
+        console.log("in onmount in survey with height: " + window.screen.height);
+        if(window.screen.height > 700){
+            document.getElementsByTagName("body")[0].style.overflowY = "hidden";
+        }
         let params = queryString.parse(window.location.search);
         if(params.takeSurvey == 1 && params.surveyID != undefined){
             surveyID = params.surveyID;
@@ -243,6 +244,7 @@
     let showLeftItemOverlay = false;
     let showRightItemOverlay = false;
 
+    $: survey;
 </script>
 <main id="surveyWrapper" tabindex="0">
     {#if counter < maxCounter}

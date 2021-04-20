@@ -13,14 +13,18 @@
 
     let showGeneralInfoOverlay = false;
     let showSurveyJudgeInstructions = false;
-    $: survey;
+
+    const printout = () => {
+        console.log("updated survey")
+    }
+    $: survey && printout();
 </script>
 
 <main>
     <div class="d-flex flex-column justify-center" style=" padding-top: 10vh;">
-        <h1 class="text-h2" style="margin-bottom: 3vh;">You've been asked to participate in a survey!</h1>
-        <h2 class="text-h3" style="margin-bottom: 2vh;">The question is:</h2>
-        <h1 class="text-h2" style="margin-bottom: 3vh;">{survey.surveyQuestion}</h1>
+        <h1 class="text-h3" style="margin-bottom: 3vh;">You've been asked to participate in a survey!</h1>
+        <h2 class="text-h4" style="margin-bottom: 2vh;">The question is:</h2>
+        <h1 class="text-h3" style="margin-bottom: 3vh;">{survey.surveyQuestion}</h1>
 
         <div class="d-flex flex-row justify-space-around" style="margin-top: 5vh;">
 

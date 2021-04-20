@@ -24,6 +24,7 @@
             buttons: ["Nevermind", "Discard"],
         }).then((willDiscard) => {
             if (willDiscard) {
+                allowLeavePageWithoutWarning = true
                 navigate("/admin_board/"+ link);
             }
         })

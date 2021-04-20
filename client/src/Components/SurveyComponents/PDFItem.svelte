@@ -40,22 +40,6 @@
     function onFileSelected(e){
         view = undefined
         if(e?.target?.files[0]){
-            let fileReader = new FileReader()
-            fileReader.readAsArrayBuffer(e.target.files[0])
-            fileReader.onloadend = (reader) => {
-                /*let tempArray = new Uint8Array(reader.target.result)
-                let newArray = []
-                for(let a in tempArray){
-                    newArray.push(tempArray[a])
-                }
-                option.data = newArray
-                */
-                console.log("mytag3 reader:", reader)
-                console.log("mytag3 option.data from file reader:", option.data)
-            }
-            fileReader.onerror = (error) => {
-                console.error("mytag3 error reading file: ", error)
-            }
             option.data = e.target.files[0]
 
             option.editedArr["data"] = "data";

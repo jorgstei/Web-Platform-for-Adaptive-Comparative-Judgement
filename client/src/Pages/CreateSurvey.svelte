@@ -376,8 +376,6 @@
         if (!willPublish) {
           return;
         } else {
-          console.log(surveyService);
-          console.log(surveyService);
           if (editing) {
             info.items = [];
             let itemFileResponses = [];

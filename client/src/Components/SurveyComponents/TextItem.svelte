@@ -42,6 +42,26 @@
             <CardText>
                 <div>Item</div>
                 <TextField
+                hint="*Required"
+                bind:value={option.tag}
+                on:change={() => {console.log("edited text tag");option.editedArr["tag"] = "tag"}}
+                class="mt-4"
+                style="min-width:100%;"
+                >
+                <div slot="append">
+                    <Tooltip
+                        top
+                        bind:active={option.showTooltip}
+                    >
+                        <Icon path={mdiInformationOutline} />
+                        <span slot="tip"
+                            >The file name or unique tag. Used to identify specific items</span
+                        >
+                    </Tooltip>
+                </div>
+                Item Tag
+                </TextField>
+                <TextField
                     hint="*Required"
                     bind:value={view}
                     on:change={onChangeData}

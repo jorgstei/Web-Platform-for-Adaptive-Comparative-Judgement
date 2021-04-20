@@ -53,16 +53,11 @@
     });
   };
 
-<<<<<<< HEAD
   onDestroy(()=>{
     allowLeavePageWithoutWarning = true;
   })
 
-  const pdf =
-    "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-=======
   const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
->>>>>>> d271c09a6d7503f25fb4532c228ee69d362ae53f
 
   const classes = {
     overall: null,
@@ -303,13 +298,6 @@
     }
   });
 
-<<<<<<< HEAD
-=======
-  const textAreaAdjust = (e) => {
-    console.log("adjusting", e);
-    e.target.style.height = e.target.scrollHeight > e.target.clientHeight ? e.target.scrollHeight + "px" : "12vh";
-  };
->>>>>>> d271c09a6d7503f25fb4532c228ee69d362ae53f
   const getAmountOfUniqueComparisons = (arrayLength) => {
     let toAdd = 1;
     let amountOfUniqueComparisons = 0;

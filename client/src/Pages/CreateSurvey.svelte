@@ -62,6 +62,10 @@
     });
   };
 
+  onDestroy(()=>{
+    allowLeavePageWithoutWarning = true;
+  })
+
   const pdf =
     "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
@@ -366,13 +370,6 @@
     );
   }
 
-  const textAreaAdjust = (e) => {
-    console.log("adjusting", e);
-    e.target.style.height =
-      e.target.scrollHeight > e.target.clientHeight
-        ? e.target.scrollHeight + "px"
-        : "12vh";
-  };
   const getAmountOfUniqueComparisons = (arrayLength) => {
     let toAdd = 1;
     let amountOfUniqueComparisons = 0;
@@ -420,17 +417,15 @@
         "error"
       );
     } else {
-      let amountOfUniqueComparisons = getAmountOfUniqueComparisons(
-        info.items.length
-      );
+      let amountOfUniqueComparisons = getAmountOfUniqueComparisons(info.items.length);
 
       if (amountOfUniqueComparisons < parseInt(info.expectedComparisons)) {
         swal(
           "Invalid input",
           "Amount of expected comparisons: " +
-            info.expectedComparisons +
-            " must be less than or equal to amount of possible unique comparisons" +
-            amountOfUniqueComparisons,
+          info.expectedComparisons +
+          " must be less than or equal to amount of possible unique comparisons" +
+          amountOfUniqueComparisons,
           "error"
         );
         return;
@@ -463,8 +458,7 @@
         if (!willPublish) {
           return;
         } else {
-          console.log(surveyService);
-          console.log(surveyService);
+          console.log("surveyService: ", surveyService);
           if (editing) {
             info.items = [];
             let itemFileResponses = [];
@@ -480,58 +474,59 @@
               }
             });
             await Promise.all(itemFileResponses);
-            surveyService
-              .put(surveyID, info)
-              .then((data) => {
-                if (data.status < 300) {
-                  data = data.data;
-                  console.log("surveyService put data: ", data);
-                  const survey_link =
-                    window.location.href.split("/admin_board")[0] +
-                    "?takeSurvey=1&surveyID=" +
-                    surveyID;
-                  let dummy = document.getElementById("dummy");
-                  dummy.value = survey_link;
-                  console.log(
-                    "Navigator object: ",
-                    navigator,
-                    "\nNavigator.clipboard",
-                    navigator.clipboard
-                  );
-
+            surveyService.put(surveyID, info)
+            .then((data) => {
+              if (data.status < 300) {
+                data = data.data;
+                console.log("surveyService put data: ", data);
+                const survey_link =
+                  window.location.href.split("/admin_board")[0] +
+                  "?takeSurvey=1&surveyID=" +
+                  surveyID;
+                let dummy = document.getElementById("dummy");
+                dummy.value = survey_link;
+                console.log(
+                  "Navigator object: ",
+                  navigator,
+                  "\nNavigator.clipboard",
                   navigator.clipboard
-                    .writeText(survey_link)
-                    .then(() => {
-                      swal(
-                        "Successfully updated survey!",
-                        "Your link is:\n" +
-                          survey_link +
-                          "\n It has been copied to your clipboard for you!",
-                        "success"
-                      );
-                      navigateWithRefreshToken("/admin_board/surveys").then(
-                        (data) => (userInfo = data)
-                      );
-                    })
-                    .catch((err) => {});
-                } else {
+                );
+
+                navigator.clipboard
+                .writeText(survey_link)
+                .then(() => {
                   swal(
-                    "Failed to edit survey.",
-                    "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                      data.data.message,
-                    "error"
+                    "Successfully updated survey!",
+                    "Your link is:\n" +
+                      survey_link +
+                      "\n It has been copied to your clipboard for you!",
+                    "success"
                   );
-                }
-              })
-              .catch((err) => {
-                console.log(err);
+                  navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+                })
+                .catch((err) => {});
+                
+              } else {
                 swal(
                   "Failed to edit survey.",
-                  "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                    err,
+                  "Error:\n" +
+                  data.data.message + 
+                  "\nIf the error message didn't help, please try again, or contact and administrator.",
                   "error"
                 );
-              });
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              swal(
+                "Failed to edit survey.",
+                "Error:\n" +
+                err + 
+                "\nIf the error message didn't help, please try again, or contact and administrator.",
+                "error"
+              );
+            });
+
           } else {
             info.items = [];
             surveyService

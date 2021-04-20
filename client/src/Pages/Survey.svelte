@@ -1,5 +1,4 @@
 <script>
-    //import Card from "../Components/Card.svelte";
     import {userService} from "../Services/UserService"
     import {surveyService} from "../Services/SurveyService"
     import {surveyAnswerService} from "../Services/SurveyAnswerService"
@@ -17,7 +16,6 @@
     import PDFView from '../Components/PDFView.svelte';
     import { mdiFullscreen } from "@mdi/js";
 
-
     export let userInfo;
     export let surveyID;
     export let takingSurvey;
@@ -32,7 +30,6 @@
     if(navwrap){
         navwrap.style.display = "none";
     }
-
 
     let randomPair = [];
     
@@ -84,6 +81,7 @@
     let complete = () => {
         if(!completed){
             completed = true
+            /*
                 setTimeout(async ()=>{
                 if(navwrap){
                     navwrap.style.display = "initial";
@@ -93,10 +91,10 @@
                 res.then(data => userInfo = data)
             }
             , 5000)
+            */
         }
-        userService.logoutJudge().then(() => userInfo = null); 
+        //userService.logoutJudge().then(() => userInfo = null); 
     }
-
 
     onMount(async () => {
         console.log("in onmount in survey with height: " + window.screen.height);
@@ -334,6 +332,15 @@
         <div id="thank_you_message">
             <h1 class="text-h2" style="margin-bottom:5vh;">Thank you for participating!</h1>
             <h2 class="text-h3">We greatly appreciate it :)</h2>
+            <Button style="margin-top:5vh;" outlined on:click={()=>{
+                if(navwrap){
+                    navwrap.style.display = "initial";
+                }
+                const res = navigateWithRefreshToken("/")
+                console.log("nav with refreshtoken res:",res)
+                res.then(data => userInfo = data)
+                userService.logoutJudge().then(() => userInfo = null); 
+            }}>Return to home</Button>
         </div>
     {/if}
 

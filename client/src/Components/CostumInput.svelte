@@ -32,7 +32,7 @@
     .bigInput{
         width: 50%;
         margin: auto;
-        padding: 0.5em 2em;
+        padding: 0.5em 0.5em;
         font-size: 1.5em;
         text-align: center;
         background-color: rgba(200, 200, 200, 0.7);

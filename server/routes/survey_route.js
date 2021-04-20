@@ -478,10 +478,7 @@ router.post("/", auth, async (req, res) => {
  */
 router.put("/:id", auth, async (req, res) => {
     console.log("called put for survey")
-    let {
-        owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
-        purpose, mediaType
-    } = me(req.body)
+    let {owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion, purpose, mediaType} = me(req.body);
     const ownerId = req.auth["user"].userid
     const me_id = me(req.params.id)
     const surveyDoc = await Survey.findOne({ _id: me_id })
@@ -489,9 +486,31 @@ router.put("/:id", auth, async (req, res) => {
         res.status(404).json({message: "Could not find survey to update."})
         return
     }
+    console.log("expectedComp", surveyDoc);
+    let expectedComparisonsIsEqual = expectedComparisons === surveyDoc.expectedComparisons;
     //TODO: Allow modifications that do not change items and expectedComparisons
-    if(surveyDoc.active && active){
-        res.status(403).json({message: "You are not allowed to edit a survey that is active."})
+    //Issue with this is that items is empty at this point. Due to uploading pdf i think..
+    /*
+    //console.log("Req body", me(req.body));
+    console.log("surveydoc", surveyDoc.items, "items", items);
+    let everyItemIsIdentical = true;
+    for (let i = 0; i < surveyDoc.items.length; i++) {
+        for (const key in surveyDoc.items[i]) {
+            if(surveyDoc.items[i].hasOwnProperty(key) && items[i].hasOwnProperty(key)){
+                //console.log("Comparing values of key", key, "from surveyDoc:", surveyDoc.items[i][key], "from items", items[i][key], "Res was:", surveyDoc.items[i][key] === items[i][key])
+                if(surveyDoc.items[i][key] !== items[i][key]){
+                    everyItemIsIdentical = false;
+                }
+            }
+            else{
+                everyItemIsIdentical = false;
+            }
+        }
+    }
+    */
+
+    if(surveyDoc.active && active && !expectedComparisonsIsEqual /*&& !everyItemIsIdentical*/){
+        res.status(403).json({message: "You are not allowed to edit the items of an active survey."})
         return
     }
     const userIsOwner = await surveyDoc.owners.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })

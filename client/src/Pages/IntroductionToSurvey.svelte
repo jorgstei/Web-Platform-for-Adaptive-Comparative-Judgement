@@ -25,7 +25,6 @@
         <h1 class="text-h3" style="margin-bottom: 3vh;">You've been asked to participate in a survey!</h1>
         <h2 class="text-h4" style="margin-bottom: 2vh;">The question is:</h2>
         <h1 class="text-h3" style="margin-bottom: 3vh;">{survey.surveyQuestion}</h1>
-
         <div class="d-flex flex-row justify-space-around" style="margin-top: 5vh;">
 
             <Card style="width:40%; cursor: default;" hover outlined class="grey lighten-4">
@@ -79,7 +78,6 @@
                         <br>
                         <img style="height: 10vh; width:auto; margin-top:1vh;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
                     </div>
-
                     <div class="text--primary text-h5" style="text-align: left; margin-top: 1vh;">
                         Good luck!
                     </div>

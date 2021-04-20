@@ -27,15 +27,7 @@
     Col,
     Overlay,
   } from "svelte-materialify";
-  import {
-    mdiEyeOff,
-    mdiEye,
-    mdiDeleteForever,
-    mdiInformationOutline,
-    mdiPlusCircle,
-    mdiFileCancel,
-    mdiAbTesting,
-  } from "@mdi/js";
+  import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel, mdiAbTesting } from "@mdi/js";
 
   import Survey from "./Survey.svelte";
   import TextItem from "../Components/SurveyComponents/TextItem.svelte";
@@ -45,29 +37,32 @@
 
   export let allowLeavePageWithoutWarning;
   export let warningOnLeaveFunc;
-  allowLeavePageWithoutWarning = false;
 
   warningOnLeaveFunc = (link) => {
     swal({
       title: "Are you sure?",
-      text:
-        "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
+      text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
       icon: "warning",
       dangerMode: true,
       buttons: ["Take me back!", "Discard"],
     }).then((willDiscard) => {
       if (willDiscard) {
+        allowLeavePageWithoutWarning = true
         navigate("/admin_board/" + link);
       }
     });
   };
 
+<<<<<<< HEAD
   onDestroy(()=>{
     allowLeavePageWithoutWarning = true;
   })
 
   const pdf =
     "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+=======
+  const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+>>>>>>> d271c09a6d7503f25fb4532c228ee69d362ae53f
 
   const classes = {
     overall: null,
@@ -86,8 +81,7 @@
   let currentPage;
 
   // To override the text between the forward and back buttons
-  const pageNumberText = (currentPage, maximumPages) =>
-    currentPage + "/" + maximumPages;
+  const pageNumberText = (currentPage, maximumPages) => currentPage + "/" + maximumPages;
 
   export let userInfo;
   export let editing = false;
@@ -128,17 +122,7 @@
         showOverlay: Boolean, used by card to toggle fullscreen/preview of the item
         showTooltip: Boolean, used by card to show info about the component f.ex. when hovering an (i) icon
     */
-  const addSurveyOption = (
-    tag,
-    mediaType,
-    mimeType,
-    data,
-    showOverlay,
-    showTooltip,
-    created = true,
-    _id = undefined,
-    fileName = ""
-  ) => {
+  const addSurveyOption = (tag, mediaType, mimeType, data, showOverlay, showTooltip, created = true, _id = undefined, fileName = "") => {
     const uuid = uuidv4();
     data = {
       tag: tag,
@@ -165,44 +149,18 @@
         });
         if (foundObject != null && foundObject != undefined) {
           console.log("mytag foundObject.editedArr: ", foundObject.editedArr);
-          if (
-            foundObject.created == false &&
-            Object.keys(foundObject.editedArr).length == 0
-          ) {
+          if (foundObject.created == false && Object.keys(foundObject.editedArr).length == 0) {
             console.log("mytag not created, no editedArr", foundObject);
             return Promise.resolve();
-          } else if (
-            foundObject != null &&
-            foundObject != undefined &&
-            foundObject.created == true
-          ) {
+          } else if (foundObject != null && foundObject != undefined && foundObject.created == true) {
             console.log("mytag created: ", foundObject);
-            return surveyService.uploadFile(
-              foundObject.data,
-              surveyId,
-              foundObject.tag
-            );
-          } else if (
-            foundObject != null &&
-            foundObject != undefined &&
-            Object.keys(foundObject.editedArr).length > 0
-          ) {
+            return surveyService.uploadFile(foundObject.data, surveyId, foundObject.tag);
+          } else if (foundObject != null && foundObject != undefined && Object.keys(foundObject.editedArr).length > 0) {
             console.log("mytag editedArr: ", foundObject);
             let promises = [];
             for (let fieldName in foundObject.editedArr) {
-              console.log(
-                "mytag2, patching with: ",
-                fieldName,
-                " value: ",
-                foundObject[fieldName]
-              );
-              promises.push(
-                surveyItemFileService.patch(
-                  fieldName,
-                  foundObject[fieldName],
-                  foundObject._id
-                )
-              );
+              console.log("mytag2, patching with: ", fieldName, " value: ", foundObject[fieldName]);
+              promises.push(surveyItemFileService.patch(fieldName, foundObject[fieldName], foundObject._id));
             }
 
             return promises;
@@ -230,9 +188,7 @@
       if (submitFunctionIndex > -1) {
         submitButtonFunctions.splice(submitFunctionIndex, 1);
       } else {
-        console.error(
-          "Unable to find submitButtonFunction even though surveyObject exists"
-        );
+        console.error("Unable to find submitButtonFunction even though surveyObject exists");
       }
       const _id = surveyOptions[index]._id;
       if (surveyOptions[index].created == false) {
@@ -245,18 +201,18 @@
       }
       surveyOptions.splice(index, 1);
     } else {
-      console.error(
-        "Tried removing surveyOption but could not find it in array."
-      );
+      console.error("Tried removing surveyOption but could not find it in array.");
     }
     surveyOptions = surveyOptions;
   };
 
-  if (editing) {
-    let params = queryString.parse(window.location.search);
-    surveyID = params.id;
-    console.log("SurveyID from RawSurveyData.svelte: ", surveyID);
-    onMount(async () => {
+  onMount(async () => {
+    allowLeavePageWithoutWarning = false;
+    if (editing) {
+      let params = queryString.parse(window.location.search);
+      surveyID = params.id;
+      console.log("SurveyID from RawSurveyData.svelte: ", surveyID);
+
       let labels = [...document.getElementsByTagName("label")];
       labels.forEach((e) => {
         e.classList.add("active");
@@ -273,10 +229,7 @@
           selectedMediaType = data.mediaType;
           selectedPurpose = data.purpose;
           selectedActiveLevel = data.active ? "1" : "0";
-          comparisonsPerJudge =
-            data.expectedComparisons != undefined
-              ? data.expectedComparisons
-              : 2;
+          comparisonsPerJudge = data.expectedComparisons != undefined ? data.expectedComparisons : 2;
 
           surveyResearchers = [];
           //TODO: Change this to a await Promise.all style fetch
@@ -299,20 +252,20 @@
             if (item.type == "plain") {
               surveyItemFileService.get(item.data).then((result) => {
                 if (result.status < 300) {
-                    result.data.data = String.fromCharCode.apply(null, result.data.data.data)
-                    item = { ...item, ...result.data };
+                  result.data.data = String.fromCharCode.apply(null, result.data.data.data);
+                  item = { ...item, ...result.data };
 
-                    addSurveyOption(
-                        item.tag,
-                        item.type,
-                        getInputFieldTypeFromMediaType(item.type),
-                        item.data,
-                        false,
-                        false,
-                        false,
-                        result.data._id,
-                        item.fileName
-                    );
+                  addSurveyOption(
+                    item.tag,
+                    item.type,
+                    getInputFieldTypeFromMediaType(item.type),
+                    item.data,
+                    false,
+                    false,
+                    false,
+                    result.data._id,
+                    item.fileName
+                  );
                 } else {
                   console.error("Couldn't load view of item.");
                 }
@@ -341,35 +294,22 @@
 
           surveyOptions = surveyOptions;
         } else {
-          swal(
-            "Error",
-            "Error getting survey data: " + data.data.message + ".",
-            "error"
-          );
+          swal("Error", "Error getting survey data: " + data.data.message + ".", "error");
         }
       });
-    });
-  } else {
-    addSurveyOption(
-      "tag" + surveyOptions.length,
-      "plain",
-      getInputFieldTypeFromMediaType("text"),
-      "",
-      false,
-      false,
-      true
-    );
-    addSurveyOption(
-      "tag" + surveyOptions.length,
-      "plain",
-      getInputFieldTypeFromMediaType("text"),
-      "",
-      false,
-      false,
-      true
-    );
-  }
+    } else {
+      addSurveyOption("tag" + surveyOptions.length, "plain", getInputFieldTypeFromMediaType("text"), "", false, false, true);
+      addSurveyOption("tag" + surveyOptions.length, "plain", getInputFieldTypeFromMediaType("text"), "", false, false, true);
+    }
+  });
 
+<<<<<<< HEAD
+=======
+  const textAreaAdjust = (e) => {
+    console.log("adjusting", e);
+    e.target.style.height = e.target.scrollHeight > e.target.clientHeight ? e.target.scrollHeight + "px" : "12vh";
+  };
+>>>>>>> d271c09a6d7503f25fb4532c228ee69d362ae53f
   const getAmountOfUniqueComparisons = (arrayLength) => {
     let toAdd = 1;
     let amountOfUniqueComparisons = 0;
@@ -411,11 +351,7 @@
     let [everyFieldFilled, errorMessage] = validateFormInputs(info);
     console.log(errorMessage);
     if (!everyFieldFilled) {
-      swal(
-        "Invalid input",
-        "Every field is obligatory. " + errorMessage,
-        "error"
-      );
+      swal("Invalid input", "Every field is obligatory. " + errorMessage, "error");
     } else {
       let amountOfUniqueComparisons = getAmountOfUniqueComparisons(info.items.length);
 
@@ -430,13 +366,7 @@
         );
         return;
       } else if (parseInt(info.expectedComparisons) < 1) {
-        swal(
-          "Invalid input",
-          "Amount of expected comparisons: '" +
-            info.expectedComparisons +
-            "' must be greater than 1.",
-          "error"
-        );
+        swal("Invalid input", "Amount of expected comparisons: '" + info.expectedComparisons + "' must be greater than 1.", "error");
         return;
       }
 
@@ -458,16 +388,12 @@
         if (!willPublish) {
           return;
         } else {
-          console.log("surveyService: ", surveyService);
           if (editing) {
             info.items = [];
             let itemFileResponses = [];
             submitButtonFunctions.forEach((e) => {
               let eFuncResponse = e.func(surveyID);
-              if (
-                typeof eFuncResponse == "object" &&
-                eFuncResponse.length != 0
-              ) {
+              if (typeof eFuncResponse == "object" && eFuncResponse.length != 0) {
                 itemFileResponses = itemFileResponses.concat(eFuncResponse);
               } else {
                 itemFileResponses.push();
@@ -511,7 +437,7 @@
                   "Failed to edit survey.",
                   "Error:\n" +
                   data.data.message + 
-                  "\nIf the error message didn't help, please try again, or contact and administrator.",
+                  "\n\nIf the error message didn't help, please try again, or contact and administrator.",
                   "error"
                 );
               }
@@ -522,7 +448,7 @@
                 "Failed to edit survey.",
                 "Error:\n" +
                 err + 
-                "\nIf the error message didn't help, please try again, or contact and administrator.",
+                "\n\nIf the error message didn't help, please try again, or contact and administrator.",
                 "error"
               );
             });
@@ -538,14 +464,9 @@
                   submitButtonFunctions.forEach((e) => {
                     itemFileResponses.push(e.func(data.loc));
                   });
-                  await Promise.all(itemFileResponses).catch((error) =>
-                    console.error("Error when posting item files:", error)
-                  );
+                  await Promise.all(itemFileResponses).catch((error) => console.error("Error when posting item files:", error));
                   console.log("postSurvey data: ", data);
-                  const survey_link =
-                    window.location.href.split("/admin_board")[0] +
-                    "?takeSurvey=1&surveyID=" +
-                    data.loc;
+                  const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + data.loc;
                   let dummy = document.getElementById("dummy");
                   dummy.value = survey_link;
                   console.log(dummy.value);
@@ -553,20 +474,15 @@
                   navigator.clipboard.writeText(survey_link).then(() => {
                     swal(
                       "Successfully created survey!",
-                      "Your link is:\n" +
-                        survey_link +
-                        "\n It has been copied to your clipboard for you!",
+                      "Your link is:\n" + survey_link + "\n It has been copied to your clipboard for you!",
                       "success"
                     );
-                    navigateWithRefreshToken("/admin_board/surveys").then(
-                      (data) => (userInfo = data)
-                    );
+                    navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
                   });
                 } else {
                   swal(
                     "Failed to create survey.",
-                    "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                      data.data.message,
+                    "Please try again, and contact an administator if it still doesn't work. Error:\n" + data.data.message,
                     "error"
                   );
                 }
@@ -575,8 +491,7 @@
                 console.log(err);
                 swal(
                   "Failed to create survey.",
-                  "Please try again, and contact an administator if it still doesn't work. Error:\n" +
-                    err,
+                  "Please try again, and contact an administator if it still doesn't work. Error:\n" + err,
                   "error"
                 );
               });
@@ -590,12 +505,7 @@
     let errorMessage = "";
     for (let key in formObj) {
       let val = formObj[key];
-      if (
-        val === "" ||
-        Number.isNaN(val) ||
-        val === undefined ||
-        val === null
-      ) {
+      if (val === "" || Number.isNaN(val) || val === undefined || val === null) {
         errorMessage = key + " is not filled out";
         return [false, errorMessage];
       } else if (key === "items") {
@@ -618,9 +528,7 @@
 
   function validateExpectedComparisons(e) {
     if (e.target.value === "") {
-      e.target.value = e.target.value
-        .replace(/[^0-9.]/g, "")
-        .replace(/(\..*?)\..*/g, "$1");
+      e.target.value = e.target.value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
     }
     const input = e.target.value;
     const parsed = parseInt(input, 10);
@@ -659,16 +567,8 @@
   const addResearcher = (researcher) => {
     console.log("researcher in add: ", researcher);
     if (researcher != null && researcher != undefined) {
-      if (
-        surveyResearchers.find((e) => e.owner_email == researcher.email) ===
-        undefined
-      ) {
-        console.log(
-          "researcher is not already added",
-          researcher,
-          "vs ",
-          surveyResearchers
-        );
+      if (surveyResearchers.find((e) => e.owner_email == researcher.email) === undefined) {
+        console.log("researcher is not already added", researcher, "vs ", surveyResearchers);
         surveyResearchers.push({
           ownerId: researcher._id,
           owner_email: researcher.email,
@@ -705,46 +605,24 @@
   };
 
   const changeResearcherRights = (e, rightToChange) => {
-    let researcherEmailWithCheckBox =
-      e.target.parentElement.parentElement.parentElement.childNodes[0]
-        .childNodes[0].innerHTML;
+    let researcherEmailWithCheckBox = e.target.parentElement.parentElement.parentElement.childNodes[0].childNodes[0].innerHTML;
     let index = surveyResearchers.findIndex((e) => {
       return e.owner_email == researcherEmailWithCheckBox;
     });
-    surveyResearchers[index].rights[rightToChange] = !surveyResearchers[index]
-      .rights[rightToChange];
-    console.log(
-      "CHANGED RESEARCHERS RIGHT",
-      rightToChange,
-      "TO: ",
-      surveyResearchers[index].rights
-    );
+    surveyResearchers[index].rights[rightToChange] = !surveyResearchers[index].rights[rightToChange];
+    console.log("CHANGED RESEARCHERS RIGHT", rightToChange, "TO: ", surveyResearchers[index].rights);
   };
 
   const searchForUsers = (e) => {
     console.log("searching for ", search_term);
-    if (
-      search_term !== undefined &&
-      search_term !== "" &&
-      search_term !== oldSearchTerm
-    ) {
+    if (search_term !== undefined && search_term !== "" && search_term !== oldSearchTerm) {
       const timeSinceLastSearch = new Date().getTime() - epochMsAtLastSearch;
 
-      console.log(
-        "epochMsAtLastSearch:",
-        epochMsAtLastSearch,
-        ", timeSinceLastSearch:",
-        timeSinceLastSearch,
-        "keyCode: ",
-        e.keyCode
-      );
+      console.log("epochMsAtLastSearch:", epochMsAtLastSearch, ", timeSinceLastSearch:", timeSinceLastSearch, "keyCode: ", e.keyCode);
       //Check that the search string is at least 3 chars long, is different than the last search term
       //and that at least half a second has gone by since the last search, or that the user manually hit enter to search
       //this is to reduce stress on the backend, save on bandwith and otherwise improve the latency of searching.
-      if (
-        (search_term.length > 2 && timeSinceLastSearch > 500) ||
-        (e.keyCode === 13 && timeSinceLastSearch > 500)
-      ) {
+      if ((search_term.length > 2 && timeSinceLastSearch > 500) || (e.keyCode === 13 && timeSinceLastSearch > 500)) {
         oldSearchTerm = search_term;
         epochMsAtLastSearch = new Date().getTime();
         console.log("Searching for: ", search_term);
@@ -806,11 +684,7 @@
   //Options is an object with .input and .mediaType
   const removeOption = (option) => {
     if (surveyOptions.length <= 2) {
-      swal(
-        "Cannot delete option",
-        "A survey must have at least 2 options.",
-        "warning"
-      );
+      swal("Cannot delete option", "A survey must have at least 2 options.", "warning");
     } else {
       removeSurveyOption(option);
     }
@@ -863,12 +737,7 @@
         Edit Survey: {surveyTitleValue}
       </h1>
     {:else}
-      <h1
-        class="text-h1 ma-2 mb-6 align-self-center"
-        style="font-size: 5rem; margin: auto;"
-      >
-        Create Survey
-      </h1>
+      <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem; margin: auto;">Create Survey</h1>
     {/if}
   </div>
   <div id="main_input_wrapper">
@@ -879,8 +748,7 @@
         on:click={() => {
           swal({
             title: "Are you sure?",
-            text:
-              "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
+            text: "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
             icon: "warning",
             dangerMode: true,
             buttons: ["Nevermind", "Discard"],
@@ -911,8 +779,7 @@
         <Tooltip top bind:active={showSurveyTitleTooltip}>
           <Icon path={mdiInformationOutline} />
           <span slot="tip"
-            >A title for what you're researching. Will not be shown to the
-            judges.<br />
+            >A title for what you're researching. Will not be shown to the judges.<br />
             For example: 'Preference of snacks'
           </span>
         </Tooltip>
@@ -920,15 +787,7 @@
       Survey title
     </Textarea>
 
-    <Textarea
-      style="margin-top: 2vh;"
-      rows={1}
-      autogrow
-      noResize
-      class="text-h5"
-      hint="*Required"
-      bind:value={surveyQuestionValue}
-    >
+    <Textarea style="margin-top: 2vh;" rows={1} autogrow noResize class="text-h5" hint="*Required" bind:value={surveyQuestionValue}>
       <div slot="append">
         <Tooltip top bind:active={showSurveyQuestionTooltip}>
           <Icon path={mdiInformationOutline} />
@@ -941,33 +800,17 @@
       Survey question
     </Textarea>
 
-    <Textarea
-      style="margin-top: 2vh;"
-      rows={4}
-      autogrow
-      class="text-h6"
-      hint="*Required"
-      bind:value={judgeInstructionsValue}
-    >
+    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" hint="*Required" bind:value={judgeInstructionsValue}>
       <div slot="append">
         <Tooltip top bind:active={showSurveyJudgeInstructionsTooltip}>
           <Icon path={mdiInformationOutline} />
-          <span slot="tip">
-            Extra info you want to give the judges before they answer your
-            survey.
-          </span>
+          <span slot="tip"> Extra info you want to give the judges before they answer your survey. </span>
         </Tooltip>
       </div>
       Judge instructions
     </Textarea>
 
-    <Textarea
-      style="margin-top: 2vh;"
-      rows={4}
-      autogrow
-      class="text-h6"
-      bind:value={internalDescriptionValue}
-    >
+    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue}>
       <div slot="append">
         <Tooltip top bind:active={showSurveyInternalDescriptionTooltip}>
           <Icon path={mdiInformationOutline} />
@@ -980,31 +823,20 @@
       Survey description
     </Textarea>
 
-    <div
-      class="d-flex flex-rows justify-space-between"
-      style="margin-top: 4vh;"
-    >
+    <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">
       <div style="min-width: 30%;">
-        <Select mandatory items={purposeItems} bind:value={selectedPurpose}>
-          Purpose
-        </Select>
+        <Select mandatory items={purposeItems} bind:value={selectedPurpose}>Purpose</Select>
       </div>
       <div style="min-width: 30%;">
-        <Select mandatory items={mediaTypeItems} bind:value={selectedMediaType}
-          >Media Type
-        </Select>
+        <Select mandatory items={mediaTypeItems} bind:value={selectedMediaType}>Media Type</Select>
       </div>
 
       <div style="min-width: 30%;">
-        <Select mandatory items={activeItems} bind:value={selectedActiveLevel}>
-          Active
-        </Select>
+        <Select mandatory items={activeItems} bind:value={selectedActiveLevel}>Active</Select>
       </div>
     </div>
 
-    <h1 class="text-h4 ma-8" style="text-align:center;">
-      Search for and add co-researchers
-    </h1>
+    <h1 class="text-h4 ma-8" style="text-align:center;">Search for and add co-researchers</h1>
     <div class="centeredInputFieldWrapper">
       <TextField
         type="text"
@@ -1027,26 +859,16 @@
       </TextField>
       <ListItemGroup class="blue-text">
         {#each searchResults as result}
-          <ListItem
-            style="border: 0.1em solid #aaa; border-top:none;"
-            on:click={() => addResearcher(result)}>{result.email}</ListItem
-          >
+          <ListItem style="border: 0.1em solid #aaa; border-top:none;" on:click={() => addResearcher(result)}>{result.email}</ListItem>
         {/each}
       </ListItemGroup>
     </div>
 
     <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
       {#each surveyResearchers as researcher}
-        <Card
-          style="width:49%; cursor: default; background-color:rgb(235,235,235);"
-          class="mb-2"
-          hover
-        >
+        <Card style="width:49%; cursor: default; background-color:rgb(235,235,235);" class="mb-2" hover>
           {#if researcher.ownerId !== userInfo.userid}
-            <Button
-              fab
-              class="float-right"
-              on:click={() => removeResearcher(researcher.owner_email)}
+            <Button fab class="float-right" on:click={() => removeResearcher(researcher.owner_email)}
               ><Icon path={mdiDeleteForever} /></Button
             >
           {/if}
@@ -1055,28 +877,15 @@
             <div class="text--primary text-h5">
               {researcher.owner_email}
             </div>
-            <div class="text--primary text-h8" style="text-align:left;">
-              Rights:
-            </div>
+            <div class="text--primary text-h8" style="text-align:left;">Rights:</div>
           </CardText>
           <CardActions>
             <div class="d-flex flex-column justfiy-left">
-              <Checkbox
-                bind:checked={researcher.rights.manageMembers}
-                disabled={researcher.ownerId == userInfo.userid}
-              >
+              <Checkbox bind:checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid}>
                 Manage members
               </Checkbox>
-              <Checkbox
-                bind:checked={researcher.rights.editSurvey}
-                disabled={researcher.ownerId == userInfo.userid}
-              >
-                Edit survey
-              </Checkbox>
-              <Checkbox
-                bind:checked={researcher.rights.viewResults}
-                disabled={researcher.ownerId == userInfo.userid}
-              >
+              <Checkbox bind:checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid}>Edit survey</Checkbox>
+              <Checkbox bind:checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid}>
                 View results
               </Checkbox>
             </div>
@@ -1085,9 +894,7 @@
       {/each}
     </div>
 
-    <div
-      style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;"
-    />
+    <div style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;" />
     <h1 class="text-h4">Items</h1>
     <div class="d-flex flex-column mt-4 mb-4 align-center">
       {#each surveyOptions as option}
@@ -1113,11 +920,8 @@
           {/if}
         </div>
       {/each}
-      <div class="d-flex flex-column mb-2"style="width:95%; margin: auto;">
-        <Card
-          style="cursor: default; height:228px; background-color:rgb(235,235,235);"
-          hover
-        >
+      <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
+        <Card style="cursor: default; height:228px; background-color:rgb(235,235,235);" hover>
           <CardText class="flex-column d-flex justify-space-between">
             <div class="mb-4">Add item</div>
             <Button
@@ -1134,10 +938,7 @@
                   false
                 );
                 surveyOptions = surveyOptions;
-                setTimeout(
-                  () => window.scrollTo(0, document.body.scrollHeight),
-                  400
-                );
+                setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 400);
               }}
             >
               <Icon path={mdiPlusCircle} size="110px" />
@@ -1147,22 +948,15 @@
       </div>
     </div>
     <div class="centeredInputFieldWrapper">
-      <TextField
-        type="number"
-        on:input={validateExpectedComparisons}
-        bind:value={comparisonsPerJudge}
-      >
+      <TextField type="number" on:input={validateExpectedComparisons} bind:value={comparisonsPerJudge}>
         <div slot="append">
           <Tooltip top bind:active={showSurveyComparisonsPerJudgeTooltip}>
             <Icon path={mdiInformationOutline} />
             <span slot="tip">
               How many comparisons you want each judge to perform.<br />
               Minimum value is 1.<br />
-              The maximum value is based on the amount of unique combinations of
-              items in the survey.<br />
-              Current max is {getAmountOfUniqueComparisons(
-                surveyOptions.length
-              )}
+              The maximum value is based on the amount of unique combinations of items in the survey.<br />
+              Current max is {getAmountOfUniqueComparisons(surveyOptions.length)}
             </span>
           </Tooltip>
         </div>
@@ -1170,12 +964,7 @@
       </TextField>
     </div>
 
-    <Button
-      outlined
-      id="submitButton"
-      style="height:6vh; font-size:1.2rem"
-      on:click={sendForm}>Submit survey</Button
-    >
+    <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={sendForm}>Submit survey</Button>
     <input type="text" id="dummy" />
   </div>
 </div>

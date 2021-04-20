@@ -14,7 +14,7 @@
   export let userInfo;
 
   export let allowLeavePageWithoutWarning;
-  let warningOnLeaveFunc;
+  export let warningOnLeaveFunc;
 
   $: userInfo;
 </script>

@@ -19,6 +19,7 @@
             buttons: ["Take me back!", "Discard"],
         }).then((willDiscard) => {
             if (willDiscard) {
+                allowLeavePageWithoutWarning = true
                 navigate(link);
             }
         })
@@ -47,6 +48,7 @@
             })
             .then((willDiscard) => {
                 if (willDiscard) {
+                    allowLeavePageWithoutWarning = true
                     userService.logout()
                     .then(()=>{
                         userInfo=null; 

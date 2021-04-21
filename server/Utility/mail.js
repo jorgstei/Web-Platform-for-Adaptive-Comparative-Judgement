@@ -13,7 +13,7 @@ async function sendMail(mailOptions) {
         const transporter = nodemailer.createTransport(
             {
                 host: "smtp.ansatt.ntnu.no",
-                port: 587,
+                port: 25,
                 secure: false,
                 requireTLS: true,
                 auth: {

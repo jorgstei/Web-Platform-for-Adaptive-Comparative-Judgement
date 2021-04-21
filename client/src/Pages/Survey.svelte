@@ -46,6 +46,7 @@
             rightOption: randomPair[counter].right._id,
             winner: 1,
         }
+        showLeftItemOutline = true;
         console.log("Sending left answer: ", answer);
         surveyAnswerService.post(answer).then(res => console.log("Posted answer, leftChoiceClicked, Response: ", res)).catch(err => swal("Something went wrong..", "Could not post answer. Recieved error:\n" + err, "error"));
         if(counter < maxCounter){
@@ -67,6 +68,7 @@
             rightOption: randomPair[counter].right._id,
             winner: 0,
         }
+        showRightItemOutline = true;
         surveyAnswerService.post(answer).then(res => console.log("Posted answer, rightChoiceClicked, Response: ", res)).catch(err => swal("Something went wrong..", "Could not post answer. Recieved error:\n" + err, "error"));
         if(counter < maxCounter){
             counter++;
@@ -242,13 +244,15 @@
     let showLeftItemOverlay = false;
     let showRightItemOverlay = false;
 
+    let showLeftItemOutline = false;
+    let showRightItemOutline = false;
     $: survey;
 </script>
 <main id="surveyWrapper" tabindex="0">
     {#if counter < maxCounter}
     {#key counter}
     
-    <h1 class="text-h4" style="margin:3vh 0 2vh 0">{question}</h1>
+    <h1 class="text-h4" style="margin:0; padding:0;">{question}</h1>
     <div style="width:75%; margin:auto;">
         <ProgressLinear value={progressPercent} height="10px"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
@@ -266,13 +270,6 @@
 
         </Overlay>
 
-        
-        <!--
-
-            {#if aPDFTest != null}
-                <PDFView src={aPDFTest} iframeId="preview" width="70vh" height="70vh"></PDFView>
-            {/if}
-        -->
         {#if randomPair.length != 0}
             <div class="cardWrapper" in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
@@ -360,8 +357,8 @@
     #container {
         margin: auto;
         padding-top: 5vh;
-        width: 80%;
-        height: 80%;
+        width: 90%;
+        height: 90%;
         display: flex;
         justify-content: space-evenly;
     }

@@ -4,7 +4,7 @@
     import swal from "sweetalert";
     
     export let showJudgeOverlay;
-    export let survey;
+    export let survey = undefined;
     console.log("Survey from IntroductionToSurvey.svelte: ", survey);
     let navwrap = document.getElementById("navWrapper");
     if(navwrap){

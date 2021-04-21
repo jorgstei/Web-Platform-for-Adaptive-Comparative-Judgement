@@ -343,7 +343,8 @@ router.get("/judge/:id", auth, async (req, res) => {
             return
         }
         console.log("Survey in get by id as judge: ", survey);
-        const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"].userid)
+        console.log("req auth", req);
+        const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"]?.userid)
 
         if (req.auth["user"].role !== "admin" && req.auth["judge"].role !== "judge" && (foundOwner == undefined || req.auth["user"].userid !== foundOwner.ownerId)) {
             res.status(403).json({message: "Forbidden"});

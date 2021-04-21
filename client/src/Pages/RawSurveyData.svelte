@@ -420,6 +420,9 @@
                   <div class="font-weight-bold">Number of items</div>
                 </Col>
                 <Col>
+                    <div class="font-weight-bold">Comparisons per judge</div>
+                </Col>
+                <Col>
                   <div class="font-weight-bold">Number of answers</div>
                 </Col>
                 <Col>
@@ -432,6 +435,9 @@
                 </Col>
                 <Col>
                   <div class="">{surveyStatistics.result.length}</div>
+                </Col>
+                <Col>
+                    <div class="">{survey.expectedComparisons}</div>
                 </Col>
                 <Col>
                   <div class="">{answerValues.length}</div>

@@ -808,7 +808,7 @@
           </span>
         </Tooltip>
       </div>
-      Survey description
+      Internal description
     </Textarea>
 
     <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">

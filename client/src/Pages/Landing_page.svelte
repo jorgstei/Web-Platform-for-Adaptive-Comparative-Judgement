@@ -54,7 +54,7 @@
 <main>
 	<div id="welcomeWrapper">
 		<h1>Welcome</h1>
-		<h2>If you are here to take a survey, please enter your access code into the field below and press "Start reviewing"</h2>
+		<h2>If you are here to take a survey, please enter your PIN code in the field below and press "Start reviewing"</h2>
 		<CostumInput onClickFunc={validate} fieldTitle="Your PIN code:" buttonTitle="Start reviewing"></CostumInput>
 	</div>
 </main>
@@ -69,7 +69,8 @@
 	}
 	#welcomeWrapper{
 		top:0;
-		background-image: url("https://i.pinimg.com/originals/63/7f/d0/637fd0330e2674544e549dbef188e993.jpg");
+		/*background-image: url("https://i.pinimg.com/originals/63/7f/d0/637fd0330e2674544e549dbef188e993.jpg");*/
+		background-image: url("/img/triangles1.png");
 		width: 100vw;
         height: 100vh;
         background-size:100% 100%;

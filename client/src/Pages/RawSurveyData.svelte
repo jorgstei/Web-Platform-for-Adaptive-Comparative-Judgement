@@ -8,7 +8,7 @@
     import axios from "axios";
     import swal from "sweetalert";
     import { dateFromObjectId } from "../Utility/dateFromObjectId";
-    import {Select, Button, Row, Col, ListItem} from "svelte-materialify"
+    import {Select, Row, Col, ButtonGroup, ButtonGroupItem} from "svelte-materialify"
 
     export let userInfo;
 
@@ -46,8 +46,8 @@
         { fieldName: "", viewName: "outfit" },
         { fieldName: "", viewName: "Left bias" },
         { fieldName: "", viewName: "Right bias" },
-        { fieldName: "", viewName: "Median time per answer" },
-        { fieldName: "", viewName: "Average time per answer" },
+        { fieldName: "", viewName: "Median seconds per answer" },
+        { fieldName: "", viewName: "Average seconds per answer" },
         { fieldName: "", viewName: "delete" },
     ];
     let allJudges = null;
@@ -65,13 +65,6 @@
     let allItems2DArray = null;
 
     let currentContentView = "linearRanking";
-
-    let contentViewItems = [
-        {name:"Linear ranking", value:"linearRanking"},
-        {name:"By judge", value:"byJudge"},
-        {name:"By item", value:"byItem"},
-        {name:"Raw data", value:"rawdata"}
-    ]
 
     let surveyStatistics = null;
 
@@ -109,10 +102,7 @@
                         let answerWithSameId = survey.items.find(
                             (obj) => obj._id == linearRanking[i].individual
                         );
-                        if (
-                            answerWithSameId == undefined ||
-                            answerWithSameId == null
-                        ) {
+                        if ( answerWithSameId == undefined || answerWithSameId == null) {
                             linearRanking2DArray.push([
                                 "none",
                                 "NaN",
@@ -130,7 +120,9 @@
                                 "NaN",
                                 "Nan",
                             ]);
-                        } else {
+                        } 
+                        else {
+                            console.log("linrank2d arr getting pushed, linrank[i] is", linearRanking[i]);
                             linearRanking2DArray.push([
                                 answerWithSameId.data,
                                 linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
@@ -175,8 +167,8 @@
                             e.outfit === undefined ? "N/A": e.outfit,
                             leftBias === "N/A" ? leftBias: leftBias.toFixed(2),
                             leftBias === "N/A" ? leftBias: (1 - leftBias).toFixed(2),
-                            medianTime === "N/A" ? medianTime: medianTime.toFixed(2) + " seconds",
-                            averageTime === "N/A" ? averageTime: averageTime.toFixed(2) + " seconds",
+                            medianTime === "N/A" ? medianTime: medianTime.toFixed(2),
+                            averageTime === "N/A" ? averageTime: averageTime.toFixed(2),
                         ]);
                     });
                     console.log(
@@ -320,11 +312,6 @@
         );
     };
 
-    //Updates current content view based on value of the dropdown menu
-    let updateCurrentContentView = () => {
-        currentContentView = document.getElementById("viewDropdown").value;
-        console.log("Current content view is: ", currentContentView);
-    };
 
     /*  Downloads data as a csv file
      *   @param {string[]} headers - The headers for the csv file
@@ -420,7 +407,7 @@
                   <div class="font-weight-bold">Number of items</div>
                 </Col>
                 <Col>
-                    <div class="font-weight-bold">Comparisons per judge</div>
+                    <div class="font-weight-bold">Expected comparisons per judge</div>
                 </Col>
                 <Col>
                   <div class="font-weight-bold">Number of answers</div>
@@ -448,10 +435,13 @@
             </Row>
         </div>
     {/if}
-    
-    <div style="max-width: 30%;">
-        <Select mandatory items={contentViewItems} bind:value={currentContentView}>View</Select>
-    </div>
+
+    <ButtonGroup mandatory tile activeClass="primary-color" bind:value={currentContentView}>
+        <ButtonGroupItem value="linearRanking">Linear ranking</ButtonGroupItem>
+        <ButtonGroupItem value="byJudge">By judge</ButtonGroupItem>
+        <ButtonGroupItem value="byItem">By item</ButtonGroupItem>
+        <ButtonGroupItem value="rawdata">Raw data</ButtonGroupItem>
+    </ButtonGroup>
     
 
 

@@ -80,7 +80,7 @@
 
     <Divider />
     <List nav dense>
-        <ListItemGroup>
+        <ListItemGroup mandatory>
             {#each menuItems as item}
                 {#if (item.requireAdmin && userInfo.role === "admin") || !item.requireAdmin}
                     <ListItem ripple={false} on:click={(e) => {

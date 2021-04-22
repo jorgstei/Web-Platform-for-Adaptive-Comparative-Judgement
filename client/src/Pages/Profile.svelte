@@ -41,8 +41,9 @@
         ).then((e) => {
             if(e === true){
                 userService.deleteUserByID(userInfo.userid).then(res => {
+                    console.log("delete user res: ", res)
                     if(res.status < 300){
-                        userInfo.logout().then(() => {
+                        userService.logout().then(() => {
                             userInfo = null
                             navigate("/")
                         })

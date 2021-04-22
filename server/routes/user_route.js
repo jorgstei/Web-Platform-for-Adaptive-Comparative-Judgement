@@ -301,6 +301,9 @@ router.post("/forgotten_my_password", async (req, res) => {
         }
         const emailResponse = await sendMail(emailOptions)
         console.log("Mail response:", emailResponse)
+        if(emailResponse.accepted.length == 0){
+            res.status(500).json({message: "Failed to send mail to address: "+email})
+        }
         res.sendStatus(204)
     } catch (error) {
         console.log("forgotten password error: ", error)
@@ -494,14 +497,16 @@ router.post("/", async (req, res) => {
     const { email, password, firstName, lastName, token } = req.body
     console.log(req.body)
     const [real, role] = await verifyUserRegistration(token, email)
-    console.log("New user role:", role)
+    if(!real || role == null){
+        res.status(422).json({message: "Invite link has expired, or the wrong email was profided"})
+    }
     if(!acceptablePassword(password, role)){
         res.status(422).json({message: "Password too weak."})
         return
     }
     const userDoc = await User.findOne({ email: {$eq: email} })
     if (userDoc != null && userDoc._id != null) {
-        res.status(409).json({ message: "This registration link has already been used." })
+        res.status(409).json({ message: "This registration link has already been used" })
         return
     }
     if (real == false) {
@@ -620,29 +625,63 @@ router.patch("/:id/change_password", auth, async (req, res) => {
  * @apiError (404) {String} message Could not find user.
  */
 router.delete("/:id", auth, async (req, res) => {
+    /*
+        FIXME: This route should use transactions because it deals with multiple collections
+    */
     console.log("Called delete user by id with userid: " + req.params.id);
     if (req.auth["user"].role !== "admin" && req.auth["user"].userid !== req.params.id) {
         res.status(403).json({message: "Forbidden"})
         return
     }
-    const result = await User.deleteOne({ _id: req.params.id })
-    const updateSurveysResult = await Survey.updateMany(
-        { "owners.owner_id": req.params.id },
-        {
-            $pull:
-            {
-                owners:
-                {
-                    owner_id: req.params.id
-                }
-            }
-        })
-    console.log(updateSurveysResult)
-    if (result.deletedCount == 1) {
-        res.sendStatus(204)
+    let deleteTransientData = false;
+    if(req.auth["user"]?.role == "admin" && req.body?.deleteTransientData == true){
+        deleteTransientData = true
     }
-    else {
-        res.status(404).json({message: "Could not find user."})
+    if(deleteTransientData){
+        const result = await User.deleteOne({ _id: req.params.id })
+        await Survey.deleteMany({
+            $and: [
+                {"owners.ownerId": {$eq: req.params.id}},
+                {owners: {$size: 1}}
+            ]
+        })
+        await Survey.updateMany(
+            { "owners.owner_id": {$eq:  req.params.id }},
+            {
+                $pull:
+                {
+                    owners:
+                    {
+                        owner_id: req.params.id
+                    }
+                }
+            })
+        if (result.deletedCount == 1) {
+            res.sendStatus(204)
+        }
+        else {
+            res.status(404).json({message: "Could not find user."})
+        }
+    }
+    else{
+        const result = await User.deleteOne({ _id: req.params.id })
+        await Survey.updateMany(
+            { "owners.owner_id": req.params.id },
+            {
+                $pull:
+                {
+                    owners:
+                    {
+                        owner_id: req.params.id
+                    }
+                }
+        })
+        if (result.deletedCount == 1) {
+            res.sendStatus(204)
+        }
+        else {
+            res.status(404).json({message: "Could not find user."})
+        }
     }
 })
 

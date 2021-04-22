@@ -7,7 +7,7 @@ const me = require('mongo-escape').escape
 const router = Router()
 
 router.get("/:id", auth, async (req, res) => {
-    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== researcher && req.auth["judge"]?.role !== "judge"){
+    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && req.auth["judge"]?.role !== "judge"){
         res.status(403).json({message: "Forbidden"})
         return;
     }
@@ -32,7 +32,7 @@ router.get("/:id", auth, async (req, res) => {
 })
 
 router.get("/:id/view", auth, async (req, res) => {
-    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== researcher && req.auth["judge"]?.role !== "judge"){
+    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && req.auth["judge"]?.role !== "judge"){
         res.status(403).json({message: "Forbidden"})
         return;
     }

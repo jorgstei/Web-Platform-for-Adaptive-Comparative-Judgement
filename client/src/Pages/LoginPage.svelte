@@ -19,7 +19,6 @@
     let newPw1;
     let newPw2;
 
-    export let newUser = false;
     export let userInfo;
     export let changePassword = false;
     export let allowLeavePageWithoutWarning;
@@ -30,7 +29,6 @@
 
     const validatePasswordFields = [ruleValidatePasswordComplexity];
 
-    console.log("NewUser?: ", newUser);
 
     const login = () => {
         let [formIsValid, errormsg] = checkValues(email, newPw1);
@@ -43,7 +41,13 @@
                         console.log(userInfo)
                         navigate("/admin_board/profile");
                     } else {
-                        swal("Failed to log in", res.data.message, "error")
+                        console.log(res)
+                        if(res?.data?.message == undefined){
+                            swal("Failed to log in", "Reason: Unable to reach server.", "error")
+                        }
+                        else{
+                            swal("Failed to log in", res.data.message, "error")
+                        }
                     }
                 })
                 .catch((err) => {

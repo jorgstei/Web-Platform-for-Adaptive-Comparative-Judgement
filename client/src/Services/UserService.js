@@ -29,7 +29,7 @@ export default class UserService extends Service{
             withCredentials: true,
             data: user
         })
-        .then(response => response.data)
+        .then(response => response)
         .catch(error => error.response)
     }
 
@@ -44,7 +44,9 @@ export default class UserService extends Service{
             }
         })
         .then(response => response)
-        .catch(error => error.response)
+        .catch(error => {
+            return error.response
+        })
     }
 
     logout(){
@@ -181,7 +183,7 @@ export default class UserService extends Service{
             url: this.path + "/user/"+id,
             withCredentials: true
         })
-        .then(response => response.data)
+        .then(response => response)
         .catch(error => error.response)
     }
 }

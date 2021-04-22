@@ -11,6 +11,42 @@ const mongoose = require('mongoose')
 
 const router = Router()
 
+function userHasEditSurveyRights(surveyId, userid){
+    Survey.findOne({_id: {$eq: surveyId}})
+    .then(survey => {
+        if(survey == undefined || survey == null || survey._id == null){
+            return false;
+        }
+        let owner = survey.owners.find(e => e._id == userid)
+        if(owner == undefined || owner.rights == undefined){
+            console.log("userHasViewResultsRights owner is undefined or has no rights")
+            return false
+        }
+        if(owner.rights.editSurvey != true){
+            return false
+        }
+        return true
+    })
+}
+
+function userHasManageMembersRights(surveyId, userid){
+    Survey.findOne({_id: {$eq: surveyId}})
+    .then(survey => {
+        if(survey == undefined || survey == null || survey._id == null){
+            return false;
+        }
+        let owner = survey.owners.find(e => e._id == userid)
+        if(owner == undefined || owner.rights == undefined){
+            console.log("userHasViewResultsRights owner is undefined or has no rights")
+            return false
+        }
+        if(owner.rights.manageMembers != true){
+            return false
+        }
+        return true
+    })
+}
+
 //Returns -1 on error, otherwise returns the invite code as a number (must be padded with 0's from the left on client side)
 async function generateUniqueHashCode(data){
     data = data.toString();
@@ -194,13 +230,13 @@ router.get("/function/count", auth, async (req, res) => {
             res.status(403).json({message: "Forbidden"})
             return
         }
-        const me_userid = me(req.auth["user"]?.userid)
+        const userid = req.auth["user"]?.userid
         if (req.auth["user"]?.role === "admin") {
             Survey.countDocuments().then(count => res.json(count))
             return;
         }
         else {
-            Survey.countDocuments({ "owners.ownerId": me_userid }).then(count => res.json(count))
+            Survey.countDocuments({ "owners.ownerId": userid }).then(count => res.json(count))
         }
     } catch (error) {
         console.log("survey/function/count error:", error)
@@ -216,7 +252,7 @@ router.get("/items_to_compare/:id", auth, async (req, res) => {
         if (!surveyDoc || surveyDoc._id == null) {
             throw new Error("Could not find survey by id")
         }
-        if (!req.auth["judge"]?.role === "judge" && !req.auth["user"]?.role === "admin" && !req.auth["user"]?.userid === surveyDoc.ownerId) {
+        if (!req.auth["judge"]?.role === "judge" && !req.auth["user"]?.role === "admin") {
             res.status(403).json({message: "Forbidden"})
         }
         const expectedComparisons = surveyDoc.expectedComparisons;
@@ -290,7 +326,7 @@ router.get("/:id", auth, async (req, res) => {
     try {
         const survey = await Survey.findOne({ _id: {$eq: req.params.id }})
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"]?.userid)
-        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== foundOwner.ownerId) {
+        if (req.auth["user"]?.role !== "admin" && foundOwner == undefined) {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -326,7 +362,6 @@ router.get("/:id", auth, async (req, res) => {
 router.get("/judge/:id", auth, async (req, res) => {
     console.log("Called get survey by id as judge");
     try {
-
         console.log("In judge by id survey:", req.params.id);
         let survey = undefined;
         if(req.params.id.length === 6){
@@ -343,7 +378,6 @@ router.get("/judge/:id", auth, async (req, res) => {
             return
         }
         console.log("Survey in get by id as judge: ", survey);
-        console.log("req auth", req);
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"]?.userid)
 
         if (req.auth["user"]?.role !== "admin" && req.auth["judge"]?.role !== "judge" && (foundOwner == undefined || req.auth["user"]?.userid !== foundOwner.ownerId)) {
@@ -356,6 +390,8 @@ router.get("/judge/:id", auth, async (req, res) => {
             return
         }
 
+        //We remove information that is of no convern to a judge
+        //Both for security, and to safe bandwidth
         survey.purpose = undefined;
         survey.owners = undefined;
         survey.active = undefined;
@@ -658,6 +694,10 @@ router.get("/function/sort", auth, async (req, res) => {
         limit: How many documents you want to retrieve, f.ex. 10 as in the case above
         direction: 1 ascending, -1 descending
     */
+   if(req.auth["user"]?.role != "admin" && req.auth["user"]?.role != "researcher"){
+       res.status(403).json({message: "Forbidden"})
+       return
+   }
    console.log("survey/function/sort called")
     const { field, skip, limit, direction } = req.query
     const me_field = field.replace("$", "")
@@ -800,6 +840,11 @@ router.post("/function/search/:term", auth, async (req, res) => {
     if (direction === undefined) me_direction = 1
     if (me_sortField === undefined) me_sortField = "dateCreated"
 
+    if(req.auth["user"]?.role != "admin" && req.auth["user"]?.role != "researcher"){
+        res.status(403).json({message: "Forbidden"})
+        return
+    }
+
     if (me_fields === undefined || me_term === undefined || me_skip === undefined || me_limit === undefined) {
         console.log("fields:", fields, ", term:", me_term, ", skip:", me_skip, ", limit:", me_limit)
         res.status(400).json({message: "Missing one of the required parameters."})
@@ -891,7 +936,8 @@ router.post("/function/search/:term", auth, async (req, res) => {
 })
 
 router.post("/function/upload_item/:id", auth, async (req, res) => {
-    if(!req.auth["user"]?.role === "admin" && !req.auth["user"]?.role === "researcher"){
+
+    if(!req.auth["user"]?.role === "admin" && !req.auth["user"]?.role === "researcher" && !userHasEditSurveyRights(req.params.id, req.auth["user"]?.userid)){
         res.status(403).json({message: "Forbidden"})
         return
     }

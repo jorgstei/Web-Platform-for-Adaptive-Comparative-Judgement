@@ -29,9 +29,15 @@
             }
             console.log("Attempting to register with user object: ", userObj);
             userService.registerUser(userObj)
-                .then(()=>{
-                    swal("You have successfully made an account for '" + email + "''. You will now be taken to the login page")
-                    .then(navigate("/login"));
+                .then((res)=>{
+                    if(res.status < 300){
+                        swal("Success!","You have successfully made an account for '" + email + "''. You will now be taken to the login page", "success")
+                        .then(navigate("/login"));
+                    }
+                    else{
+                        swal("Error","Unable to create user.\nReason: " +res.data?.message+".", "error")
+                        .then(navigate("/login"));
+                    }
                 })
                 .catch(err => {
                     console.log(err)
@@ -98,7 +104,7 @@
             valuesAreValid = false;
             errormsg = "Password must be 12 characters long.";
         }
-        else if(params.role === "researcher" && !pwAdminRequirement.test(pw1)){
+        else if(params.role === "researcher" && !pwResearcherRequirement.test(pw1)){
             valuesAreValid = false;
             errormsg = "Password must be 8 characters long.";
         }

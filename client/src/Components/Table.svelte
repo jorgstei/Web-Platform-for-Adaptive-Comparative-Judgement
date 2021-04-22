@@ -164,7 +164,6 @@
                                 let tableIndex = tableAttributes.findIndex(e=>e.viewName=="id" || e.viewName=="judge id");
                                 if(tableIndex != -1){
                                     let content_id = row[tableIndex];
-                                    console.log("Deleting dude with id", content_id, "which was row", tableIndex);
                                     swal({
                                     title: "Are you sure?",
                                     text: "Are you sure you want to delete this " + itemName + "?",

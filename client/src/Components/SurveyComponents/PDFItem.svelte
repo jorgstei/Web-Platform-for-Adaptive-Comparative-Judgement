@@ -30,6 +30,7 @@
     let view = undefined
 
     onMount(() => {
+        console.log("in pdfitem with option", option);
         let uploadBtn = document.getElementById("pdfupload-btn-"+option.uuid)
         if(!uploadBtn){
             console.error("mytag unable to get uploadBtn")
@@ -82,11 +83,31 @@
 
 <Card style="cursor: default; background-color:rgb(235,235,235);" hover>
     <Row>
-        <Col cols={11}>
+        <Col cols={12}>
             <CardText>
+                <Button
+                fab
+                outlined
+                class="float-left"
+                on:click={showOverlay}
+                >
+                    <Icon path={mdiFullscreen}/>
+                </Button>
+                
+                <Button
+                fab
+                outlined
+                class="float-right"
+                on:click={() => functionObject.removeOption(option)}
+                >
+                    <Icon path={mdiDeleteForever}/>
+                </Button>
+            
+                
                 <div>Item</div>
                 <input type="file" accept="application/pdf" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden/>
-                <label class="labelBtn" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
+                <label class="labelBtn" style="width:80%; margin:auto;" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
+                
                 <TextField
                     hint="*Required"
                     bind:value={option.tag}
@@ -115,26 +136,9 @@
                     class="mt-4">Media Type</Select
                 >
             </CardText>
-        </Col>
-        <Col cols={1}>
-            <Button
-                fab
-                outlined
-                class="float-right"
-                on:click={() => functionObject.removeOption(option)}
-                >
-                <Icon path={mdiDeleteForever}/>
-            </Button>
             
-            <Button
-                fab
-                outlined
-                class="float-right mt-9"
-                on:click={showOverlay}
-                >
-                <Icon path={mdiFullscreen}/>
-            </Button>
         </Col>
+        
     </Row>
 </Card>
 <Overlay

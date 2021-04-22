@@ -32,7 +32,7 @@
     console.log("allow and func in menu", allowLeavePageWithoutWarning, warningOnLeaveFunc);
     const menuItems = [
         {
-            text:"Profile", icon: mdiAccount, to:"profile", requireAdmin: false
+            text:"Account", icon: mdiAccount, to:"profile", requireAdmin: false
         },
         {
             text:"Invite", icon: mdiAccountPlus, to: "invite_researcher", requireAdmin: true

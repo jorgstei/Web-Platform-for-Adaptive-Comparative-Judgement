@@ -918,7 +918,7 @@
               class="align-self-center"
               on:click={() => {
                 addSurveyOption(
-                  selectedMediaType + surveyOptions.length,
+                  "tag" + surveyOptions.length,
                   selectedMediaType,
                   getInputFieldTypeFromMediaType(selectedMediaType),
                   "",

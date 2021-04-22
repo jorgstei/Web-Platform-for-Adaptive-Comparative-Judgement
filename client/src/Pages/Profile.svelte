@@ -61,11 +61,11 @@
 
 {#if userInfo != null}
     <div class="d-flex flex-column justify-content-center align-content-center">
-        <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Profile</h1>
+        <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Account</h1>
         <Card class="elevation-4 align-self-center justify-self-center" style="width:50vh;height:auto;">
             <CardText class="justify-content-left">
                 <h5 class="text-h5 ma-2 mb-6">Welcome {userInfo.email}</h5>
-                <p>Number of surveys you have access too: {numberOfSurveys}</p>
+                <p>Number of surveys you have access to: {numberOfSurveys}</p>
             </CardText>
             <CardActions class="d-flex flex-row justify-space-around" style="width: 100%;">
                 <Button class="red white-text" on:click={() => deleteAccountClicked()}>

@@ -93,7 +93,7 @@
                 >
                     <Icon path={mdiFullscreen}/>
                 </Button>
-                
+
                 <Button
                 fab
                 outlined
@@ -152,7 +152,6 @@ style="cursor:default"
     </TextField>
     {#if view != undefined}
         <PDFView iframeId="preview" width="70vh" height="70vh" src={view}></PDFView>
-        <!--<PDFViewer {pdf} {classes} {options} bind:currentPage {pageNumberText}></PDFViewer>-->
         <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
             Close overlay
         </Button>

@@ -121,69 +121,77 @@
 
                     {#if tableAttributes.findIndex(e => e.viewName === 'delete') != -1}
                         {#if userRights != undefined && userRights != null && userRights.length > 0 && userRights[tableData.findIndex(e=>e==row)].editSurvey}
-                        <td class="col" title="Delete survey." style="cursor:pointer;"
+                        <td class="col" title="{"Deletess " + itemName}"  style="cursor:pointer;"
                             on:click={()=>{
-                                let content_id = row[tableAttributes.findIndex(e=>e.viewName=="id")]; 
-                                swal({
-                                title: "Are you sure?",
-                                text: "Are you sure you want to delete this " + itemName + "?",
-                                icon: "warning",
-                                dangerMode: true,
-                                buttons: ["Cancel", "Delete"]
-                                })
-                                .then(async willDelete => {
-                                    if (willDelete) {
-                                        await deleteFunc(content_id).then(()=> {
-                                            swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
-                                            const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id");
-                                            const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
-                                            //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
-                                            tableData.splice(surveyIndex, 1);
-                                            surveyActivityStatus.splice(surveyIndex, 1);
-                                            userRights.splice(surveyIndex, 1);
-
-                                            tableData = tableData;
-                                            surveyActivityStatus = surveyActivityStatus;
-                                            userRights = userRights;
-                                        }).catch((err)=>{
-                                            swal("Could not delete", "Due to error: " + err, "error");
-                                        })
-                                    }
-                                });
+                                // Content id is gotten from a column with the header id or judge id. These are necessary to make the delete function work.
+                                // 
+                                let tableIndex = tableAttributes.findIndex(e=>e.viewName=="id" || e.viewName=="judge id");
+                                if(tableIndex != -1){
+                                    let content_id = row[tableIndex]; 
+                                    swal({
+                                    title: "Are you sure?",
+                                    text: "Are you sure you want to delete this " + itemName + "?",
+                                    icon: "warning",
+                                    dangerMode: true,
+                                    buttons: ["Cancel", "Delete"]
+                                    })
+                                    .then(async willDelete => {
+                                        if (willDelete) {
+                                            await deleteFunc(content_id).then(()=> {
+                                                swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
+                                                const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id" || attr.viewName=="judge id");
+                                                const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
+                                                //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
+                                                tableData.splice(surveyIndex, 1);
+                                                surveyActivityStatus.splice(surveyIndex, 1);
+                                                userRights.splice(surveyIndex, 1);
+    
+                                                tableData = tableData;
+                                                surveyActivityStatus = surveyActivityStatus;
+                                                userRights = userRights;
+                                            }).catch((err)=>{
+                                                swal("Could not delete", "Due to error: " + err, "error");
+                                            })
+                                        }
+                                    });
+                                }
                             }}>
                             <Icon path={mdiDelete}></Icon>
                         </td>
                         {:else if userInfo != undefined && userInfo != null && userInfo.role === "admin"}
                         <td class="col" title="Delete survey." style="cursor:pointer;"
                             on:click={()=>{
-                                let content_id = row[tableAttributes.findIndex(e=>e.viewName=="id")];
-                                swal({
-                                title: "Are you sure?",
-                                text: "Are you sure you want to delete this " + itemName + "?",
-                                icon: "warning",
-                                dangerMode: true,
-                                buttons: ["Cancel", "Delete"]
-                                })
-                                .then(async willDelete => {
-                                    if (willDelete) {
-                                        await deleteFunc(content_id).then(()=> {
-                                            swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
-                                            const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id");
-                                            const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
-                                            //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
-                                            tableData.splice(surveyIndex, 1);
-                                            surveyActivityStatus.splice(surveyIndex, 1);
-                                            userRights.splice(surveyIndex, 1);
-
-                                            tableData = tableData;
-                                            surveyActivityStatus = surveyActivityStatus;
-                                            userRights = userRights;
-
-                                        }).catch((err)=>{
-                                            swal("Could not delete", "Due to error: " + err, "error");
-                                        })
-                                    }
-                                });
+                                let tableIndex = tableAttributes.findIndex(e=>e.viewName=="id" || e.viewName=="judge id");
+                                if(tableIndex != -1){
+                                    let content_id = row[tableIndex];
+                                    swal({
+                                    title: "Are you sure?",
+                                    text: "Are you sure you want to delete this " + itemName + "?",
+                                    icon: "warning",
+                                    dangerMode: true,
+                                    buttons: ["Cancel", "Delete"]
+                                    })
+                                    .then(async willDelete => {
+                                        if (willDelete) {
+                                            await deleteFunc(content_id).then(()=> {
+                                                swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
+                                                const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id" || attr.viewName=="judge id");
+                                                const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
+                                                //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
+                                                tableData.splice(surveyIndex, 1);
+                                                surveyActivityStatus.splice(surveyIndex, 1);
+                                                userRights.splice(surveyIndex, 1);
+    
+                                                tableData = tableData;
+                                                surveyActivityStatus = surveyActivityStatus;
+                                                userRights = userRights;
+    
+                                            }).catch((err)=>{
+                                                swal("Could not delete", "Due to error: " + err, "error");
+                                            })
+                                        }
+                                    });
+                                }
                             }}>
                             <Icon path={mdiDelete}></Icon>
                             

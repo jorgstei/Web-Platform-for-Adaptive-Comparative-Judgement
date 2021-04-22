@@ -4,7 +4,7 @@
     import swal from "sweetalert";
     
     export let showJudgeOverlay;
-    export let survey;
+    export let survey = undefined;
     console.log("Survey from IntroductionToSurvey.svelte: ", survey);
     let navwrap = document.getElementById("navWrapper");
     if(navwrap){
@@ -65,7 +65,7 @@
                 </Button>
                 <CardText>
                     <div>Extra info</div>
-                    <div class="text--primary text-h4">How a survey doesnt works</div>
+                    <div class="text--primary text-h4">How a survey works</div>
                     <div class="text--primary text-h6" style="text-align: left; padding-top: 1vh;">
                         You will be presented with several pairs of items to compare.
                         These items will be answers to the question above, and you should choose the one which best fits your preference.

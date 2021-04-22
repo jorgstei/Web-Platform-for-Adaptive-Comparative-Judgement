@@ -38,9 +38,26 @@
 
 <Card style="cursor: default; background-color:rgb(235,235,235);" hover>
     <Row>
-        <Col cols={11}>
+        <Col cols={12}>
             <CardText>
-                <div>Item</div>
+                <Button
+                    fab
+                    outlined
+                    class="float-left"
+                    on:click={()=>{option.showOverlay = true; console.log("clicked on card");}}
+                    >
+                    <Icon path={mdiFullscreen}/>
+                </Button>
+                <Button
+                fab
+                outlined
+                class="float-right"
+                on:click={() => functionObject.removeOption(option)}
+                >
+                    <Icon path={mdiDeleteForever}/>
+                </Button>
+                
+                <div style="margin-bottom: 5em;">Item</div>
                 <TextField
                 hint="*Required"
                 bind:value={option.tag}
@@ -91,23 +108,7 @@
             </CardText>
         </Col>
         <Col cols={1}>
-            <Button
-                fab
-                outlined
-                class="float-right"
-                on:click={() => functionObject.removeOption(option)}
-                >
-                <Icon path={mdiDeleteForever}/>
-            </Button>
             
-            <Button
-                fab
-                outlined
-                class="float-right mt-9"
-                on:click={()=>{option.showOverlay = true; console.log("clicked on card");}}
-                >
-                <Icon path={mdiFullscreen}/>
-            </Button>
         </Col>
     </Row>
 </Card>

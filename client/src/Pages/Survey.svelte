@@ -167,6 +167,7 @@
                             right = item.right;
                         }
                         randomPair.push({"left": left, "right": right});
+                        randomPair = randomPair;
                         console.log("pushed to randompair", randomPair);
                     });
                     randomPair = randomPair;
@@ -215,10 +216,10 @@
     })
     
 
-    const in_duration = 1000;
-    const in_delay = 500;
-    const out_duration = 1000;
-    const out_delay = 500;
+    const in_duration = 800;
+    const in_delay = 300;
+    const out_duration = 800;
+    const out_delay = 300;
     const transition_x = 300;
 
     const changeElevation = (e)=> {
@@ -243,18 +244,20 @@
     let showRightItemOverlay = false;
 
     $: survey;
+    // apply to left and right cards for animation, currently fu**s up rerendering when getting a pdf
+    // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
+    // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
 </script>
 <main id="surveyWrapper" tabindex="0">
     {#if counter < maxCounter}
     {#key counter}
     
-    <h1 class="text-h4" style="margin:3vh 0 2vh 0">{question}</h1>
-    <div style="width:75%; margin:auto;">
+    <div style="width:75%; margin:auto; margin-top:1vh;">
         <ProgressLinear value={progressPercent} height="10px"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
 
-    <div id="container" class="d-flex flex-row ">
+    <div id="container" class="d-flex flex-row justify-space-between">
         <Overlay
             bind:active={showJudgeOverlay}
             opacity={1}
@@ -266,22 +269,15 @@
 
         </Overlay>
 
-        
-        <!--
-
-            {#if aPDFTest != null}
-                <PDFView src={aPDFTest} iframeId="preview" width="70vh" height="70vh"></PDFView>
-            {/if}
-        -->
-        {#if randomPair.length != 0}
-            <div class="cardWrapper" in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
+        {#if randomPair.length != 0 && randomPair[counter] != undefined}
+            <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center; height:60vh;">
+                    <CardText style="text-align: center; height:70vh;">
                         {#if randomPair[counter].left.type == "plain"}
                             <TextView textID={randomPair[counter].left.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].left.type == "pdf"}
-                            <div style="float: right; cursor:pointer;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
-                            <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="80%"></PDFView>
+                            <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
+                            <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="100%"></PDFView>
 
                             <Overlay
                             bind:active={showLeftItemOverlay}
@@ -295,18 +291,18 @@
                     </CardText>
     
                     <CardActions>
-                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={leftChoiceClicked}>Choose left</Button>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:5vh;" outlined on:click={leftChoiceClicked}>Choose left</Button>
                     </CardActions>
                 </Card>
             </div>
-            <div class="cardWrapper" in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}} on:mouseover={changeElevation} on:mouseleave={changeElevation}>
+            <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center; height:60vh">
+                    <CardText style="text-align: center; height:70vh">
                         {#if randomPair[counter].right.type == "plain"}
                             <TextView textID={randomPair[counter].right.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].right.type == "pdf"}
                             <div style="float: right; cursor:pointer;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
-                            <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="80%"></PDFView>
+                            <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="100%"></PDFView>
 
 
                             <Overlay
@@ -321,7 +317,7 @@
                     </CardText>
                     
                     <CardActions>
-                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={rightChoiceClicked}>Choose right</Button>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:5vh;" outlined on:click={rightChoiceClicked}>Choose right</Button>
                     </CardActions>
                 </Card>
             </div>
@@ -348,7 +344,8 @@
 
 <style>
     .cardWrapper {
-        width:45%; height:80%;
+        width:48%; height:90%;
+        transition: border 500ms ease-out;
     }
     main {
         margin:auto;
@@ -359,9 +356,9 @@
     }
     #container {
         margin: auto;
-        padding-top: 5vh;
-        width: 80%;
-        height: 80%;
+        padding-top: 3vh;
+        width: 100%;
+        height: 92%;
         display: flex;
         justify-content: space-evenly;
     }

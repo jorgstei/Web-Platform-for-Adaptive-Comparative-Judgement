@@ -49,6 +49,7 @@
         background-color: rgba(100, 100, 100, 0.7);
         border-color: rgba(100, 100, 100, 0.7);
         color: rgba(255,255,255,0.9);
+        margin-bottom: 1em;
     }
     .submitBtn:hover{
         background-color:  rgba(100, 100, 100, 0.7);

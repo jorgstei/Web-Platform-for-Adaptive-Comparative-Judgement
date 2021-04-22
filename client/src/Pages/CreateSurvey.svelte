@@ -808,7 +808,7 @@
           </span>
         </Tooltip>
       </div>
-      Survey description
+      Internal description
     </Textarea>
 
     <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">
@@ -918,7 +918,7 @@
               class="align-self-center"
               on:click={() => {
                 addSurveyOption(
-                  selectedMediaType + surveyOptions.length,
+                  "tag" + surveyOptions.length,
                   selectedMediaType,
                   getInputFieldTypeFromMediaType(selectedMediaType),
                   "",

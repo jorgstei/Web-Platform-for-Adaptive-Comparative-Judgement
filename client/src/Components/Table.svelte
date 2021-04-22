@@ -164,33 +164,47 @@
                                 let tableIndex = tableAttributes.findIndex(e=>e.viewName=="id" || e.viewName=="judge id");
                                 if(tableIndex != -1){
                                     let content_id = row[tableIndex];
-                                    swal({
-                                    title: "Are you sure?",
-                                    text: "Are you sure you want to delete this " + itemName + "?",
-                                    icon: "warning",
-                                    dangerMode: true,
-                                    buttons: ["Cancel", "Delete"]
-                                    })
-                                    .then(async willDelete => {
-                                        if (willDelete) {
-                                            await deleteFunc(content_id).then(()=> {
-                                                swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
-                                                const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id" || attr.viewName=="judge id");
-                                                const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
-                                                //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
-                                                tableData.splice(surveyIndex, 1);
-                                                surveyActivityStatus.splice(surveyIndex, 1);
-                                                userRights.splice(surveyIndex, 1);
-    
-                                                tableData = tableData;
-                                                surveyActivityStatus = surveyActivityStatus;
-                                                userRights = userRights;
-    
-                                            }).catch((err)=>{
-                                                swal("Could not delete", "Due to error: " + err, "error");
-                                            })
-                                        }
-                                    });
+                                    if(itemName == "researcher"){
+                                        swal({
+                                            title: "Are you sure?",
+                                            text: "Are you sure you want to delete this " + itemName + "?",                                            
+                                            icon: "warning",
+                                            dangerMode: true,
+                                            buttons: ["Cancel", "Delete", "Delete with surveys"]
+                                        })
+                                        .then(swalResult => {
+                                            console.log("Swal result:", swalResult)
+                                        })
+                                    }
+                                    else{
+                                        swal({
+                                            title: "Are you sure?",
+                                            text: "Are you sure you want to delete this " + itemName + "?",
+                                            icon: "warning",
+                                            dangerMode: true,
+                                            buttons: ["Cancel", "Delete"]
+                                        })
+                                        .then(async willDelete => {
+                                            if (willDelete) {
+                                                await deleteFunc(content_id).then(()=> {
+                                                    swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
+                                                    const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id" || attr.viewName=="judge id");
+                                                    const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
+                                                    //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
+                                                    tableData.splice(surveyIndex, 1);
+                                                    surveyActivityStatus.splice(surveyIndex, 1);
+                                                    userRights.splice(surveyIndex, 1);
+                                                    
+                                                    tableData = tableData;
+                                                    surveyActivityStatus = surveyActivityStatus;
+                                                    userRights = userRights;
+                                                    
+                                                }).catch((err)=>{
+                                                    swal("Could not delete", "Due to error: " + err, "error");
+                                                })
+                                            }
+                                        });
+                                    }
                                 }
                             }}>
                             <Icon path={mdiDelete}></Icon>

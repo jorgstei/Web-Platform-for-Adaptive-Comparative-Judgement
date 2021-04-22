@@ -637,6 +637,7 @@ router.delete("/:id", auth, async (req, res) => {
     if(req.auth["user"]?.role == "admin" && req.body?.deleteTransientData == true){
         deleteTransientData = true
     }
+    console.log("findme deleteTransientData after check:", deleteTransientData)
     if(deleteTransientData){
         const result = await User.deleteOne({ _id: req.params.id })
         await Survey.deleteMany({

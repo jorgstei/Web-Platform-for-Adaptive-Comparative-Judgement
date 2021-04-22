@@ -177,10 +177,11 @@ export default class UserService extends Service{
         .catch(error => error.response)
     }
 
-    deleteUserByID(id){
+    deleteUserByID(id, deleteTransientData=false){
         return axios({
             method: "delete",
             url: this.path + "/user/"+id,
+            data: deleteTransientData,
             withCredentials: true
         })
         .then(response => response)

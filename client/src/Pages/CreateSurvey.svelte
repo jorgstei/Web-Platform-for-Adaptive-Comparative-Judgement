@@ -1,8 +1,5 @@
 <script>
   import { v4 as uuidv4 } from "uuid";
-  import OptionBox from "../Components/OptionBox.svelte";
-  import ResearcherBox from "../Components/ResearcherBox.svelte";
-  import SearchDropdown from "../Components/SearchDropdown.svelte";
   import swal from "sweetalert";
   import { surveyService } from "../Services/SurveyService";
   import { navigate } from "svelte-routing";

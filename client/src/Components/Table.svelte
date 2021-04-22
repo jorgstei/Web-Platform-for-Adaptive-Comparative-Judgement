@@ -3,9 +3,8 @@
     import {onMount} from 'svelte'
     import { toast } from "@zerodevx/svelte-toast";
     import { Link } from "svelte-routing";
-    import { attr } from "svelte/internal";
-    import { mdiChevronDown, mdiChevronUp, mdiUnfoldMoreHorizontal, mdiPoll, mdiShare, mdiFileEditOutline, mdiDelete, mdiSquareEditOutline } from "@mdi/js";
-    import {Icon, Button } from 'svelte-materialify';
+    import { mdiChevronDown, mdiChevronUp, mdiUnfoldMoreHorizontal, mdiPoll, mdiShare, mdiDelete, mdiSquareEditOutline } from "@mdi/js";
+    import { Icon } from 'svelte-materialify';
 
     export let filterBy = undefined;
     export let dir = 1;

@@ -1,9 +1,6 @@
 <script>
-	import queryString from "query-string";
 	import { SvelteToast } from "@zerodevx/svelte-toast";
-	import { surveyService } from "../Services/SurveyService";
 	import { userService } from "../Services/UserService";
-	import Footer from "../Components/Footer.svelte";
 	import Navbar from "../Components/Navbar.svelte";
 	import Survey from "./Survey.svelte";
 	import { Router, Route } from "svelte-routing";
@@ -15,9 +12,6 @@
 	import AdminBoard from "./AdminBoard.svelte";
 	import RegisterAccount from "./RegisterAccount.svelte";
 	import ForgottenPassword from "./ForgottenPassword.svelte";
-	import IntroductionToSurvey from "./IntroductionToSurvey.svelte";
-	import { navigateWithRefreshToken } from "../Utility/naviagte";
-	import { navigate } from "svelte-routing";
 	import { MaterialApp } from "svelte-materialify";
 
 	export let url = "";
@@ -69,10 +63,6 @@
 
 			<Route path="forgotten_password">
 				<ForgottenPassword bind:userInfo />
-			</Route>
-
-			<Route path="create_survey">
-				<CreateSurvey bind:userInfo/>
 			</Route>
 
 			<Route path="about">

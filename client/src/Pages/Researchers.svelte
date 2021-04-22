@@ -84,8 +84,8 @@
       bind:tableData={data2DArray}
       itemName = "researcher"
       {tableAttributes}
-      deleteFunc={async (id) => {
-        await userService.deleteUserByID(id);
+      deleteFunc={async (id, deleteTransientData) => {
+        return await userService.deleteUserByID(id, deleteTransientData);
       }}
     />
     <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} bind:direction={tableFilterParams.direction} {...tableFilterParams} />

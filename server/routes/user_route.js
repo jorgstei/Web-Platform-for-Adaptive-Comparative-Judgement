@@ -634,6 +634,7 @@ router.delete("/:id", auth, async (req, res) => {
         return
     }
     let deleteTransientData = false;
+    console.log("delete req.body:", req.body)
     if(req.auth["user"]?.role == "admin" && req.body?.deleteTransientData == true){
         deleteTransientData = true
     }

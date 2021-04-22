@@ -164,16 +164,53 @@
                                 let tableIndex = tableAttributes.findIndex(e=>e.viewName=="id" || e.viewName=="judge id");
                                 if(tableIndex != -1){
                                     let content_id = row[tableIndex];
+                                    let checkBoxContainer = document.createElement("div")
+                                    let deleteTransientData = document.createElement("input")
+                                    let deleteTransientDataLabel = document.createElement("label")
+                                    deleteTransientData.type = "checkbox"
+                                    deleteTransientData.checked = false
+                                    deleteTransientData.id = "deleteTransientData"
+                                    deleteTransientDataLabel.setAttribute("for", "deleteTransientData")
+                                    deleteTransientDataLabel.innerText = "Delete researchers surveys too: "
+                                    deleteTransientDataLabel.style = "color:black; display:inline;"
+                                    checkBoxContainer.appendChild(deleteTransientDataLabel)
+                                    checkBoxContainer.appendChild(deleteTransientData)
                                     if(itemName == "researcher"){
                                         swal({
                                             title: "Are you sure?",
+                                            content: checkBoxContainer,
                                             text: "Are you sure you want to delete this " + itemName + "?",                                            
                                             icon: "warning",
                                             dangerMode: true,
-                                            buttons: ["Cancel", "Delete", "Delete with surveys"]
+                                            buttons: ["Cancel", "Delete"]
                                         })
-                                        .then(swalResult => {
-                                            console.log("Swal result:", swalResult)
+                                        .then(async willDelete => {
+                                            if (willDelete) {
+                                                await deleteFunc(content_id, deleteTransientData.checked).then((res)=> {
+                                                    console.log("deleteFunc res:", res)
+                                                    if(res?.status < 300){
+                                                        console.log("Delete ok")
+                                                        swal("Deleted!", capitalizeFirstCharacter(itemName) + " has been deleted!", "success");
+                                                        const idAttrIndex = tableAttributes.findIndex(attr=>attr.viewName=="id" || attr.viewName=="judge id");
+                                                        const surveyIndex = tableData.findIndex(e => e[idAttrIndex] == content_id);
+                                                        //console.log("idattrindex", idAttrIndex, "surveyindex", surveyIndex);
+                                                        tableData.splice(surveyIndex, 1);
+                                                        surveyActivityStatus.splice(surveyIndex, 1);
+                                                        userRights.splice(surveyIndex, 1);
+                                                        
+                                                        tableData = tableData;
+                                                        surveyActivityStatus = surveyActivityStatus;
+                                                        userRights = userRights;
+                                                    }
+                                                    else{
+                                                        console.log("Delete not ok")
+                                                        swal("Error", "Unable to delete researcher\nReason: " + res?.data?.message, "error")
+                                                    }
+                                                    
+                                                }).catch((err)=>{
+                                                    swal("Could not delete", "Due to error: " + err, "error");
+                                                })
+                                            }
                                         })
                                     }
                                     else{

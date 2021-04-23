@@ -393,7 +393,7 @@
                 console.log("surveyService put data: ", data);
                 const survey_link =
                   window.location.href.split("/admin_board")[0] +
-                  "?takeSurvey=1&surveyID=" +
+                  "/survey?takeSurvey=1&surveyID=" +
                   surveyID;
                 let dummy = document.getElementById("dummy");
                 dummy.value = survey_link;
@@ -452,7 +452,7 @@
                   });
                   await Promise.all(itemFileResponses).catch((error) => console.error("Error when posting item files:", error));
                   console.log("postSurvey data: ", data);
-                  const survey_link = window.location.href.split("/admin_board")[0] + "?takeSurvey=1&surveyID=" + data.loc;
+                  const survey_link = window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + data.loc;
                   let dummy = document.getElementById("dummy");
                   dummy.value = survey_link;
                   console.log(dummy.value);

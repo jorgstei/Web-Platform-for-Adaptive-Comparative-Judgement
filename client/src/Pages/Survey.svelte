@@ -31,6 +31,7 @@
     export let takingSurvey;
     export let showJudgeOverlay = false;
 
+    let question = undefined
     let completed = false
     let navwrap = document.getElementById("navWrapper");
 
@@ -254,7 +255,7 @@
     {#if counter < maxCounter}
     {#key counter}
     
-    <div style="width:75%; margin:auto;">
+    <div style="width:100%; margin:auto;">
         <ProgressLinear value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
@@ -266,44 +267,40 @@
             color={"#eee"}
             style="cursor:default;"
         >
-        
         <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
-
         </Overlay>
 
         {#if randomPair.length != 0 && randomPair[counter] != undefined}
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
-                <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center; height:90%;">
+                <Card style="min-width:100%; height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
+                    <div style="text-align: center; height:85%">
                         {#if randomPair[counter].left.type == "plain"}
                             <TextView textID={randomPair[counter].left.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].left.type == "pdf"}
                             <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="100%"></PDFView>
-
                             <Overlay
                             bind:active={showLeftItemOverlay}
                             opacity={1}
                             color={"#eee"}
                             style="cursor:default;">
-                                <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
-                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
-                            </Overlay>
+                            <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
+                            <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+                        </Overlay>
                         {/if}
-                    </CardText>
-    
+                    </div>
                     <CardActions>
-                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={leftChoiceClicked}>Choose left</Button>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;margin-top:7px" outlined on:click={leftChoiceClicked}>Choose left</Button>
                     </CardActions>
                 </Card>
             </div>
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
-                <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center; height:90%">
+                <Card style="min-width:100%; height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
+                    <div style="text-align: center; height:85%">
                         {#if randomPair[counter].right.type == "plain"}
                             <TextView textID={randomPair[counter].right.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].right.type == "pdf"}
-                            <div style="float: right; cursor:pointer;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
+                            <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="100%"></PDFView>
 
 
@@ -316,10 +313,10 @@
                                 <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
                             </Overlay>
                         {/if}
-                    </CardText>
+                    </div>
                     
                     <CardActions>
-                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={rightChoiceClicked}>Choose right</Button>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;margin-top:7px" outlined on:click={rightChoiceClicked}>Choose right</Button>
                     </CardActions>
                 </Card>
             </div>
@@ -346,7 +343,7 @@
 
 <style>
     .cardWrapper {
-        width:48%; height:90%;
+        width:48%; height:100%;
         transition: border 500ms ease-out;
     }
     main {
@@ -354,11 +351,11 @@
         margin-top: 0;
         width: 100vw;
         max-width: 100%;
-        height: 100vh;
+        height: 100%;
     }
     #container {
         margin: auto;
-        padding-top: 3vh;
+        padding-top: 0.5vh;
         width: 100%;
         height: 90%;
         display: flex;

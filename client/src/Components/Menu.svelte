@@ -59,11 +59,10 @@
 </script>
 
 {#if userInfo != null && userInfo != undefined}
-<NavigationDrawer bind:mini={collapsedMenu} style="position:fixed; padding-bottom: 10vh; margin-top:5vh;padding-top:5vh;z-index:2;" miniWidth="5vw;">
+<NavigationDrawer bind:mini={collapsedMenu} style="position:fixed; padding-bottom: 10vh; margin-top:5vh;padding-top:5vh;z-index:2;" miniWidth="4vw;">
 
-    <ListItem>
+
         <div class="d-flex flex-row justify-space-between">
-
             {#if !collapsedMenu}
                 <h4 class="text-h4">Menu</h4>
             {/if}
@@ -76,7 +75,7 @@
             </Button>
         </div>
         
-    </ListItem>
+
 
     <Divider />
     <List nav dense>

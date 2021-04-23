@@ -11,6 +11,10 @@
     export let showJudgeOverlay;
     export let allowLeavePageWithoutWarning = true;
 
+    /*
+        Allow tab navigation to click the elements with space or enter
+        This will affect both "Navbar" items and "Menu" items.
+    */
     let makeNavBarElementsTabbable = () => {
         [...document.getElementsByClassName("s-list-item link")]
         .forEach(e => {
@@ -83,23 +87,21 @@
         }
     }
 
-    /*
-        Allow tab navigation to click the elements with space or enter
-    */
+    //Allow enter(13) and space(32) to simulate click events
     const tabSpaceOrEnter = (e) => {
-        console.log("tabSpaceOrEnter: ", e)
         if(e.keyCode == 13 || e.keyCode == 32) {
             e.target.click()
-            e.target.focused = false
         }
     }
+    //Changes to userInfo might trigger the navbar to change state, 
+    //because of this we need to update the new elements to support tab navigation
     $: userInfo && makeNavBarElementsTabbable()
 </script>
 
 
 <AppBar class=" d-flex flex-row align-content-right justify-content-right" style="position:fixed;width:100%; padding:0;">
-    <div slot="icon" style="height:150%; width:auto; cursor: pointer;" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
-        <img src="/img/Compair.svg" style="width:100%; height: 100%;" alt="Compair logo"/>
+    <div slot="icon" style="height:100%; width:auto; cursor: pointer;" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
+        <img src="/img/Compair.svg" style="height: 100%; width:100%; min-height:50%;" alt="Compair logo"/>
     </div>
     
     {#if takingSurvey}

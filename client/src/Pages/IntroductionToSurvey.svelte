@@ -30,12 +30,14 @@
                 <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showSurveyJudgeInstructions = true; e.stopPropagation();}}>
                     <Icon path={mdiArrowExpand} size="2vw"></Icon>
                 </Button>
-                <CardText class="instruction-text">
-                  <div>Extra info</div>
-                  <div class="text--primary text-h4">Researcher instructions</div>
-                  <div class="text--primary" style="text-align: left; padding-top: 1vh;">
-                    {survey?.judgeInstructions}
-                  </div>
+                <CardText>
+                    <div class="instruction-text">
+                        <div>Extra info</div>
+                        <div class="text--primary text-h4">Researcher instructions</div>
+                        <div class="text--primary" style="text-align: left; padding-top: 1vh;">
+                            {survey?.judgeInstructions}
+                        </div>
+                    </div>
                 </CardText>
             </Card>
 
@@ -62,23 +64,25 @@
                 <Button fab class="float-right" style="min-width:3vw; min-height:3vw;" on:click={(e)=>{showGeneralInfoOverlay = true; e.stopPropagation();}}>
                     <Icon path={mdiArrowExpand} size="2vw"></Icon>
                 </Button>
-                <CardText class="extra-info-text">
-                    <div>Extra info</div>
-                    <div class="text--primary text-h4">How a survey works</div>
-                    <div class="text--primary" style="text-align: left; padding-top: 1vh;">
-                        You will be presented with several pairs of items to compare.
-                        These items will be answers to the question above, and you should choose the one which best fits your preference.
-                        An item can be a text field, pdf, image, etc.
-                        To choose an item you can click the button beneath it.
-                        You will be asked to answer {survey?.expectedComparisons} comparisons! 
-                    </div>
-                    <div class="text--primary text-h6 mt-4">
-                        You can also use the arrow keys to choose between options:
-                        <br>
-                        <img style="height: 10vh; width:auto; margin-top:1vh;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
-                    </div>
-                    <div class="text--primary text-h5" style="text-align: left; margin-top: 1vh;">
-                        Good luck!
+                <CardText>
+                    <div class="extra-info-text">
+                        <div>Extra info</div>
+                        <div class="text--primary text-h4">How a survey works</div>
+                        <div class="text--primary" style="text-align: left; padding-top: 1vh;">
+                            You will be presented with several pairs of items to compare.
+                            These items will be answers to the question above, and you should choose the one which best fits your preference.
+                            An item can be a text field, pdf, image, etc.
+                            To choose an item you can click the button beneath it.
+                            You will be asked to answer {survey?.expectedComparisons} comparisons! 
+                        </div>
+                        <div class="text--primary text-h6 mt-4">
+                            You can also use the arrow keys to choose between options:
+                            <br>
+                            <img style="height: 10vh; width:auto; margin-top:1vh;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
+                        </div>
+                        <div class="text--primary text-h5" style="text-align: left; margin-top: 1vh;">
+                            Good luck!
+                        </div>
                     </div>
                 </CardText>
             </Card>
@@ -138,6 +142,7 @@
     img {
         max-width: 100%;
     }
+    /* Small Screens (mobile, tablet)*/
     @media (min-width: 0px) and (max-width: 768px) {
         .question-header {
             font-size: 2.75rem;
@@ -149,15 +154,28 @@
             font-size: 0.75rem;
         }
     }
-    @media (min-width: 769px) and (max-width: 2160px) {
+    /* Medium Screens (laptops, desktops)*/
+    @media (min-width: 769px) and (max-width: 1199px) {
         .question-header {
-            font-size: 4rem;
+            font-size: 5rem;
         }
         .question-text {
-            font-size: 3rem;
+            font-size: 3.5rem;
         }
         .instruction-text, .extra-info-text  {
-            font-size: 0.75rem;
+            font-size: 1.25rem;
+        }
+    }
+    /* Large Screens (1200p and above)*/
+    @media (min-width: 1200px) and (max-width: 4320px) {
+        .question-header {
+            font-size: 6rem;
+        }
+        .question-text {
+            font-size: 4.5rem;
+        }
+        .instruction-text, .extra-info-text  {
+            font-size: 1.5em;
         }
     }
 </style>

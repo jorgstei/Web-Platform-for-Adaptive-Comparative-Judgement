@@ -17,7 +17,7 @@
 
 <style>
     .wrapper{
-        width: 25vw;
+        width: 30vw;
         margin: auto;
         display: grid;
         grid-template-columns: auto;

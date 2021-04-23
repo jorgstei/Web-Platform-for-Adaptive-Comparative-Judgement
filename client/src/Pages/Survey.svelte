@@ -16,13 +16,21 @@
     import PDFView from '../Components/PDFView.svelte';
     import { mdiFullscreen } from "@mdi/js";
 
+
+    /*
+        TODO: Currently if a judge refreshes the page, they have no way
+        to get back to the state they were in.
+        A possible solution to this is to store the survey id, and the pairs of IDs a judge is supposed
+        to judge in the judge-token, as well as the number of comparisons completed.
+        This will be at a cost of higher network usage.
+        Another solution is to no longer have a stateless backend.
+    */
+
     export let userInfo;
     export let surveyID;
     export let takingSurvey;
     export let showJudgeOverlay = false;
 
-    console.log("In survey with surveyid", surveyID);
-    let question = "";
     let completed = false
     let navwrap = document.getElementById("navWrapper");
 
@@ -81,19 +89,7 @@
     let complete = () => {
         if(!completed){
             completed = true
-            /*
-                setTimeout(async ()=>{
-                if(navwrap){
-                    navwrap.style.display = "initial";
-                }
-                const res = navigateWithRefreshToken("/")
-                console.log("nav with refreshtoken res:",res)
-                res.then(data => userInfo = data)
-            }
-            , 5000)
-            */
         }
-        //userService.logoutJudge().then(() => userInfo = null); 
     }
 
     onMount(async () => {
@@ -103,9 +99,10 @@
             document.getElementsByTagName("body")[0].style.overflowY = "hidden";
         }
         let params = queryString.parse(window.location.search);
-        if(params.takeSurvey == 1 && params.surveyID != undefined){
+        if(params?.takeSurvey == 1 && params?.surveyID != undefined){
             surveyID = params.surveyID;
         }
+
         await surveyService.getJudgeToken(surveyID).then(async data => {
             if(data.status < 300){
                 data = data.data
@@ -357,7 +354,7 @@
         margin-top: 0;
         width: 100vw;
         max-width: 100%;
-        height: 100%;
+        height: 100vh;
     }
     #container {
         margin: auto;

@@ -97,8 +97,9 @@
     }
 
     onMount(async () => {
-        console.log("in onmount in survey with height: " + window.screen.height);
+        console.log("in onmount in survey with height: " + window.screen.height, "current overflowy is:", document.getElementsByTagName("body")[0].style.overflowY);
         if(window.screen.height > 700){
+            console.log("it was true??")
             document.getElementsByTagName("body")[0].style.overflowY = "hidden";
         }
         let params = queryString.parse(window.location.search);
@@ -252,8 +253,8 @@
     {#if counter < maxCounter}
     {#key counter}
     
-    <div style="width:75%; margin:auto; margin-top:1vh;">
-        <ProgressLinear value={progressPercent} height="10px"></ProgressLinear>
+    <div style="width:75%; margin:auto;">
+        <ProgressLinear value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
 
@@ -262,7 +263,7 @@
             bind:active={showJudgeOverlay}
             opacity={1}
             color={"#eee"}
-            style="cursor:default"
+            style="cursor:default;"
         >
         
         <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
@@ -272,7 +273,7 @@
         {#if randomPair.length != 0 && randomPair[counter] != undefined}
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center; height:70vh;">
+                    <CardText style="text-align: center; height:90%;">
                         {#if randomPair[counter].left.type == "plain"}
                             <TextView textID={randomPair[counter].left.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].left.type == "pdf"}
@@ -291,13 +292,13 @@
                     </CardText>
     
                     <CardActions>
-                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:5vh;" outlined on:click={leftChoiceClicked}>Choose left</Button>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={leftChoiceClicked}>Choose left</Button>
                     </CardActions>
                 </Card>
             </div>
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; min-height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
-                    <CardText style="text-align: center; height:70vh">
+                    <CardText style="text-align: center; height:90%">
                         {#if randomPair[counter].right.type == "plain"}
                             <TextView textID={randomPair[counter].right.data} headerSizeNumber="3"></TextView>
                         {:else if randomPair[counter].right.type == "pdf"}
@@ -317,7 +318,7 @@
                     </CardText>
                     
                     <CardActions>
-                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:5vh;" outlined on:click={rightChoiceClicked}>Choose right</Button>
+                        <Button style="position: absolute; left:30%; bottom:0; min-width:40%; height:10%;" outlined on:click={rightChoiceClicked}>Choose right</Button>
                     </CardActions>
                 </Card>
             </div>
@@ -358,7 +359,7 @@
         margin: auto;
         padding-top: 3vh;
         width: 100%;
-        height: 92%;
+        height: 90%;
         display: flex;
         justify-content: space-evenly;
     }

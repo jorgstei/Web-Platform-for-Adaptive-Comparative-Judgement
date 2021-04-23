@@ -1,9 +1,7 @@
 <script>
 	import CostumInput from "../Components/CostumInput.svelte";
-	import queryString from "query-string";
 	import {navigate} from "svelte-routing";
 	import { surveyService } from "../Services/SurveyService";
-	import {navigateWithRefreshToken} from "../Utility/naviagte";
 	import { onDestroy, onMount } from "svelte";
 	import swal from "sweetalert";
 

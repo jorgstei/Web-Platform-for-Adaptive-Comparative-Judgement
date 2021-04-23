@@ -34,6 +34,8 @@
 
   export let allowLeavePageWithoutWarning;
   export let warningOnLeaveFunc;
+  export let userInfo;
+  export let editing = false;
 
   warningOnLeaveFunc = (link) => {
     swal({
@@ -75,8 +77,7 @@
   // To override the text between the forward and back buttons
   const pageNumberText = (currentPage, maximumPages) => currentPage + "/" + maximumPages;
 
-  export let userInfo;
-  export let editing = false;
+  
 
   //An array of functions to run when we press submit/edit survey. Remember to remove the corresponding function when removing the item that added the function
   let submitButtonFunctions = [];

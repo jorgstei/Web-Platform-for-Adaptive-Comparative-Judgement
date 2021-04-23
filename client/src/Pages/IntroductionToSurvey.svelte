@@ -117,17 +117,16 @@
 
         </div>
         
-        <Button outlined style="width: 30%; height: 5vh; margin-top: 7vh; margin-bottom:5%;" class="align-self-center" 
+        <Button outlined style="width: 30%; height: 5vh; margin-top: 5vh; margin-bottom:5vh;" class="align-self-center" 
             on:click={() => {showJudgeOverlay = false}}
         >Continue</Button>
     </div>
-    
-    
-
 </main>
 
 <style>
     main {
+        overflow-y: scroll;
+        height: 100vh;
         text-align: center;
         margin: auto;
         width: 100%;

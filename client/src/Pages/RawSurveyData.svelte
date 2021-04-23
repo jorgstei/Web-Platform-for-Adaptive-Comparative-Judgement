@@ -434,17 +434,17 @@
                 </Col>
             </Row>
         </div>
+
+        <ButtonGroup mandatory tile activeClass="primary-color" bind:value={currentContentView}>
+            <ButtonGroupItem value="linearRanking">Linear ranking</ButtonGroupItem>
+            <ButtonGroupItem value="byJudge">By judge</ButtonGroupItem>
+            <ButtonGroupItem value="byItem">By item</ButtonGroupItem>
+            <ButtonGroupItem value="rawdata">Raw data</ButtonGroupItem>
+        </ButtonGroup>
     {/if}
 
-    <ButtonGroup mandatory tile activeClass="primary-color" bind:value={currentContentView}>
-        <ButtonGroupItem value="linearRanking">Linear ranking</ButtonGroupItem>
-        <ButtonGroupItem value="byJudge">By judge</ButtonGroupItem>
-        <ButtonGroupItem value="byItem">By item</ButtonGroupItem>
-        <ButtonGroupItem value="rawdata">Raw data</ButtonGroupItem>
-    </ButtonGroup>
     
-
-
+    
     {#if currentContentView == "linearRanking"}
         {#if linearRanking != null && linearRanking.length > 0}
             <Table

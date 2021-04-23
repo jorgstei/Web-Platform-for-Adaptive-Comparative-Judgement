@@ -1,7 +1,5 @@
 <script>
   import Menu from "../Components/Menu.svelte";
-  import Table from "../Components/Table.svelte";
-  import { userService } from "../Services/UserService";
   import { Router, Route, navigate } from "svelte-routing";
   import Surveys from "./Surveys.svelte";
   import Researchers from "./Researchers.svelte";
@@ -12,7 +10,6 @@
   import Profile from "./Profile.svelte";
   
   export let userInfo;
-
   export let allowLeavePageWithoutWarning;
   export let warningOnLeaveFunc;
 

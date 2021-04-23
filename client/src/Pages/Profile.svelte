@@ -69,14 +69,13 @@
                 <p>Number of surveys you have access to: {numberOfSurveys}</p>
             </CardText>
             <CardActions class="d-flex flex-row justify-space-around" style="width: 100%;">
-                <Button class="red white-text" on:click={() => deleteAccountClicked()}>
+                <Button class="red white-text" style="width:40%;" on:click={() => deleteAccountClicked()}>
                     Delete Account
                 </Button>
-                <div class="justicy-self-center align-self-center">
-                    <Button on:click={() => navigate("/admin_board/change_password")}>
-                        Change Password
-                    </Button>
-                </div>
+                
+                <Button style="width:40%;" on:click={() => navigate("/admin_board/change_password")}>
+                    Change Password
+                </Button>
             </CardActions>
         </Card>
     </div>

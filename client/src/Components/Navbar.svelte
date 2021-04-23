@@ -3,12 +3,27 @@
     import {userService} from "../Services/UserService";
     import {AppBar, List, ListItemGroup, ListItem, Icon, Button} from "svelte-materialify"
     import { mdiInformationOutline } from "@mdi/js";
+    import { onMount } from "svelte";
 
     export let refreshToken;
     export let userInfo;
     export let takingSurvey;
     export let showJudgeOverlay;
     export let allowLeavePageWithoutWarning = true;
+
+    let makeNavBarElementsTabbable = () => {
+        [...document.getElementsByClassName("s-list-item link")]
+        .forEach(e => {
+            console.log("Found element to put onkeyup")
+            console.log(e)
+            e.onkeyup = tabSpaceOrEnter 
+        })  
+    }
+
+    onMount(() => {
+        makeNavBarElementsTabbable()
+    })
+
     let warningOnLeaveFunc = (link)=> {
         swal({
             title: "Are you sure?",
@@ -67,7 +82,18 @@
             })
         }
     }
-    $: userInfo
+
+    /*
+        Allow tab navigation to click the elements with space or enter
+    */
+    const tabSpaceOrEnter = (e) => {
+        console.log("tabSpaceOrEnter: ", e)
+        if(e.keyCode == 13 || e.keyCode == 32) {
+            e.target.click()
+            e.target.focused = false
+        }
+    }
+    $: userInfo && makeNavBarElementsTabbable()
 </script>
 
 
@@ -90,22 +116,22 @@
                 {"Home"}
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/test")}>
+                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/test")}>
                     {"Test"}
                 </ListItem>
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/admin_board/profile")}>
+                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/admin_board/profile")}>
                     {"Board"}
                 </ListItem>
             {/if}
-            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/about")}>
+            <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/about")}>
                 {"About"}
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => logout()}>
+                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => logout()}>
                     {"Log out"}
                 </ListItem>
             {:else}
-                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/login")}>
+                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/login")}>
                     {"Log in"}
                 </ListItem>
             {/if}

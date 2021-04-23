@@ -14,7 +14,6 @@
 	import ForgottenPassword from "./ForgottenPassword.svelte";
 	import { MaterialApp } from "svelte-materialify";
 
-	export let url = "";
 	let userInfo = null;
 
 	let allowLeavePageWithoutWarning = true;
@@ -50,7 +49,7 @@
 </script>
 
 <MaterialApp>
-	<Router {url}>
+	<Router>
 		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning/>
 		<div class="pt-14">
 			<Route path="/">
@@ -80,15 +79,19 @@
 			<Route path="admin_board/*">
 				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning/>
 			</Route>
+			<Route path="survey">
+				<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
+			</Route>
 		</div>
-	</Router>
-	<Router {url}>
-		<Route path="survey">
-			<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
-		</Route>
 	</Router>
 	<SvelteToast options={{ reversed: true, intro: { y: 192 } }} />
 </MaterialApp>
 
 <style>
+	:global(.s-list-item:focus){
+		color: white;	
+		background: rgba(76,76,76,0.5);
+		outline-color: yellow;
+		outline-style: auto;
+	}
 </style>

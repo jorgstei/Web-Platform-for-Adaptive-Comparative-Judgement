@@ -170,7 +170,7 @@
                                     deleteTransientData.checked = false
                                     deleteTransientData.id = "deleteTransientData"
                                     deleteTransientDataLabel.setAttribute("for", "deleteTransientData")
-                                    deleteTransientDataLabel.innerText = "Delete researchers surveys too: "
+                                    deleteTransientDataLabel.innerText = "Delete this reseachers surveys as well: "
                                     deleteTransientDataLabel.style = "color:black; display:inline;"
                                     checkBoxContainer.appendChild(deleteTransientDataLabel)
                                     checkBoxContainer.appendChild(deleteTransientData)

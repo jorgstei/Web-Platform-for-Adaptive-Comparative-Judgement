@@ -130,10 +130,14 @@
                 }
             }
             else{
-                swal("Error", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.\nError: "+data.data.message, "error").then(() => navigate("/"))
+                swal("Error", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.\nError: "+data.data.message, "error")
+                .then(() => {
+                    navigate("/")
+                })
             }
         })
-        .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error").then(() => navigate("/")))
+        .catch(err => swal("Something went wrong..", "Could not get authentication cookie for this survey. If the problem persists, please contact an administrator.", "error")
+        .then(() => navigate("/")))
 
         if(surveyID != undefined){
             surveyService.getItemsToCompareBySurveyId(surveyID)
@@ -353,7 +357,7 @@
         margin-top: 0;
         width: 100vw;
         max-width: 100%;
-        height: 100vh;
+        height: 100%;
     }
     #container {
         margin: auto;

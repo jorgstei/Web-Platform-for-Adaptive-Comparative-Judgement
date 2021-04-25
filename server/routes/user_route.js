@@ -38,7 +38,7 @@ function acceptablePassword(password, role){
 */
 function hashNoSalt(data) {
     console.log("data", data)
-    return sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(data))
+    return sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(data))
 }
 
 function createUserRegisterToken(to, role) {
@@ -61,7 +61,7 @@ function createForgottenPasswordToken(to) {
     const now = new Date(Date.now())
     const nowSeconds = Math.round(Date.now() / 1000)
     const exp = new Date(now)
-    exp.setMinutes(exp.getMinutes() + 1440)
+    exp.setMinutes(exp.getMinutes() + 60)
     const expSeconds = Math.round(exp.getTime() / 1000)
     const token = jwt.sign(
         {

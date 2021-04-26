@@ -288,7 +288,7 @@ router.post("/forgotten_my_password", async (req, res) => {
 
     const link = process.env.CLIENT_BASE_URL + "/forgotten_password/?token=" + createForgottenPasswordToken(hashNoSalt(email))
     const body_intro = "<html><div>Someone requested a password reset link for the ACJ account belonging to this email address.<br>"
-    const body_invite_link = "<p>Please us this link to create a new password for your account. You must enter the email address you received this mail from in order to create a new password.</p>"
+    const body_invite_link = "<p>Please use this link to create a new password for your account. You must enter the email address you received this mail from in order to create a new password.</p>"
         + "<a href=" + link + ">" + link + "</a>"
     const body_outro = "</div></html>"
     try {
@@ -296,7 +296,7 @@ router.post("/forgotten_my_password", async (req, res) => {
         {
             from: process.env.MAIL_FROM_STRING,
             to: email,
-            subject: "You have been invited to join ACJ",
+            subject: "Someone requested a password reset for your account",
             html: body_intro + body_invite_link + body_outro
         }
         const emailResponse = await sendMail(emailOptions)
@@ -391,7 +391,7 @@ router.post("/invite_link", auth, async (req, res) => {
     }
     const link = process.env.CLIENT_BASE_URL + "/register_account/?role="+role+"&token=" + createUserRegisterToken(hashNoSalt(email), role)
     const body_intro = "<html><div>You have been invited to join ACJ.<br>"
-    const body_invite_link = "<p>Please us this link to create your account. You must enter the email address you received this mail from in order to create the account.</p>"
+    const body_invite_link = "<p>Please use this link to create your account. You must enter the email address you received this mail from in order to create the account.</p>"
         + "<a href=" + link + ">" + link + "</a>"
     const body_outro = "</div></html>"
     try {

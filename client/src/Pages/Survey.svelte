@@ -12,8 +12,8 @@
     import queryString from "query-string";
     import { surveyItemFileService } from "../Services/SurveyItemFileService";
     import { nodeBufferToFile } from "../Utility/nodeBufferToBlobURL";
-    import TextView from '../Components/TextView.svelte';
-    import PDFView from '../Components/PDFView.svelte';
+    import TextView from '../Components/SurveyComponents/TextView.svelte';
+    import PDFView from '../Components/SurveyComponents/PDFView.svelte';
     import { mdiFullscreen } from "@mdi/js";
 
 
@@ -247,7 +247,7 @@
     let showRightItemOverlay = false;
 
     $: survey;
-    // apply to left and right cards for animation, currently fu**s up rerendering when getting a pdf
+    // apply to left and right cards for animation, currently messes up rerendering pdfs
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
 </script>
@@ -269,7 +269,7 @@
         >
         <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
         </Overlay>
-
+        <!-- Add new media types with {:else if ...} Remember to do this to both left and right card-->
         {#if randomPair.length != 0 && randomPair[counter] != undefined}
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">

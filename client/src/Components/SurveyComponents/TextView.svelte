@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import {surveyItemFileService} from "../Services/SurveyItemFileService";
+    import {surveyItemFileService} from "../../Services/SurveyItemFileService";
 
     export let textID;
     export let headerSizeNumber;

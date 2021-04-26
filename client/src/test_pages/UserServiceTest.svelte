@@ -1,7 +1,7 @@
 <script>
     import { surveyService } from "../Services/SurveyService";
     import { surveyItemFileService } from "../Services/SurveyItemFileService"
-    import PDFView from "../Components/PDFView.svelte"
+    import PDFView from "../Components/SurveyComponents/PDFView.svelte"
     import PDFObject from "pdfobject"
     import { nodeBufferToBlobURL } from "../Utility/nodeBufferToBlobURL";
 

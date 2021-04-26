@@ -26,10 +26,8 @@
   } from "svelte-materialify";
   import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel, mdiAbTesting } from "@mdi/js";
 
-  import Survey from "./Survey.svelte";
   import TextItem from "../Components/SurveyComponents/TextItem.svelte";
   import PDFItem from "../Components/SurveyComponents/PDFItem.svelte";
-  import PDFView from "../Components/PDFView.svelte";
   import { surveyItemFileService } from "../Services/SurveyItemFileService";
 
   export let allowLeavePageWithoutWarning;
@@ -647,6 +645,9 @@
     { name: "For fun", value: "fun" },
   ];
   let selectedPurpose = "research";
+
+  //Survey level media type, sets the default type when adding items
+  //value: should be the last part of the mimetype (application/pdf -> pdf, text/plain -> plain etc.)
   let mediaTypeItems = [
     { name: "Text", value: "plain" },
     { name: "PDF", value: "pdf" },
@@ -676,10 +677,11 @@
     }
   };
 
+  //Media types per item, used to change what kind of item is rendered.
+  //value: should be the last part of the mimetype (application/pdf -> pdf, text/plain -> plain etc.)
   let optionMediaTypeItems = [
     { name: "Text", value: "plain" },
     { name: "PDF", value: "pdf" },
-    { name: "Image", value: "image" },
   ];
 
   let showSurveyTitleTooltip,
@@ -885,6 +887,7 @@
     <div class="d-flex flex-column mt-4 mb-4 align-center">
       {#each surveyOptions as option}
         <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
+          <!--Add new media types by adding {:else if option.mediaType == "yourtype"} below-->
           {#if option.mediaType == "plain"}
             <TextItem
               bind:option

@@ -19,7 +19,7 @@
     import { surveyItemFileService } from "../../Services/SurveyItemFileService";
     import { nodeBufferToBlobURL, nodeBufferToFile } from "../../Utility/nodeBufferToBlobURL";
     import { onMount } from "svelte";
-    import PDFView from "../PDFView.svelte"
+    import PDFView from "./PDFView.svelte"
 
 
     export let option;

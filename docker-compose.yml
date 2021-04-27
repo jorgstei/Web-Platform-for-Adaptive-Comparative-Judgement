@@ -1,14 +1,13 @@
-version: "2"
+version: "3"
 services:
   acj-db:
-    build: ./docker/mongodb
-    env_file: ./docker/mongodb/.env
+    build: ./mongodb
+    env_file: ./mongodb/.env
     volumes: 
       - acj-db-data:/data/db
   acj-backend:
-    context: ./server
-    build: ./docker/server
-    env_file: ./docker/server/.env
+    build: ./server
+    env_file: ./server/.env
     ports:
       #Bind ports for REST-API
       - "xyz:xyz"
@@ -18,8 +17,7 @@ services:
     depends_on: 
       - acj-db
   acj-frontend:
-    context: ./client
-    build: ./docker/client
+    build: ./client
     ports:
       #Bind ports for frontend
       - "zyx:zyx"
@@ -30,7 +28,7 @@ services:
       #Bind a volume for your certificates
       - /etc/letsencrypt/archive/yourdomain:/project/certs
   acj-analyse:
-    build: ./docker/AnalyseModule
+    build: ./AnalyseModule
 volumes:
   acj-db-data:
     driver: local

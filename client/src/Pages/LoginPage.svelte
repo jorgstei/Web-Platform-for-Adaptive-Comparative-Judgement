@@ -19,16 +19,16 @@
     let newPw1;
     let newPw2;
 
-    export let newUser = false;
     export let userInfo;
     export let changePassword = false;
+    export let allowLeavePageWithoutWarning;
+    allowLeavePageWithoutWarning = true;
 
     //Email regex:
     const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
     const validatePasswordFields = [ruleValidatePasswordComplexity];
 
-    console.log("NewUser?: ", newUser);
 
     const login = () => {
         let [formIsValid, errormsg] = checkValues(email, newPw1);
@@ -39,9 +39,15 @@
                     if (res != null && res.status == 200) {
                         userInfo = res.data;
                         console.log(userInfo)
-                        navigate("/admin_board");
+                        navigate("/admin_board/profile");
                     } else {
-                        swal("Failed to log in", res.data.message, "error")
+                        console.log(res)
+                        if(res?.data?.message == undefined){
+                            swal("Failed to log in", "Reason: Unable to reach server.", "error")
+                        }
+                        else{
+                            swal("Failed to log in", res.data.message, "error")
+                        }
                     }
                 })
                 .catch((err) => {
@@ -228,6 +234,11 @@
             login();
         }
     };
+    const changeThePasswordOnEnterPress = (e) => {
+        if(e.keyCode == 13){
+            changeThePassword();
+        }
+    }
 </script>
 
 <div>
@@ -241,6 +252,7 @@
                 hint="*Required"
                 bind:value={oldPw}
                 type={oldPasswordShow ? "text" : "password"}
+                on:keydown={changeThePasswordOnEnterPress}
             >
                 Old Password
                 <div
@@ -256,6 +268,7 @@
                 rules={validatePasswordFields}
                 bind:value={newPw1}
                 type={newPw1Show ? "text" : "password"}
+                on:keydown={changeThePasswordOnEnterPress}
             >
                 New Password
                 <div slot="append" on:click={() => (newPw1Show = !newPw1Show)}>
@@ -268,6 +281,7 @@
                 rules={validatePasswordFields}
                 bind:value={newPw2}
                 type={newPw2Show ? "text" : "password"}
+                on:keydown={changeThePasswordOnEnterPress}
             >
                 New Password Repeated
                 <div slot="append" on:click={() => (newPw2Show = !newPw2Show)}>
@@ -288,13 +302,14 @@
                 Log in below to see your surveys, and continue making new ones.
             </h2>
             <div class="d-flex flex-column justify-center align-left">
-                <TextField class="ma-2" rules={[validateEmail]} bind:value={email}>
+                <TextField class="ma-2" rules={[validateEmail]} bind:value={email} on:keydown={loginOnEnterPress}>
                     Email
                 </TextField>
                 <TextField
                     class="ma-2"
                     bind:value={newPw1}
                     type={newPw1Show ? "text" : "password"}
+                    on:keydown={loginOnEnterPress}
                 >
                     Password
                     <div slot="append" on:click={() => (newPw1Show = !newPw1Show)}>

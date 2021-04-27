@@ -5,19 +5,23 @@
     import { onMount } from "svelte";
     import TableFilter from "../Components/TableFilter.svelte";
     import { Overlay, ProgressCircular } from 'svelte-materialify';
+    import { surveyAnswerService } from "../Services/SurveyAnswerService";
+    
 
     export let userInfo;
+    export let allowLeavePageWithoutWarning;
+    allowLeavePageWithoutWarning = true;
 
     let loadingData = true;
     
-    const tableFilterParams = {
+    let tableFilterParams = {
         countFunction: () => surveyService.getCount(),
         limit: 10,
-        direction: 1,
+        direction: -1,
         filterFunction: (a, b, c, d) => surveyService.getSorted(a, b, c, d),
     };
     let filterBy = {
-        filterName: "_id",
+        filterName: "dateCreated",
         counter: 0,
     };
     console.log("in surveys");
@@ -40,7 +44,16 @@
         },
         {
             fieldName: "inviteCode",
-            viewName: "code"
+            viewName: "PIN"
+        },
+        
+        {
+            fieldName: "",
+            viewName: "judges",
+        },
+        {
+            fieldName: "",
+            viewName: "answers",
         },
         {
             fieldName: "_id",
@@ -79,8 +92,18 @@
         data2DArray = [];
         activeStatus = [];
         userRights = [];
+        loadingData = true;
+        let foundJudgesArr = [];
+        let amountOfAnswersArr = [];
         for (let i = 0; i < data.length; i++) {
-            console.log("data length:", data.length);
+            foundJudgesArr[i] = surveyAnswerService.getJudgesCountBySurveyID(data[i]._id);
+            amountOfAnswersArr[i] = surveyAnswerService.getAnswerCountBySurveyID(data[i]._id);
+        }
+        foundJudgesArr = await Promise.all(foundJudgesArr);
+        amountOfAnswersArr = await Promise.all(amountOfAnswersArr);
+        
+        for (let i = 0; i < data.length; i++) {
+            //console.log("data length:", data.length);
             if (!(userInfo.role == "admin")) {
                 userRights.push(
                     data[i].owners.find((e) => userInfo.userid == e.ownerId)
@@ -94,7 +117,7 @@
                 });
             }
             activeStatus.push(data[i].active);
-            console.log("Pushed active status", data[i].active, "from survey", data[i]);
+            //console.log("Pushed active status", data[i].active, "from survey", data[i]);
             let email = "No owner";
             if (
                 data[i].users != undefined &&
@@ -115,22 +138,30 @@
             else{
                 strInviteCode = "Not active";
             }
+
+            let foundJudges = foundJudgesArr[i];
+            let amountOfAnswers = amountOfAnswersArr[i];
+
             const arr = [
                 data[i].title,
                 email,
                 DD_MM_YYYY_Date,
                 data[i].items.length,
                 strInviteCode,
-                data[i]._id,
+                foundJudges.data,
+                amountOfAnswers.data,
+                data[i]._id,  
             ];
             
-            if ( !data2DArray.some((e) => e[e.length - 1] == arr[arr.length - 1]) ) {
+            if (!data2DArray.some((e) => e[e.length - 1] == arr[arr.length - 1]) ) {
                 data2DArray.push(arr);
                 data2DArray[i] = data2DArray[i];
             }
+            
         }
         data2DArray = data2DArray;
         console.log("Transformed survey 2D array data:", data2DArray);
+        loadingData = false;
     }
 
     $: data && generateTable();
@@ -144,7 +175,8 @@
 {#if data2DArray}
     <div class="d-flex flex-column justify-content-center">
         <Table
-            bind:filterBy
+            bind:dir = {tableFilterParams.direction}
+            bind:filterBy={filterBy}
             bind:tableData={data2DArray}
             bind:userInfo
             itemName = "survey"
@@ -155,7 +187,7 @@
                 await surveyService.deleteSurvey(id);
             }}
         />
-        <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+        <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} bind:direction={tableFilterParams.direction} {...tableFilterParams} />
     </div>
 {/if}
 

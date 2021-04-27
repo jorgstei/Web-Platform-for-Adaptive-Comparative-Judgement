@@ -1,6 +1,7 @@
-const { Router, response } = require('express')
+const { Router } = require('express')
 const Survey = require('../models/Survey')
 const SurveyAnswer = require("../models/SurveyAnswer")
+const SurveyItemFile = require("../models/SurveyItemFile")
 const { auth } = require("./authentication")
 const me = require('mongo-escape').escape
 const escapeStringRegexp = require('escape-string-regexp')
@@ -9,6 +10,42 @@ const axios = require('axios')
 const mongoose = require('mongoose')
 
 const router = Router()
+
+function userHasEditSurveyRights(surveyId, userid){
+    Survey.findOne({_id: {$eq: surveyId}})
+    .then(survey => {
+        if(survey == undefined || survey == null || survey._id == null){
+            return false;
+        }
+        let owner = survey.owners.find(e => e._id == userid)
+        if(owner == undefined || owner.rights == undefined){
+            console.log("userHasViewResultsRights owner is undefined or has no rights")
+            return false
+        }
+        if(owner.rights.editSurvey != true){
+            return false
+        }
+        return true
+    })
+}
+
+function userHasManageMembersRights(surveyId, userid){
+    Survey.findOne({_id: {$eq: surveyId}})
+    .then(survey => {
+        if(survey == undefined || survey == null || survey._id == null){
+            return false;
+        }
+        let owner = survey.owners.find(e => e._id == userid)
+        if(owner == undefined || owner.rights == undefined){
+            console.log("userHasViewResultsRights owner is undefined or has no rights")
+            return false
+        }
+        if(owner.rights.manageMembers != true){
+            return false
+        }
+        return true
+    })
+}
 
 //Returns -1 on error, otherwise returns the invite code as a number (must be padded with 0's from the left on client side)
 async function generateUniqueHashCode(data){
@@ -193,13 +230,13 @@ router.get("/function/count", auth, async (req, res) => {
             res.status(403).json({message: "Forbidden"})
             return
         }
-        const me_userid = me(req.auth["user"]?.userid)
+        const userid = req.auth["user"]?.userid
         if (req.auth["user"]?.role === "admin") {
             Survey.countDocuments().then(count => res.json(count))
             return;
         }
         else {
-            Survey.countDocuments({ "owners.ownerId": me_userid }).then(count => res.json(count))
+            Survey.countDocuments({ "owners.ownerId": userid }).then(count => res.json(count))
         }
     } catch (error) {
         console.log("survey/function/count error:", error)
@@ -215,7 +252,7 @@ router.get("/items_to_compare/:id", auth, async (req, res) => {
         if (!surveyDoc || surveyDoc._id == null) {
             throw new Error("Could not find survey by id")
         }
-        if (!req.auth["judge"]?.role === "judge" && !req.auth["user"]?.role === "admin" && !req.auth["user"]?.userid === surveyDoc.ownerId) {
+        if (!req.auth["judge"]?.role === "judge" && !req.auth["user"]?.role === "admin") {
             res.status(403).json({message: "Forbidden"})
         }
         const expectedComparisons = surveyDoc.expectedComparisons;
@@ -289,7 +326,7 @@ router.get("/:id", auth, async (req, res) => {
     try {
         const survey = await Survey.findOne({ _id: {$eq: req.params.id }})
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"]?.userid)
-        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== foundOwner.ownerId) {
+        if (req.auth["user"]?.role !== "admin" && foundOwner == undefined) {
             res.status(403).json({message: "Forbidden"})
             return
         }
@@ -325,7 +362,6 @@ router.get("/:id", auth, async (req, res) => {
 router.get("/judge/:id", auth, async (req, res) => {
     console.log("Called get survey by id as judge");
     try {
-
         console.log("In judge by id survey:", req.params.id);
         let survey = undefined;
         if(req.params.id.length === 6){
@@ -342,7 +378,6 @@ router.get("/judge/:id", auth, async (req, res) => {
             return
         }
         console.log("Survey in get by id as judge: ", survey);
-    
         const foundOwner = survey.owners.find(owner => owner.ownerId === req.auth["user"]?.userid)
 
         if (req.auth["user"]?.role !== "admin" && req.auth["judge"]?.role !== "judge" && (foundOwner == undefined || req.auth["user"]?.userid !== foundOwner.ownerId)) {
@@ -355,6 +390,8 @@ router.get("/judge/:id", auth, async (req, res) => {
             return
         }
 
+        //We remove information that is of no convern to a judge
+        //Both for security, and to safe bandwidth
         survey.purpose = undefined;
         survey.owners = undefined;
         survey.active = undefined;
@@ -371,6 +408,25 @@ router.get("/judge/:id", auth, async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" })
     }
 })
+
+
+router.get("/function/checkPIN/:PIN", async (req, res) => {
+    console.log("Called check if pin exists as judge");
+    try{
+        const surveyWithPIN = await Survey.findOne({inviteCode: {$eq: req.params.PIN}});
+        if(surveyWithPIN?._id == null){
+            res.status(404).json({message: "There is no survey with that PIN"});
+            return
+        }
+        res.sendStatus(200);
+    }
+    catch (error) {
+        console.log("Error checking whether PIN was valid");
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+
 
 /**
  * @api {post} /api/survey
@@ -459,19 +515,39 @@ router.post("/", auth, async (req, res) => {
  */
 router.put("/:id", auth, async (req, res) => {
     console.log("called put for survey")
-    let {
-        owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
-        purpose, mediaType
-    } = me(req.body)
+    let {owners, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion, purpose, mediaType} = me(req.body);
     const ownerId = req.auth["user"]?.userid
-    const surveyDoc = await Survey.findOne({ _id: req.params.id })
+    const me_id = me(req.params.id)
+    const surveyDoc = await Survey.findOne({ _id: me_id })
     if (surveyDoc._id == null) {
         res.status(404).json({message: "Could not find survey to update."})
         return
     }
+    console.log("expectedComp", surveyDoc);
+    let expectedComparisonsIsEqual = expectedComparisons === surveyDoc.expectedComparisons;
     //TODO: Allow modifications that do not change items and expectedComparisons
-    if(surveyDoc.active && active){
-        res.status(403).json({message: "You are not allowed to edit a survey that is active."})
+    //Issue with this is that items is empty at this point. Due to uploading pdf i think..
+    /*
+    //console.log("Req body", me(req.body));
+    console.log("surveydoc", surveyDoc.items, "items", items);
+    let everyItemIsIdentical = true;
+    for (let i = 0; i < surveyDoc.items.length; i++) {
+        for (const key in surveyDoc.items[i]) {
+            if(surveyDoc.items[i].hasOwnProperty(key) && items[i].hasOwnProperty(key)){
+                //console.log("Comparing values of key", key, "from surveyDoc:", surveyDoc.items[i][key], "from items", items[i][key], "Res was:", surveyDoc.items[i][key] === items[i][key])
+                if(surveyDoc.items[i][key] !== items[i][key]){
+                    everyItemIsIdentical = false;
+                }
+            }
+            else{
+                everyItemIsIdentical = false;
+            }
+        }
+    }
+    */
+
+    if(surveyDoc.active && active && !expectedComparisonsIsEqual /*&& !everyItemIsIdentical*/){
+        res.status(403).json({message: "You are not allowed to edit the items of an active survey."})
         return
     }
     const userIsOwner = await surveyDoc.owners.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
@@ -496,7 +572,7 @@ router.put("/:id", auth, async (req, res) => {
         }
         const surveyReplaceResult = await Survey.updateOne({ _id: req.params.id },
             {
-                owners, inviteCode, expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion,
+                owners, inviteCode, expectedComparisons, active, title, internalDescription, judgeInstructions, surveyQuestion,
                 purpose, mediaType
             }
         )
@@ -618,6 +694,10 @@ router.get("/function/sort", auth, async (req, res) => {
         limit: How many documents you want to retrieve, f.ex. 10 as in the case above
         direction: 1 ascending, -1 descending
     */
+   if(req.auth["user"]?.role != "admin" && req.auth["user"]?.role != "researcher"){
+       res.status(403).json({message: "Forbidden"})
+       return
+   }
    console.log("survey/function/sort called")
     const { field, skip, limit, direction } = req.query
     const me_field = field.replace("$", "")
@@ -699,6 +779,11 @@ router.get("/function/sort", auth, async (req, res) => {
                 { $skip: me_skip },
                 { $limit: me_limit },
             ]
+        ).collation(                
+            { 
+                locale: "en_US",
+                numericOrdering: true
+            }
         )
         res.json(surveys)
     } catch (error) {
@@ -754,6 +839,11 @@ router.post("/function/search/:term", auth, async (req, res) => {
     let me_direction = Number(me(direction))
     if (direction === undefined) me_direction = 1
     if (me_sortField === undefined) me_sortField = "dateCreated"
+
+    if(req.auth["user"]?.role != "admin" && req.auth["user"]?.role != "researcher"){
+        res.status(403).json({message: "Forbidden"})
+        return
+    }
 
     if (me_fields === undefined || me_term === undefined || me_skip === undefined || me_limit === undefined) {
         console.log("fields:", fields, ", term:", me_term, ", skip:", me_skip, ", limit:", me_limit)
@@ -841,6 +931,50 @@ router.post("/function/search/:term", auth, async (req, res) => {
         res.json(surveys)
     } catch (error) {
         console.log("Error searching surveys:", error)
+        res.status(500).json({message: "Internal Server Error"})
+    }
+})
+
+router.post("/function/upload_item/:id", auth, async (req, res) => {
+
+    if(!req.auth["user"]?.role === "admin" && !req.auth["user"]?.role === "researcher" && !userHasEditSurveyRights(req.params.id, req.auth["user"]?.userid)){
+        res.status(403).json({message: "Forbidden"})
+        return
+    }
+    try {
+        const tag = me(req.query.tag)
+        const fileName = req.files?.file?.name?.replace("..", "")
+        console.log("Find me: ", req.files)
+        if(req.files?.file == undefined || req.files?.file == null || req.files?.file?.truncated == true){
+            res.status(422).json({message: "Filesize too large for file: " + fileName+".\nMax supported filesize is 16MB"})
+            return
+        }
+        SurveyItemFile.create({
+            surveyId: me(req.params.id),
+            data: req.files.file.data,
+            tag: tag,
+            fileName: fileName,
+            mimeType: req.files.file.mimetype
+        })
+        .then((file) => {
+            console.log("Successfully created file:",file)
+            Survey.updateOne({_id: me(req.params.id)}, 
+                {
+                    $push: {
+                        items: {
+                            type: file.mimeType.split("/")[1],
+                            data: file._id
+                        }
+                    }
+                }
+            )
+            .then(updateOneResult => {
+                console.log(updateOneResult)
+                res.status(201).json({loc: file._id})
+            })
+        })
+    } catch (error) {
+        console.log(error)
         res.status(500).json({message: "Internal Server Error"})
     }
 })

@@ -8,7 +8,7 @@
     import axios from "axios";
     import swal from "sweetalert";
     import { dateFromObjectId } from "../Utility/dateFromObjectId";
-    import {Select, Button, Row, Col, ListItem} from "svelte-materialify"
+    import {Select, Row, Col, ButtonGroup, ButtonGroupItem} from "svelte-materialify"
 
     export let userInfo;
 
@@ -39,15 +39,15 @@
     ];
     let linearRanking = null;
     let allJudgesHeaders = [
-        { fieldName: "", viewName: "id" },
+        { fieldName: "", viewName: "judge id" },
         { fieldName: "", viewName: "answers" },
         { fieldName: "", viewName: "agree" },
         { fieldName: "", viewName: "infit" },
         { fieldName: "", viewName: "outfit" },
         { fieldName: "", viewName: "Left bias" },
         { fieldName: "", viewName: "Right bias" },
-        { fieldName: "", viewName: "Median time per answer" },
-        { fieldName: "", viewName: "Average time per answer" },
+        { fieldName: "", viewName: "Median seconds per answer" },
+        { fieldName: "", viewName: "Average seconds per answer" },
         { fieldName: "", viewName: "delete" },
     ];
     let allJudges = null;
@@ -65,13 +65,6 @@
     let allItems2DArray = null;
 
     let currentContentView = "linearRanking";
-
-    let contentViewItems = [
-        {name:"Linear ranking", value:"linearRanking"},
-        {name:"By judge", value:"byJudge"},
-        {name:"By item", value:"byItem"},
-        {name:"Raw data", value:"rawdata"}
-    ]
 
     let surveyStatistics = null;
 
@@ -109,10 +102,7 @@
                         let answerWithSameId = survey.items.find(
                             (obj) => obj._id == linearRanking[i].individual
                         );
-                        if (
-                            answerWithSameId == undefined ||
-                            answerWithSameId == null
-                        ) {
+                        if ( answerWithSameId == undefined || answerWithSameId == null) {
                             linearRanking2DArray.push([
                                 "none",
                                 "NaN",
@@ -130,7 +120,9 @@
                                 "NaN",
                                 "Nan",
                             ]);
-                        } else {
+                        } 
+                        else {
+                            console.log("linrank2d arr getting pushed, linrank[i] is", linearRanking[i]);
                             linearRanking2DArray.push([
                                 answerWithSameId.data,
                                 linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
@@ -175,8 +167,8 @@
                             e.outfit === undefined ? "N/A": e.outfit,
                             leftBias === "N/A" ? leftBias: leftBias.toFixed(2),
                             leftBias === "N/A" ? leftBias: (1 - leftBias).toFixed(2),
-                            medianTime === "N/A" ? medianTime: medianTime.toFixed(2) + " seconds",
-                            averageTime === "N/A" ? averageTime: averageTime.toFixed(2) + " seconds",
+                            medianTime === "N/A" ? medianTime: medianTime.toFixed(2),
+                            averageTime === "N/A" ? averageTime: averageTime.toFixed(2),
                         ]);
                     });
                     console.log(
@@ -320,11 +312,6 @@
         );
     };
 
-    //Updates current content view based on value of the dropdown menu
-    let updateCurrentContentView = () => {
-        currentContentView = document.getElementById("viewDropdown").value;
-        console.log("Current content view is: ", currentContentView);
-    };
 
     /*  Downloads data as a csv file
      *   @param {string[]} headers - The headers for the csv file
@@ -407,8 +394,9 @@
         currentContentView;
 </script>
 
+<h1 class="text-h1 ma-2" style="font-size: 5rem;">{survey.title}</h1>
+<br>
 <div class="d-flex flex-column align-center">
-    <h1 id="title">{survey.title}</h1>
     {#if surveyStatistics != null}
         <div style="border:1px solid #aaa; width:60%; margin-bottom:4vh;">
             <Row class="align-start" noGutters style="width:1+0%;">
@@ -417,6 +405,9 @@
                 </Col>
                 <Col>
                   <div class="font-weight-bold">Number of items</div>
+                </Col>
+                <Col>
+                    <div class="font-weight-bold">Expected comparisons per judge</div>
                 </Col>
                 <Col>
                   <div class="font-weight-bold">Number of answers</div>
@@ -433,6 +424,9 @@
                   <div class="">{surveyStatistics.result.length}</div>
                 </Col>
                 <Col>
+                    <div class="">{survey.expectedComparisons}</div>
+                </Col>
+                <Col>
                   <div class="">{answerValues.length}</div>
                 </Col>
                 <Col>
@@ -440,14 +434,17 @@
                 </Col>
             </Row>
         </div>
+
+        <ButtonGroup mandatory tile activeClass="primary-color" bind:value={currentContentView}>
+            <ButtonGroupItem value="linearRanking">Linear ranking</ButtonGroupItem>
+            <ButtonGroupItem value="byJudge">By judge</ButtonGroupItem>
+            <ButtonGroupItem value="byItem">By item</ButtonGroupItem>
+            <ButtonGroupItem value="rawdata">Raw data</ButtonGroupItem>
+        </ButtonGroup>
     {/if}
-    
-    <div style="max-width: 30%;">
-        <Select mandatory items={contentViewItems} bind:value={currentContentView}>View</Select>
-    </div>
-    
 
-
+    
+    
     {#if currentContentView == "linearRanking"}
         {#if linearRanking != null && linearRanking.length > 0}
             <Table
@@ -457,9 +454,9 @@
                 element={csvDownloadLinearRankingButton}
             />
         {:else}
-            <h3>
-                This survey is yet to be answered. Come back once you've
-                gathered some participants, or taken the test yourself!
+            <h3 class="text-h5">
+                This survey is yet to be answered enough for us to analyze. <br>
+                Come back once you've gathered some participants, or taken the test yourself!
             </h3>
         {/if}
     {:else if currentContentView == "rawdata"}
@@ -530,8 +527,7 @@
         font-size: 1.7rem;
     }
     #title {
-        width: -moz-fit-content;
-        width: fit-content;
+
         margin: auto;
         margin-bottom: 3vh;
     }

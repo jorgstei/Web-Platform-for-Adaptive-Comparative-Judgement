@@ -6,6 +6,8 @@
     import { navigateWithRefreshToken } from "../Utility/naviagte";
     let showErrorField = false;
     export let userInfo;
+    export let allowLeavePageWithoutWarning;
+    allowLeavePageWithoutWarning = true;
     //Email regex:
     const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
@@ -64,7 +66,7 @@
 
     const registerOnEnterPress = (e) => {
         if(e.keyCode == 13){
-            register();
+            register(selectedValue, txtValue);
         }
     }
 
@@ -72,7 +74,7 @@
         {name: "Researcher", value: "researcher"},
         {name: "Admin", value: "admin"}
     ]
-    let selectedValue;
+    let selectedValue = "researcher";
     let txtValue;
 
 </script>
@@ -82,8 +84,8 @@
 <div class="d-flex flex-row justify-center">
     <div class="d-flex flex-column">
         <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Invite Researcher</h1>
-        <Select class="ma-2" hint="*Required" items={selectItems} bind:value={selectedValue}>Role</Select>
-        <TextField class="ma-2" hint="*Required" bind:value={txtValue}>Email</TextField>
+        <Select mandatory class="ma-2" hint="*Required" items={selectItems} bind:value={selectedValue}>Role</Select>
+        <TextField class="ma-2" hint="*Required" bind:value={txtValue} on:keydown={registerOnEnterPress}>Email</TextField>
         <Button class="ma-2 mt-6" outlined on:click={()=>{register(selectedValue, txtValue)}}>Register user</Button>
         <p id="errorField"></p>
     </div>

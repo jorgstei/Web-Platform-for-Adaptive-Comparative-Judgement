@@ -8,6 +8,8 @@
 
   let loadingData = true;
   export let userInfo;
+  export let allowLeavePageWithoutWarning;
+  allowLeavePageWithoutWarning = true;
 
   console.log("in researchers");
   const tableFilterParams = {
@@ -76,16 +78,17 @@
   <h1 class="text-h1 ma-2" style="font-size: 5rem">Users</h1>
   <div class="d-flex flex-column justify-content-center">
       <Table
-      bind:filterBy
+      bind:dir = {tableFilterParams.direction}
+      bind:filterBy={filterBy}
       bind:userInfo
       bind:tableData={data2DArray}
       itemName = "researcher"
       {tableAttributes}
-      deleteFunc={async (id) => {
-        await userService.deleteUserByID(id);
+      deleteFunc={async (id, deleteTransientData) => {
+        return await userService.deleteUserByID(id, deleteTransientData);
       }}
     />
-    <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} {...tableFilterParams} />
+    <TableFilter bind:loadingData={loadingData} bind:filterBy={filterBy} bind:data={data} bind:userInfo={userInfo} bind:direction={tableFilterParams.direction} {...tableFilterParams} />
   </div>
   
 {/if}

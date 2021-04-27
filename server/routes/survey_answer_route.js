@@ -2,8 +2,27 @@ const {Router} = require('express')
 const SurveyAnswer = require('../models/SurveyAnswer')
 const {auth} = require("./authentication")
 const Survey = require('../models/Survey')
+const me = require('mongo-escape').escape
 
 const router = Router()
+
+function userHasViewResultsRights(surveyId, userid){
+    Survey.findOne({_id: {$eq: surveyId}})
+    .then(survey => {
+        if(survey == undefined || survey == null || survey._id == null){
+            return false;
+        }
+        let owner = survey.owners.find(e => e._id == userid)
+        if(owner == undefined || owner.rights == undefined){
+            console.log("userHasViewResultsRights owner is undefined or has no rights")
+            return false
+        }
+        if(owner.rights.viewResults != true){
+            return false
+        }
+        return true
+    })
+}
 
 /**
  * @apiDefine SuccessGetSurveyAnswerArray
@@ -38,7 +57,7 @@ const router = Router()
 router.get("/", auth, async (req, res) => {
     console.log("Get all SurveyAnswers called")
     try{
-        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
+        if(req.auth["user"]?.role !== "admin"){
             res.sendStatus(403)
             return
         }
@@ -75,6 +94,10 @@ router.get("/:id", auth, async (req, res) => {
         if(!surveyAnswer || surveyAnswer._id == null){
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
+        if(!userHasViewResultsRights(surveyAnswer.surveyId, req.auth["user"]?.userid)){
+            res.sendStatus(403)
+            return
+        }
         res.json(surveyAnswer)
     } catch(error) {
         console.log(error)
@@ -104,6 +127,10 @@ router.get("/judge/:id", auth, async (req, res) => {
         if(!surveyAnswers){
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
+        if(!userHasViewResultsRights(surveyAnswer[0].surveyId, req.auth["user"]?.userid)){
+            res.sendStatus(403)
+            return
+        }
         res.json(surveyAnswers)
     } catch(error) {
         res.status(404).json({message: "Empty collection"})
@@ -124,7 +151,6 @@ router.get("/judge/:id", auth, async (req, res) => {
 router.get("/survey/:id", auth, async (req, res) => {
     console.log("Get SurveyAnswer by id called")
     try{
-
         if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
             res.sendStatus(403)
             return
@@ -132,6 +158,10 @@ router.get("/survey/:id", auth, async (req, res) => {
         const surveyAnswers = await SurveyAnswer.find({surveyId: {$eq: req.params.id}})
         if(!surveyAnswers){
             throw new Error("survey_answer_route.js, couldn't get by id")
+        }
+        if(req.auth["user"]?.role != "admin" && !userHasViewResultsRights(req.params.id, req.auth["user"]?.userid)){
+            res.sendStatus(403)
+            return
         }
         res.json(surveyAnswers)
     } catch(error) {
@@ -190,13 +220,14 @@ router.delete("/:id", auth, async (req, res) => {
         return
     }
     const surveyDoc = await Survey.findOne({_id: surveyAnswerDoc.surveyId})
-    console.log("delete surveyAnswerDoc: ", surveyAnswerDoc)
-    console.log("delete surveyDoc: ", surveyDoc)
+
     if(!surveyDoc || !surveyDoc._id){
         res.sendStatus(404)
         return
     }
-    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId){
+    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId 
+        && !userHasViewResultsRights(surveyDoc.surveyId, req.auth["user"]?.userid)
+    ){
         res.sendStatus(403)
         return
     }
@@ -235,7 +266,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(404)
         return
     }
-    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId){
+    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId && !userHasViewResultsRights(surveyDoc._id, req.auth["user"].userid)){
         res.sendStatus(403)
         return
     }
@@ -250,5 +281,55 @@ router.delete("/:id", auth, async (req, res) => {
         res.sendStatus(500)
     }
 })
+
+
+router.get("/function/count/answers/:surveyid", auth, async (req, res) => {
+    //console.log("Get count of answers called");
+    try {
+        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
+            res.status(403).json({message: "Forbidden"})
+            return
+        }
+        else{
+            SurveyAnswer.countDocuments({surveyId: me(req.params.surveyid)})
+            .then(count => {
+                //console.log("Got answer count:", count);
+                res.json(count)
+            })
+            return;
+        }
+
+    } catch (error) {
+        console.log("Could not count surveyanswers:", error)
+        res.status(500).json({message: "Internal Server Error"})
+    }
+})
+
+router.get("/function/count/judges/:surveyid", auth, async (req, res) => {
+    //console.log("Get count of judges called");
+    try {
+        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && !userHasViewResultsRights(req.params.id, req.auth["user"]?.userid)) {
+            res.status(403).json({message: "Forbidden"})
+            return
+        }
+        else{
+            //SurveyAnswer.find({surveyId:{$eq: req.params.id}}).distinct("judgeId").count().then(count => res.json(count))
+            SurveyAnswer.aggregate([{ $match: { surveyId: me(req.params.surveyid)}}, { $group: { _id: '$judgeId', count: {$sum: 1} } }])
+            .then(result => {
+                //console.log("Got judge count:", result.length);
+                res.json(result.length);
+            })
+            return;
+        }
+
+    } catch (error) {
+        console.log("Could not count judges:", error)
+        res.status(500).json({message: "Internal Server Error"})
+    }
+})
+
+
+
+
 
 module.exports = router

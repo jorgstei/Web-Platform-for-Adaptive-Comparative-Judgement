@@ -17,7 +17,7 @@ export default class SurveyService extends Service{
         return axios(
             {
                 method: "post",
-                url: this.path + "/survey/function/estimate",//processs.envv.estimateServicePath,
+                url: this.path + "/survey/function/estimate",
                 data: data,
                 withCredentials: true
             }
@@ -51,6 +51,16 @@ export default class SurveyService extends Service{
             method: "get",
             url: this.path + "/survey/judge/"+id,
             withCredentials: true
+        })
+        .then(response => response)
+        .catch(error => error.response)
+    }
+
+    getPinIsValid(pin){
+        return axios({
+            method: "get",
+            url: this.path + "/survey/function/checkPIN/" + pin,
+            withCredentials: false
         })
         .then(response => response)
         .catch(error => error.response)
@@ -146,9 +156,28 @@ export default class SurveyService extends Service{
     search(data, term){
         return axios({
             method: "get",
-            url: this.post+"/survey/function/search/"+term,
-            data: data
+            url: this.path+"/survey/function/search/"+term,
+            data: data,
+            withCredentials: true
         })        
+        .then(response => response)
+        .catch(error => error.response)
+    }
+
+    uploadFile(file, surveyId, tag){
+        let formData = new FormData()
+        formData.append('file', file)
+        console.log("uploadFile file:", file)
+        console.log("formData: ", formData)
+        return axios({
+            method: "post",
+            data: formData,
+            url: this.path + "/survey/function/upload_item/"+surveyId+"/?tag="+tag,
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            withCredentials: true
+        })
         .then(response => response)
         .catch(error => error.response)
     }

@@ -14,6 +14,7 @@ const bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
 const { hash } = require('./Utility/hashing')
 const User = require('./models/User')
+const fileUpload = require('express-fileupload')
  
 const mongoConnectionString = process.env.MongoDBConnectionString;
 mongoose.connect(mongoConnectionString,
@@ -48,12 +49,21 @@ mongoose.connect(mongoConnectionString,
 server.use(cors({
     origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000", "http://compair.it.ntnu.no"
     , "https://compair.it.ntnu.no", "https://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:1030"
+    , "http://10.0.0.41", "http://10.0.0.41:5000"
     ],
     credentials: true
 }))
-server.use(bodyParser.json())
+server.use(bodyParser.json({limit: "16mb"}))
 
 server.use(cookieParser())
+
+server.use(fileUpload({
+    debug: true,
+    createParentPath: true,
+    limits:{
+        fileSize: 16 * 1024 * 1024, //16 MB file size limit TODO: Should this be part of server .env?
+    }
+}))
 
 const auth = require("./routes/authentication")
 server.use("/auth", auth.router)
@@ -66,6 +76,9 @@ server.use("/api/surveyanswer", surveyAnswerRoute)
 
 const userRoute = require('./routes/user_route')
 server.use("/api/user", userRoute)
+
+const surveyItemFileRoute = require('./routes/survey_item_file_route')
+server.use("/api/surveyitemfile", surveyItemFileRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){
     try {

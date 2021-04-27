@@ -1,6 +1,6 @@
 const {Schema, model} = require('mongoose')
 
-const SurveySchema = new Schema(
+const SurveyAnswerSchema = new Schema(
     {
         judgeId: {
             type: String,
@@ -26,5 +26,5 @@ const SurveySchema = new Schema(
     }
 )
 
-const SurveyAnswer = model('SurveyAnswer', SurveySchema)
+const SurveyAnswer = model('SurveyAnswer', SurveyAnswerSchema)
 module.exports = SurveyAnswer

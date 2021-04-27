@@ -182,7 +182,7 @@ router.get("/survey/:id", auth, async (req, res) => {
 router.post("/", auth, async (req, res) => {
     console.log("Insert one SurveyAnswer")
     const surveyAnswer = req.body
-    console.log("surveyAnswer instert: ", surveyAnswer)
+    console.log("Inserted surveyAnswer: ", surveyAnswer)
     console.log("req.role: ", req.role)
     if(req.auth["judge"]?.role !== "judge"){
         res.sendStatus(403)

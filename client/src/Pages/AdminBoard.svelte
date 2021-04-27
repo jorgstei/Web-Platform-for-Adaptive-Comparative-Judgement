@@ -47,7 +47,7 @@
           <CreateSurvey bind:userInfo={userInfo} editing={true} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc/>
         </Route>
         <Route path="change_password">
-          <LoginPage bind:userInfo={userInfo} changePassword={true}}/>
+          <LoginPage bind:userInfo={userInfo} changePassword={true}/>
         </Route>
       </div>
     {:else}

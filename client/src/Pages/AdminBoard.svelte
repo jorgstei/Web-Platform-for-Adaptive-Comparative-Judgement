@@ -9,8 +9,11 @@
   import LoginPage from "./LoginPage.svelte";
   import Profile from "./Profile.svelte";
   
+  //userInfo contains email, userid and role when we are logged in. Should be null otherwise
   export let userInfo;
+  //Boolean that is being bound to several different sub-pages, used to warn a user that tries to navigate out of edit/create  survey
   export let allowLeavePageWithoutWarning;
+  //A function that alerts the user when they navigate out of edit/create survey
   export let warningOnLeaveFunc;
 
   $: userInfo;

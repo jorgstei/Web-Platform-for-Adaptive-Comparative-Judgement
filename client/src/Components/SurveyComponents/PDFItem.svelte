@@ -1,26 +1,10 @@
 <script>
-    import {
-        TextField,
-        Button,
-        Icon,
-        Tooltip,
-        Select,
-        Card,
-        CardText,
-        Row,
-        Col,
-        Overlay,
-    } from "svelte-materialify";
-    import {
-        mdiDeleteForever,
-        mdiInformationOutline,
-        mdiFullscreen,
-    } from "@mdi/js";
+    import { TextField, Button, Icon, Tooltip, Select, Card, CardText, Row, Col, Overlay } from "svelte-materialify";
+    import { mdiDeleteForever, mdiInformationOutline, mdiFullscreen } from "@mdi/js";
     import { surveyItemFileService } from "../../Services/SurveyItemFileService";
     import { nodeBufferToBlobURL, nodeBufferToFile } from "../../Utility/nodeBufferToBlobURL";
     import { onMount } from "svelte";
-    import PDFView from "./PDFView.svelte"
-
+    import PDFView from "./PDFView.svelte";
 
     export let option;
     export let optionMediaTypeItems;
@@ -46,47 +30,45 @@
         })
     })
 
-    function onFileSelected(e){
-        view = undefined
-        if(e?.target?.files[0]){
-            option.data = e.target.files[0]
+  function onFileSelected(e) {
+    view = undefined;
+    if (e?.target?.files[0]) {
+      option.data = e.target.files[0];
 
-            option.editedArr["data"] = "data";
-            option.editedArr["fileName"] = "fileName";
-            option.fileName = e.target.files[0].name
-            uploadLabelText = e.target.files[0].name
-            if(option.tag == ""){
-                option.tag = e.target.files[0].name
-                option.editedArr["tag"] = "tag"
-            }
-            view = URL.createObjectURL(e.target.files[0])
+      option.editedArr["data"] = "data";
+      option.editedArr["fileName"] = "fileName";
+      option.fileName = e.target.files[0].name;
+      uploadLabelText = e.target.files[0].name;
+      if (option.tag == "") {
+        option.tag = e.target.files[0].name;
+        option.editedArr["tag"] = "tag";
+      }
+      view = URL.createObjectURL(e.target.files[0]);
 
-            option = option
-            console.log("File selected: ", option.data)
-        }
-        else{
-            uploadLabelText = "Choose File"
-        }
+      option = option;
+      console.log("File selected: ", option.data);
+    } else {
+      uploadLabelText = "Choose File";
     }
+  }
 
-    async function showOverlay(){
-        const objectIdRegex = /^[0-9a-fA-F]{24}$/
-        //If option._id is a valid objectID we must assume we should fetch the complete data from server
-        if(view == undefined && typeof(option._id) == "string" && option._id.match(objectIdRegex)){
-            await surveyItemFileService.get(option._id).then(response => {
-                if(response.status < 300){
-                    console.log(response.data)
-                    view = URL.createObjectURL(nodeBufferToFile(response.data.data.data, "application/pdf"))
-                    console.log("mytag3 view ready")
-                }
-                else{
-                    console.error("Couldn't get PDF object from server")
-                }
-            })
+  async function showOverlay() {
+    const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+    //If option._id is a valid objectID we must assume we should fetch the complete data from server
+    if (view == undefined && typeof option._id == "string" && option._id.match(objectIdRegex)) {
+      await surveyItemFileService.get(option._id).then((response) => {
+        if (response.status < 300) {
+          console.log(response.data);
+          view = URL.createObjectURL(nodeBufferToFile(response.data.data.data, "application/pdf"));
+          console.log("mytag3 view ready");
+        } else {
+          console.error("Couldn't get PDF object from server");
         }
-        option.showOverlay = true; console.log("clicked on card");
+      });
     }
-
+    option.showOverlay = true;
+    console.log("clicked on card");
+  }
 </script>
 
 <Card style="cursor: default; background-color:rgb(235,235,235);" hover>
@@ -173,13 +155,13 @@ style="cursor:default"
 </Overlay>
 
 <style>
-    .labelBtn{
-        padding: 0.5rem;
-        font-family: sans-serif;
-        border-radius: 0.3rem;
-        cursor: pointer;
-    }
-    .labelBtn:hover{
-        background-color: gray;
-    }
+  .labelBtn {
+    padding: 0.5rem;
+    font-family: sans-serif;
+    border-radius: 0.3rem;
+    cursor: pointer;
+  }
+  .labelBtn:hover {
+    background-color: gray;
+  }
 </style>

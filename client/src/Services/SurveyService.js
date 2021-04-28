@@ -90,6 +90,19 @@ export default class SurveyService extends Service{
         .catch(error => error.response)
     }
 
+    putOwners(id, owners){
+        return axios(
+            {
+                method: "put",
+                url: this.path + "/survey/"+id+"/owners",
+                withCredentials: true,
+                data: owners
+            }
+        )
+        .then(response => response)
+        .catch(error => error.response)
+    }
+
 
     getItemsToCompareBySurveyId(id){
         return axios({

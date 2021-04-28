@@ -72,10 +72,6 @@
 				<RegisterAccount />
 			</Route>
 
-			<Route path="test">
-				<UserServiceTest />
-			</Route>
-
 			<Route path="admin_board/*">
 				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning/>
 			</Route>

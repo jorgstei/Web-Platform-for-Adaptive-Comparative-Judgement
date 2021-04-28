@@ -28,48 +28,51 @@
   import { surveyItemFileService } from "../Services/SurveyItemFileService";
 
   export let allowLeavePageWithoutWarning;
-  export let warningOnLeaveFunc;
   export let userInfo;
   export let editing = false;
   export let disableFields = false;
+  export let warningOnLeaveFunc;
 
-  warningOnLeaveFunc = (link) => {
-    swal({
-      title: "Are you sure?",
-      text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
-      icon: "warning",
-      dangerMode: true,
-      buttons: ["Take me back!", "Discard"],
-    }).then((willDiscard) => {
-      if (willDiscard) {
-        allowLeavePageWithoutWarning = true
-        navigate("/admin_board/" + link);
-      }
-    });
+  const actualWarningOnLeaveFunc = (link) => {
+    console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
+    if(userIsAllowedToManageMembers || !disableFields){
+      swal({
+        title: "Are you sure?",
+        text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
+        icon: "warning",
+        dangerMode: true,
+        buttons: ["Take me back!", "Discard"],
+      }).then((willDiscard) => {
+        if (willDiscard) {
+          allowLeavePageWithoutWarning = true
+          navigate(link);
+        }
+      });
+    }
+    else{
+      allowLeavePageWithoutWarning = true
+      navigate(link);
+    }
   };
 
   onDestroy(()=>{
     allowLeavePageWithoutWarning = true;
   })
 
-    onDestroy(() => {
-        allowLeavePageWithoutWarning = true;
-    });
+  const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
-    const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+  const classes = {
+      overall: null,
+      controls: null,
+      container: null,
+  };
 
-    const classes = {
-        overall: null,
-        controls: null,
-        container: null,
-    };
-
-    const options = {
-        // "paged" or "all"
-        display: "paged",
-        // "dark" or "light" or your own
-        theme: "dark",
-    };
+  const options = {
+      // "paged" or "all"
+      display: "paged",
+      // "dark" or "light" or your own
+      theme: "dark",
+  };
 
     // The current page number
     let currentPage;
@@ -200,11 +203,12 @@
   };
 
   onMount(async () => {
+    warningOnLeaveFunc = actualWarningOnLeaveFunc;
     allowLeavePageWithoutWarning = false;
     if (editing) {
       let params = queryString.parse(window.location.search);
       surveyID = params.id;
-      console.log("SurveyID from RawSurveyData.svelte: ", surveyID);
+      console.log("SurveyID from CreateSurvey.svelte: ", surveyID);
 
       let labels = [...document.getElementsByTagName("label")];
       labels.forEach((e) => {
@@ -404,6 +408,7 @@
                             }
                         });
                         await Promise.all(itemFileResponses);
+                        await changeMembers();
                         surveyService
                             .put(surveyID, info)
                             .then((data) => {
@@ -730,12 +735,38 @@
     };
 
   const changeMembers = () => {
-    console.log("Changing members", surveyResearchers);
-
+    console.log("Changing members", surveyResearchers, surveyID);
+    surveyService.putOwners(surveyID, surveyResearchers)
+    .then(res=>{
+      if(disableFields && userIsAllowedToManageMembers){
+        if(res.status < 300){
+          swal(
+            "Successfully edited members!",
+            "Your change of members was successful",
+            "success"
+          );
+          navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+        }
+        else{
+          swal(
+            "Failed to edit members!",
+            "We were not able to edit members",
+            "error"
+          );
+        }
+      }
+    })
+    .catch(err=>{
+      swal(
+        "Could not edit members!",
+        "We were unable to edit members",
+        "error"
+      )
+    })
   }
   
   const warnUserOnEditingItemsInActiveSurvey = () => {
-    if(selectedActiveLevel === "1" && !userHasBeenWarnedOnFocus){
+    if(selectedActiveLevel === "1" && !userHasBeenWarnedOnFocus && editing){
       let checkBoxContainer = document.createElement("div")
       let confirmWarningSeen = document.createElement("input")
       let confirmWarningSeenLabel = document.createElement("label")
@@ -764,7 +795,7 @@
     }
   }
   let userHasChangedItemsOrExpectedComparisons = false;
-  let userHasBeenWarnedOnFocus = false;
+  let userHasBeenWarnedOnFocus = !editing;
 
   $: surveyResearchers & searchResults & disableFields & userIsAllowedToManageMembers;
 </script>
@@ -772,9 +803,16 @@
 <div id="create_wrapper">
   <div id="titleWrapper">
     {#if editing}
-      <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">
-        Edit Survey: {surveyTitleValue}
-      </h1>
+      {#if !userIsAllowedToManageMembers && disableFields}
+        <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">
+          Viewing Survey: {surveyTitleValue}
+        </h1>
+      {:else}
+        <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">
+          Edit Survey: {surveyTitleValue}
+        </h1>
+      {/if}
+      
     {:else}
       <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem; margin: auto;">Create Survey</h1>
     {/if}

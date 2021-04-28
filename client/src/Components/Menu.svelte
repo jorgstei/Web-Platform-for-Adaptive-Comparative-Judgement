@@ -14,21 +14,8 @@
     
     export let userInfo;
     export let allowLeavePageWithoutWarning = true;
-    export let warningOnLeaveFunc = (link)=> {
-        swal({
-            title: "Are you sure?",
-            text:
-                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
-            icon: "warning",
-            dangerMode: true,
-            buttons: ["Nevermind", "Discard"],
-        }).then((willDiscard) => {
-            if (willDiscard) {
-                allowLeavePageWithoutWarning = true
-                navigate("/admin_board/"+ link);
-            }
-        })
-    }
+    export let warningOnLeaveFunc;
+
     console.log("allow and func in menu", allowLeavePageWithoutWarning, warningOnLeaveFunc);
     const menuItems = [
         {
@@ -87,7 +74,7 @@
                                 navigateTo("/admin_board/"+item.to);
                             }
                             else{
-                                warningOnLeaveFunc(item.to)
+                                warningOnLeaveFunc("/admin_board/" + item.to)
                             }      
                         }
                         }>

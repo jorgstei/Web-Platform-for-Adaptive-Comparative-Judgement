@@ -488,19 +488,19 @@ router.post("/", auth, async (req, res) => {
 router.put("/:id/owners", auth, async (req, res) => {
     try {
         const surveyDoc = await Survey.findOne({ _id: {$eq: req.params.id} })
-        const userIsOwner = await surveyDoc?.owners?.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
-        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && !userIsOwner && 
-            userHasManageMembersRights(req.params.id, req.auth["user"]?.userid)) {
+        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && userHasManageMembersRights(req.params.id, req.auth["user"]?.userid)) {
             res.status(403).json({message: "Forbidden"})
             return
         }
+        const me_owners = me(req.body);
+        console.log("meowners:", me_owners);
         surveyDoc.updateOne({owners: me_owners})
         .then(updateResult => {
             console.log("put owners result: ", updateResult)
             res.sendStatus(204);
         })
     } catch (error) {
-        console.log("PUT survey/:id/owners error")
+        console.log("PUT survey/:id/owners error:", error)
         res.status(500).json({message: "Internal Server Error when updating owners"})
     }
 })

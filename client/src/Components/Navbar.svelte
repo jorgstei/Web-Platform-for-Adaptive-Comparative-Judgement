@@ -10,6 +10,7 @@
     export let takingSurvey;
     export let showJudgeOverlay;
     export let allowLeavePageWithoutWarning = true;
+    export let warningOnLeaveFunc;
 
     /*
         Allow tab navigation to click the elements with space or enter
@@ -27,22 +28,6 @@
     onMount(() => {
         makeNavBarElementsTabbable()
     })
-
-    let warningOnLeaveFunc = (link)=> {
-        swal({
-            title: "Are you sure?",
-            text:
-                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
-            icon: "warning",
-            dangerMode: true,
-            buttons: ["Take me back!", "Discard"],
-        }).then((willDiscard) => {
-            if (willDiscard) {
-                allowLeavePageWithoutWarning = true
-                navigate(link);
-            }
-        })
-    }
 
     const navigateWithRefreshToken = (to) => {
         refreshToken()
@@ -95,7 +80,8 @@
     }
     //Changes to userInfo might trigger the navbar to change state, 
     //because of this we need to update the new elements to support tab navigation
-    $: userInfo && makeNavBarElementsTabbable()
+    $: userInfo && makeNavBarElementsTabbable();
+    $: warningOnLeaveFunc;
 </script>
 
 

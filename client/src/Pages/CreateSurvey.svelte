@@ -503,14 +503,17 @@
             });
         }
     };
-
+    // Ensures that all the keys in the formObj have non-null-ish values. Returns an array of a bool (true if ok, false if not) and an error message (empty if ok)
     const validateFormInputs = (formObj) => {
         let errorMessage = "";
         for (let key in formObj) {
             let val = formObj[key];
             if (val === "" || Number.isNaN(val) || val === undefined || val === null) {
+              //Filter out fields that are not obligatory here
+              if(key!="internalDescription"){
                 errorMessage = key + " is not filled out";
                 return [false, errorMessage];
+              }
             } else if (key === "items") {
                 if (val.length < 2) {
                     errorMessage = "The survey must have 2 or more options";
@@ -529,6 +532,7 @@
         return [true, ""];
     };
 
+    //Makes sure that amount of expected comparisons is less than or equal to total number of unique combinations of items
     function validateExpectedComparisons(e) {
         if (e.target.value === "") {
             e.target.value = e.target.value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
@@ -651,12 +655,14 @@
     };
 
     const checkIfAddResearcherByEnter = (e) => {
-        console.log("in checkifadd researcher with keycode", e);
+        //console.log("in checkifadd researcher with keycode", e);
         if (e.keyCode == 13) {
             searchForUsers(e);
         }
     };
 
+
+    // All items in purpose-dropdown
     let purposeItems = [
         { name: "Research", value: "research" },
         { name: "Grading", value: "grading" },
@@ -673,17 +679,17 @@
     ];
     let selectedMediaType = "plain";
 
+    // All items in active-dropdown
     let activeItems = [
         { name: "Yes", value: "1" },
         { name: "No", value: "0" },
     ];
     let selectedActiveLevel = "1";
-
+    // Values to be bound to all the input fields
     let surveyTitleValue;
     let surveyQuestionValue;
     let judgeInstructionsValue;
     let internalDescriptionValue;
-
     let comparisonsPerJudge;
     let search_term;
 
@@ -703,6 +709,7 @@
         { name: "PDF", value: "pdf" },
     ];
 
+    // Booleans for showing the tooltips (icons to the right in the input fields) 
     let showSurveyTitleTooltip,
         showSurveyQuestionTooltip,
         showSurveyJudgeInstructionsTooltip,
@@ -713,6 +720,7 @@
         showAddOptionTooltip,
         showCancelEditingTooltip = false;
 
+    // Translates a mediatype (one of the ones in optionMediaTypeItems.value) to the corresponding 'accept'-string in input fields
     function getInputFieldTypeFromMediaType(mediaType) {
         if (mediaType == "pdf") {
             return "application/pdf";
@@ -733,7 +741,7 @@
         console.log("blurred with val", value);
         value = value;
     };
-
+  // Updates owners of the survey in the database
   const changeMembers = () => {
     console.log("Changing members", surveyResearchers, surveyID);
     surveyService.putOwners(surveyID, surveyResearchers)
@@ -765,6 +773,7 @@
     })
   }
   
+  // Forces user to check a checkbox in order to not get warned about changing items/expectedcomparisons in a survey
   const warnUserOnEditingItemsInActiveSurvey = () => {
     if(selectedActiveLevel === "1" && !userHasBeenWarnedOnFocus && editing){
       let checkBoxContainer = document.createElement("div")

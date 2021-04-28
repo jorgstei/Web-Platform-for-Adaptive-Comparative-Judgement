@@ -1,6 +1,7 @@
 <script>
     import {
         TextField,
+        Textarea,
         Button,
         Icon,
         Tooltip,
@@ -127,8 +128,32 @@ import { onMount } from "svelte";
                 </Select>
             </CardText>
         </Col>
-        <Col cols={1}>
-            
-        </Col>
     </Row>
 </Card>
+
+
+<Overlay
+bind:active={option.showOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default;"
+>
+    <div style="width: 50vw;">
+        <TextField type="text" accept="application/text" bind:value={option.tag} disabled={disableFields}>
+            Item Tag
+        </TextField>
+    
+        <Textarea
+            bind:value={view}
+            on:change={onChangeData}
+            style="min-width:100%; margin-top:2vh;"
+            disabled={disableFields}
+            on:focus={onFocusFunc}
+        >
+            Item value
+        </Textarea>
+        <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
+            Close overlay
+        </Button>
+    </div>
+</Overlay>

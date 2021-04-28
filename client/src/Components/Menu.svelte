@@ -53,13 +53,14 @@
             {#if !collapsedMenu}
                 <h4 class="text-h4">Menu</h4>
             {/if}
-            <Button fab style="width:2vw; height: 2vw;" on:click={()=>{collapsedMenu = !collapsedMenu;}}>
+            <div style="cursor:pointer;" on:click={()=>{collapsedMenu = !collapsedMenu;}}>
                 {#if !collapsedMenu}
-                    <Icon size="1vw" path={mdiChevronLeft }></Icon>
+                    <Icon size="2vw" path={mdiChevronLeft} ></Icon>
                 {:else}
-                <Icon path={mdiChevronRight}></Icon>
+                    <Icon size="2vw" path={mdiChevronRight}></Icon>
                 {/if}
-            </Button>
+            </div>
+            
         </div>
         
 

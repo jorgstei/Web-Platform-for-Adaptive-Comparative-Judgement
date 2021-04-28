@@ -489,7 +489,8 @@ router.put("/:id/owners", auth, async (req, res) => {
     try {
         const surveyDoc = await Survey.findOne({ _id: {$eq: req.params.id} })
         const userIsOwner = await surveyDoc?.owners?.some(e => { (e.ownerId == ownerId) && e.rights.editSurvey == true })
-        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && !userIsOwner) {
+        if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && !userIsOwner && 
+            userHasManageMembersRights(req.params.id, req.auth["user"]?.userid)) {
             res.status(403).json({message: "Forbidden"})
             return
         }

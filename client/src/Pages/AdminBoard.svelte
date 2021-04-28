@@ -38,7 +38,7 @@
           <Surveys bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>
         </Route>
         <Route path="create_survey">
-          <CreateSurvey bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc/>
+          <CreateSurvey bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc disableFields={false}/>
         </Route>
         <Route path="survey_data">
           <RawSurveyData bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>

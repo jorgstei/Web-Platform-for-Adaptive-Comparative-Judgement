@@ -16,10 +16,14 @@
         mdiInformationOutline,
         mdiFullscreen,
     } from "@mdi/js";
+import { onMount } from "svelte";
 
     export let option;
     export let optionMediaTypeItems;
     export let functionObject;
+    export let disableFields = false;
+    export let onFocusFunc;
+    export let userHasBeenWarnedOnFocus = false;
 
     let view = option.data
 
@@ -33,6 +37,13 @@
         option.data = new File([view], "rawtext.txt", {type: "text/plain"})
         console.log("Changed text option.data: ", option.data)
     }
+    onMount(()=>{
+        let selects = [...document.getElementsByClassName("textItemSelect")]
+        selects.forEach((e)=>{
+            e.addEventListener("click", onFocusFunc)
+        })      
+
+    })
 
 </script>
 
@@ -48,6 +59,7 @@
                     >
                     <Icon path={mdiFullscreen}/>
                 </Button>
+                {#if !disableFields}
                 <Button
                 fab
                 outlined
@@ -56,6 +68,7 @@
                 >
                     <Icon path={mdiDeleteForever}/>
                 </Button>
+                {/if}
                 
                 <div style="margin-bottom: 5em;">Item</div>
                 <TextField
@@ -64,6 +77,7 @@
                 on:change={() => {console.log("edited text tag");option.editedArr["tag"] = "tag"}}
                 class="mt-4"
                 style="min-width:100%;"
+                disabled={disableFields}
                 >
                 <div slot="append">
                     <Tooltip
@@ -84,6 +98,8 @@
                     on:change={onChangeData}
                     class="mt-4"
                     style="min-width:100%;"
+                    disabled={disableFields}
+                    on:focus={onFocusFunc}
                 >
                     <div slot="append">
                         <Tooltip
@@ -103,8 +119,12 @@
                     items={optionMediaTypeItems}
                     bind:value={option.mediaType}
                     on:change={onChangeMediaType}
-                    class="mt-4">Media Type</Select
-                >
+                    disabled={disableFields}
+                    mandatory
+                    on:click={onFocusFunc}
+                    class="mt-4 textItemSelect">
+                    Media Type
+                </Select>
             </CardText>
         </Col>
         <Col cols={1}>

@@ -25,6 +25,9 @@
     export let option;
     export let optionMediaTypeItems;
     export let functionObject;
+    export let disableFields = false;
+    export let onFocusFunc;
+    export let userHasBeenWarnedOnFocus = false;
     
     let uploadLabelText = "Choose File"
     let view = undefined
@@ -36,6 +39,11 @@
             console.error("mytag unable to get uploadBtn")
         }
         uploadLabelText = option.fileName == "" ? "Choose File" : option.fileName
+
+        let selects = [...document.getElementsByClassName("textItemSelect")]
+        selects.forEach((e)=>{
+            e.addEventListener("click", onFocusFunc);
+        })
     })
 
     function onFileSelected(e){
@@ -93,7 +101,7 @@
                 >
                     <Icon path={mdiFullscreen}/>
                 </Button>
-
+                {#if !disableFields}
                 <Button
                 fab
                 outlined
@@ -102,18 +110,21 @@
                 >
                     <Icon path={mdiDeleteForever}/>
                 </Button>
+                {/if}
             
                 
                 <div>Item</div>
-                <input type="file" accept="application/pdf" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden/>
-                <label class="labelBtn" style="width:80%; margin:auto;" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
-                
+                <div on:click={onFocusFunc}>
+                    <input type="file" accept="application/pdf" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden disabled={disableFields}/>
+                    <label class="labelBtn" style="width:80%; margin:auto;" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
+                </div>
                 <TextField
                     hint="*Required"
                     bind:value={option.tag}
                     on:change={() => {console.log("edited pdf tag");option.editedArr["tag"] = "tag"}}
                     class="mt-4"
                     style="min-width:100%;"
+                    disabled={disableFields}
                 >
                     <div slot="append">
                         <Tooltip
@@ -133,8 +144,11 @@
                     items={optionMediaTypeItems}
                     bind:value={option.mediaType}
                     on:change={()=>option.mimeType = functionObject.getInputFieldTypeFromMediaType(option.mediaType)}
-                    class="mt-4">Media Type</Select
-                >
+                    disabled={disableFields}
+                    mandatory
+                    class="mt-4 textItemSelect">
+                    Media Type
+                </Select>
             </CardText>
             
         </Col>
@@ -147,7 +161,7 @@ opacity={1}
 color={"#eee"}
 style="cursor:default"
 >
-    <TextField type={"text"} accept={"application/text"} bind:value={option.tag}>
+    <TextField type={"text"} accept={"application/text"} bind:value={option.tag} disabled={disableFields}>
         Item Tag
     </TextField>
     {#if view != undefined}

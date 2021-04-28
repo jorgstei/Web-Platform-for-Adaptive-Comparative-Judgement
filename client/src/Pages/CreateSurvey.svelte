@@ -20,11 +20,8 @@
     CardText,
     CardActions,
     Checkbox,
-    Row,
-    Col,
-    Overlay,
   } from "svelte-materialify";
-  import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel, mdiAbTesting } from "@mdi/js";
+  import { mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel } from "@mdi/js";
 
   import TextItem from "../Components/SurveyComponents/TextItem.svelte";
   import PDFItem from "../Components/SurveyComponents/PDFItem.svelte";
@@ -34,6 +31,7 @@
   export let warningOnLeaveFunc;
   export let userInfo;
   export let editing = false;
+  export let disableFields = false;
 
   warningOnLeaveFunc = (link) => {
     swal({
@@ -104,6 +102,8 @@
 
   let searchResults = [];
   let surveyID = null;
+
+  let userIsAllowedToManageMembers = true;
 
   /*
         tag: String, user friendly name for the item, f.ex. filename, or whatever the user decides it to be
@@ -222,15 +222,29 @@
           selectedActiveLevel = data.active ? "1" : "0";
           comparisonsPerJudge = data.expectedComparisons != undefined ? data.expectedComparisons : 2;
 
+          let currentUserIsOwnerInSurvey = false;
           surveyResearchers = [];
           //TODO: Change this to a await Promise.all style fetch
           for (let i = 0; i < data.owners.length; i++) {
             let owner = await userService.getUserByID(data.owners[i].ownerId);
             data.owners[i].owner_email = owner.email;
             surveyResearchers.push(data.owners[i]);
+            
+            if(data.owners[i].ownerId == userInfo.userid){
+              currentUserIsOwnerInSurvey = true;
+              disableFields = !data.owners[i].rights.editSurvey;
+              userIsAllowedToManageMembers = data.owners[i].rights.manageMembers;
+            }
           }
+
+          if(!currentUserIsOwnerInSurvey && userInfo.role !== "admin"){
+            disableFields = true;
+            userIsAllowedToManageMembers = false;
+          }
+
           console.log("Survey researcher", surveyResearchers);
           surveyResearchers = surveyResearchers;
+          
 
           console.log("compobj:", data.items);
           for (let item of data.items) {
@@ -715,7 +729,44 @@
     value = value;
   };
 
-  $: surveyResearchers & searchResults;
+  const changeMembers = () => {
+    console.log("Changing members", surveyResearchers);
+
+  }
+  
+  const warnUserOnEditingItemsInActiveSurvey = () => {
+    if(selectedActiveLevel === "1" && !userHasBeenWarnedOnFocus){
+      let checkBoxContainer = document.createElement("div")
+      let confirmWarningSeen = document.createElement("input")
+      let confirmWarningSeenLabel = document.createElement("label")
+      confirmWarningSeen.type = "checkbox"
+      confirmWarningSeen.checked = false
+      confirmWarningSeen.id = "confirmWarningSeen"
+      confirmWarningSeenLabel.setAttribute("for", "confirmWarningSeen")
+      confirmWarningSeenLabel.innerText = "I understand: "
+      confirmWarningSeenLabel.style = "color:black; display:inline;"
+      checkBoxContainer.appendChild(confirmWarningSeenLabel)
+      checkBoxContainer.appendChild(confirmWarningSeen)
+      swal({
+          title: "Are you sure?",
+          content: checkBoxContainer,
+          text: "Changing the items or expected comparisons of an active survey will jeopardize the integrity of the data you have gathered",                                            
+          icon: "warning",
+          dangerMode: true,
+          buttons: ["Cancel", "OK"]
+      }).then((understood)=>{
+        if(understood){
+          if(confirmWarningSeen.checked == true){
+            userHasBeenWarnedOnFocus = true;
+          }
+        }
+      })
+    }
+  }
+  let userHasChangedItemsOrExpectedComparisons = false;
+  let userHasBeenWarnedOnFocus = false;
+
+  $: surveyResearchers & searchResults & disableFields & userIsAllowedToManageMembers;
 </script>
 
 <div id="create_wrapper">
@@ -729,7 +780,7 @@
     {/if}
   </div>
   <div id="main_input_wrapper">
-    {#if editing}
+    {#if editing && !disableFields}
       <Button
         fab
         style="right: 2vw; top:7vh; position: fixed; min-width:4vw; min-height:4vw;"
@@ -760,6 +811,7 @@
       noResize
       class="text-h5"
       hint="*Required"
+      disabled={disableFields}
       bind:value={surveyTitleValue}
       on:focus={() => console.log("title got focused")}
     >
@@ -775,7 +827,7 @@
       Survey title
     </Textarea>
 
-    <Textarea style="margin-top: 2vh;" rows={1} autogrow noResize class="text-h5" hint="*Required" bind:value={surveyQuestionValue}>
+    <Textarea style="margin-top: 2vh;" rows={1} autogrow noResize class="text-h5" hint="*Required" bind:value={surveyQuestionValue} disabled={disableFields}>
       <div slot="append">
         <Tooltip top bind:active={showSurveyQuestionTooltip}>
           <Icon path={mdiInformationOutline} />
@@ -788,7 +840,7 @@
       Survey question
     </Textarea>
 
-    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" hint="*Required" bind:value={judgeInstructionsValue}>
+    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" hint="*Required" bind:value={judgeInstructionsValue} disabled={disableFields}>
       <div slot="append">
         <Tooltip top bind:active={showSurveyJudgeInstructionsTooltip}>
           <Icon path={mdiInformationOutline} />
@@ -798,7 +850,7 @@
       Judge instructions
     </Textarea>
 
-    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue}>
+    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue} disabled={disableFields}>
       <div slot="append">
         <Tooltip top bind:active={showSurveyInternalDescriptionTooltip}>
           <Icon path={mdiInformationOutline} />
@@ -813,14 +865,14 @@
 
     <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">
       <div style="min-width: 30%;">
-        <Select mandatory items={purposeItems} bind:value={selectedPurpose}>Purpose</Select>
+        <Select mandatory items={purposeItems} bind:value={selectedPurpose} disabled={disableFields}>Purpose</Select>
       </div>
       <div style="min-width: 30%;">
-        <Select mandatory items={mediaTypeItems} bind:value={selectedMediaType}>Media Type</Select>
+        <Select mandatory items={mediaTypeItems} bind:value={selectedMediaType} disabled={disableFields}>Media Type</Select>
       </div>
 
       <div style="min-width: 30%;">
-        <Select mandatory items={activeItems} bind:value={selectedActiveLevel}>Active</Select>
+        <Select mandatory items={activeItems} bind:value={selectedActiveLevel} disabled={disableFields}>Active</Select>
       </div>
     </div>
 
@@ -832,6 +884,7 @@
         on:input={searchForUsers}
         bind:value={search_term}
         on:keydown={checkIfAddResearcherByEnter}
+        disabled={!userIsAllowedToManageMembers}
       >
         <div slot="append">
           <Tooltip top bind:active={showSurveySearchForUsersTooltip}>
@@ -845,17 +898,19 @@
         </div>
         Add researchers
       </TextField>
+      {#if userIsAllowedToManageMembers}
       <ListItemGroup class="blue-text">
         {#each searchResults as result}
           <ListItem style="border: 0.1em solid #aaa; border-top:none;" on:click={() => addResearcher(result)}>{result.email}</ListItem>
         {/each}
       </ListItemGroup>
+      {/if}
     </div>
 
     <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
       {#each surveyResearchers as researcher}
         <Card style="width:49%; cursor: default; background-color:rgb(235,235,235);" class="mb-2" hover>
-          {#if researcher.ownerId !== userInfo.userid}
+          {#if (userInfo.role == "admin") || (researcher.ownerId !== userInfo.userid && userIsAllowedToManageMembers)}
             <Button fab class="float-right" on:click={() => removeResearcher(researcher.owner_email)}
               ><Icon path={mdiDeleteForever} /></Button
             >
@@ -869,11 +924,13 @@
           </CardText>
           <CardActions>
             <div class="d-flex flex-column justfiy-left">
-              <Checkbox bind:checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid}>
+              <Checkbox bind:checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid || ((userInfo.role !== "admin") && !userIsAllowedToManageMembers)}>
                 Manage members
               </Checkbox>
-              <Checkbox bind:checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid}>Edit survey</Checkbox>
-              <Checkbox bind:checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid}>
+              <Checkbox bind:checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid || ((userInfo.role !== "admin") && !userIsAllowedToManageMembers)}>
+                Edit survey
+              </Checkbox>
+              <Checkbox bind:checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid || ((userInfo.role !== "admin") && !userIsAllowedToManageMembers)}>
                 View results
               </Checkbox>
             </div>
@@ -892,6 +949,9 @@
             <TextItem
               bind:option
               bind:optionMediaTypeItems
+              bind:disableFields
+              bind:userHasBeenWarnedOnFocus
+              onFocusFunc={editing ? warnUserOnEditingItemsInActiveSurvey: {}}
               functionObject={{
                 getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
                 removeOption: removeOption,
@@ -901,6 +961,9 @@
             <PDFItem
               bind:option
               bind:optionMediaTypeItems
+              bind:disableFields
+              bind:userHasBeenWarnedOnFocus
+              onFocusFunc={editing ? warnUserOnEditingItemsInActiveSurvey: {}}
               functionObject={{
                 getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
                 removeOption: removeOption,
@@ -909,6 +972,7 @@
           {/if}
         </div>
       {/each}
+      {#if !disableFields}
       <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
         <Card style="cursor: default; height:228px; background-color:rgb(235,235,235);" hover>
           <CardText class="flex-column d-flex justify-space-between">
@@ -918,16 +982,19 @@
               style="min-width:110px; min-height:110px;"
               class="align-self-center"
               on:click={() => {
-                addSurveyOption(
-                  "tag" + surveyOptions.length,
-                  selectedMediaType,
-                  getInputFieldTypeFromMediaType(selectedMediaType),
-                  "",
-                  false,
-                  false
-                );
-                surveyOptions = surveyOptions;
-                setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 400);
+                warnUserOnEditingItemsInActiveSurvey();
+                if(userHasBeenWarnedOnFocus){
+                  addSurveyOption(
+                    "tag" + surveyOptions.length,
+                    selectedMediaType,
+                    getInputFieldTypeFromMediaType(selectedMediaType),
+                    "",
+                    false,
+                    false
+                  );
+                  surveyOptions = surveyOptions;
+                  setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 400);
+                }
               }}
             >
               <Icon path={mdiPlusCircle} size="110px" />
@@ -935,9 +1002,10 @@
           </CardText>
         </Card>
       </div>
+      {/if}
     </div>
     <div class="centeredInputFieldWrapper">
-      <TextField type="number" on:input={validateExpectedComparisons} bind:value={comparisonsPerJudge}>
+      <TextField type="number" on:input={validateExpectedComparisons} bind:value={comparisonsPerJudge} disabled={disableFields} on:focus={warnUserOnEditingItemsInActiveSurvey}>
         <div slot="append">
           <Tooltip top bind:active={showSurveyComparisonsPerJudgeTooltip}>
             <Icon path={mdiInformationOutline} />
@@ -952,8 +1020,11 @@
         Expected comparisons per judge
       </TextField>
     </div>
-
-    <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={sendForm}>Submit survey</Button>
+    {#if !disableFields}
+      <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={sendForm}>Submit survey</Button>
+    {:else if userIsAllowedToManageMembers}
+      <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={changeMembers}>Submit member changes</Button>
+    {/if}
     <input type="text" id="dummy" />
   </div>
 </div>

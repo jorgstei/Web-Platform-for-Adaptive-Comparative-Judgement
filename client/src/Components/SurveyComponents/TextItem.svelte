@@ -1,6 +1,7 @@
 <script>
     import {
         TextField,
+        Textarea,
         Button,
         Icon,
         Tooltip,
@@ -16,10 +17,14 @@
         mdiInformationOutline,
         mdiFullscreen,
     } from "@mdi/js";
+import { onMount } from "svelte";
 
     export let option;
     export let optionMediaTypeItems;
     export let functionObject;
+    export let disableFields = false;
+    export let onFocusFunc;
+    export let userHasBeenWarnedOnFocus = false;
 
     let view = option.data
 
@@ -33,6 +38,13 @@
         option.data = new File([view], "rawtext.txt", {type: "text/plain"})
         console.log("Changed text option.data: ", option.data)
     }
+    onMount(()=>{
+        let selects = [...document.getElementsByClassName("textItemSelect")]
+        selects.forEach((e)=>{
+            e.addEventListener("click", onFocusFunc)
+        })      
+
+    })
 
 </script>
 
@@ -48,6 +60,7 @@
                     >
                     <Icon path={mdiFullscreen}/>
                 </Button>
+                {#if !disableFields}
                 <Button
                 fab
                 outlined
@@ -56,6 +69,7 @@
                 >
                     <Icon path={mdiDeleteForever}/>
                 </Button>
+                {/if}
                 
                 <div style="margin-bottom: 5em;">Item</div>
                 <TextField
@@ -64,6 +78,7 @@
                 on:change={() => {console.log("edited text tag");option.editedArr["tag"] = "tag"}}
                 class="mt-4"
                 style="min-width:100%;"
+                disabled={disableFields}
                 >
                 <div slot="append">
                     <Tooltip
@@ -84,6 +99,8 @@
                     on:change={onChangeData}
                     class="mt-4"
                     style="min-width:100%;"
+                    disabled={disableFields}
+                    on:focus={onFocusFunc}
                 >
                     <div slot="append">
                         <Tooltip
@@ -91,9 +108,9 @@
                             bind:active={option.showTooltip}
                         >
                             <Icon path={mdiInformationOutline} />
-                            <span slot="tip"
-                                >Item text</span
-                            >
+                            <span slot="tip">
+                                Item text
+                            </span>
                         </Tooltip>
                     </div>
                     Item value
@@ -103,12 +120,40 @@
                     items={optionMediaTypeItems}
                     bind:value={option.mediaType}
                     on:change={onChangeMediaType}
-                    class="mt-4">Media Type</Select
-                >
+                    disabled={disableFields}
+                    mandatory
+                    on:click={onFocusFunc}
+                    class="mt-4 textItemSelect">
+                    Media Type
+                </Select>
             </CardText>
-        </Col>
-        <Col cols={1}>
-            
         </Col>
     </Row>
 </Card>
+
+
+<Overlay
+bind:active={option.showOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default;"
+>
+    <div style="width: 50vw;">
+        <TextField type="text" accept="application/text" bind:value={option.tag} disabled={disableFields}>
+            Item Tag
+        </TextField>
+    
+        <Textarea
+            bind:value={view}
+            on:change={onChangeData}
+            style="min-width:100%; margin-top:2vh;"
+            disabled={disableFields}
+            on:focus={onFocusFunc}
+        >
+            Item value
+        </Textarea>
+        <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
+            Close overlay
+        </Button>
+    </div>
+</Overlay>

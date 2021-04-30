@@ -8,10 +8,12 @@
 
     export let userInfo = null;
     export let allowLeavePageWithoutWarning;
+    export let selectedMenuListValue;
     allowLeavePageWithoutWarning = true;
 
     let numberOfSurveys = undefined
     onMount(() => {
+        selectedMenuListValue = "Account";
         surveyService.getCount().then(response => {
             if(response.status < 300){
                 numberOfSurveys = response.data
@@ -63,7 +65,7 @@
 {#if userInfo != null}
     <div class="d-flex flex-column justify-content-center align-content-center">
         <h1 class="text-h1 ma-2 mb-6" style="font-size: 5rem">Account</h1>
-        <Card class="elevation-4 align-self-center justify-self-center" style="width:50vh;height:auto;">
+        <Card class="elevation-4 align-self-center justify-self-center" style="width:40vw;height:auto;">
             <CardText class="justify-content-left">
                 <h5 class="text-h5 ma-2 mb-6">Welcome {userInfo.email}</h5>
                 <p>Number of surveys you have access to: {numberOfSurveys}</p>

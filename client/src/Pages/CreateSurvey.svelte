@@ -1,73 +1,106 @@
 <script>
-    import { v4 as uuidv4 } from "uuid";
-    import swal from "sweetalert";
-    import { surveyService } from "../Services/SurveyService";
-    import { navigate } from "svelte-routing";
-    import queryString from "query-string";
-    import { onMount, onDestroy } from "svelte";
-    import { userService } from "../Services/UserService";
-    import { navigateWithRefreshToken } from "../Utility/naviagte";
-    import {
-        TextField,
-        Button,
-        Icon,
-        Tooltip,
-        Textarea,
-        Select,
-        ListItemGroup,
-        ListItem,
-        Card,
-        CardText,
-        CardActions,
-        Checkbox,
-        Row,
-        Col,
-        Overlay,
-    } from "svelte-materialify";
-    import { mdiEyeOff, mdiEye, mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel, mdiAbTesting } from "@mdi/js";
+  import { v4 as uuidv4 } from "uuid";
+  import swal from "sweetalert";
+  import { surveyService } from "../Services/SurveyService";
+  import { navigate } from "svelte-routing";
+  import queryString from "query-string";
+  import { onMount, onDestroy } from "svelte";
+  import { userService } from "../Services/UserService";
+  import { navigateWithRefreshToken } from "../Utility/naviagte";
+  import {
+    TextField,
+    Button,
+    Icon,
+    Tooltip,
+    Textarea,
+    Select,
+    ListItemGroup,
+    ListItem,
+    Card,
+    CardText,
+    CardActions,
+    Checkbox,
+  } from "svelte-materialify";
+  import { mdiDeleteForever, mdiInformationOutline, mdiPlusCircle, mdiFileCancel } from "@mdi/js";
 
-    import TextItem from "../Components/SurveyComponents/TextItem.svelte";
-    import PDFItem from "../Components/SurveyComponents/PDFItem.svelte";
-    import { surveyItemFileService } from "../Services/SurveyItemFileService";
+  import TextItem from "../Components/SurveyComponents/TextItem.svelte";
+  import PDFItem from "../Components/SurveyComponents/PDFItem.svelte";
+  import { surveyItemFileService } from "../Services/SurveyItemFileService";
 
-    export let allowLeavePageWithoutWarning;
-    export let warningOnLeaveFunc;
-    export let userInfo;
-    export let editing = false;
+  export let allowLeavePageWithoutWarning;
+  export let userInfo;
+  export let editing = false;
+  export let disableFields = false;
+  export let warningOnLeaveFunc;
+  export let selectedMenuListValue;
 
-    warningOnLeaveFunc = (link) => {
-        swal({
-            title: "Are you sure?",
-            text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
-            icon: "warning",
-            dangerMode: true,
-            buttons: ["Take me back!", "Discard"],
-        }).then((willDiscard) => {
-            if (willDiscard) {
-                allowLeavePageWithoutWarning = true;
-                navigate("/admin_board/" + link);
-            }
-        });
-    };
+  const actualWarningOnLeaveFunc = (link) => {
+    console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
+    console.log("navigating with link:", link);
+    if(userIsAllowedToManageMembers || !disableFields){
+      let linkDivided = link.split("/");
+      let lastPathInLink = linkDivided[linkDivided.length-1];
+      switch (lastPathInLink) {
+        case "surveys":
+          selectedMenuListValue = "Surveys"
+          break;
+        case "invite_researcher":
+          selectedMenuListValue = "Invite"
+          break;
+        case "researchers":
+          selectedMenuListValue = "Users"
+          break;
+        case "create_survey":
+          selectedMenuListValue = "Create Survey"
+          break;
+        case "profile":
+          selectedMenuListValue = "Account"
+          break;
+        default:
+          selectedMenuListValue = "Create Survey"
+          break;
+      }
+      console.log("selected", selectedMenuListValue);
+      swal({
+        title: "Are you sure?",
+        text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
+        icon: "warning",
+        dangerMode: true,
+        buttons: ["Take me back!", "Discard"],
+      }).then((willDiscard) => {
+        if (willDiscard) {
+          allowLeavePageWithoutWarning = true;
+          navigate(link);
+        }
+        else{
+          selectedMenuListValue = "Create Survey";
+        }
+      });
+    }
+    else{
+      allowLeavePageWithoutWarning = true
+      navigate(link);
+    }
+  };
 
-    onDestroy(() => {
-        allowLeavePageWithoutWarning = true;
-    });
+  onDestroy(()=>{
+    allowLeavePageWithoutWarning = true;
+  })
 
-    const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+  const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
-    const classes = {
-        overall: null,
-        controls: null,
-        container: null,
-    };
+  const classes = {
+      overall: null,
+      controls: null,
+      container: null,
+  };
 
-    const options = {
-        // "paged" or "all"
-        display: "paged",
-        // "dark" or "light" or your own
-        theme: "dark",
-    };
+  const options = {
+      // "paged" or "all"
+      display: "paged",
+      // "dark" or "light" or your own
+      theme: "dark",
+  };
 
     // The current page number
     let currentPage;
@@ -84,26 +117,28 @@
         return "Do you really want to leave our brilliant application?";
     };
     */
-    let searchHint = "";
-    let oldSearchTerm = "";
-    let epochMsAtLastSearch = new Date().getTime();
-    let surveyResearchers = [
-        {
-            ownerId: userInfo.userid,
-            owner_email: userInfo.email,
-            obligatory: true,
-            rights: {
-                manageMembers: true,
-                editSurvey: true,
-                viewResults: true,
-            },
-        },
-    ];
+  let searchHint = "";
+  let oldSearchTerm = "";
+  let epochMsAtLastSearch = new Date().getTime();
+  let surveyResearchers = [
+    {
+      ownerId: userInfo.userid,
+      owner_email: userInfo.email,
+      obligatory: true,
+      rights: {
+        manageMembers: true,
+        editSurvey: true,
+        viewResults: true,
+      },
+    },
+  ];
 
-    let searchResults = [];
-    let surveyID = null;
+  let searchResults = [];
+  let surveyID = null;
 
-    /*
+  let userIsAllowedToManageMembers = true;
+
+  /*
         tag: String, user friendly name for the item, f.ex. filename, or whatever the user decides it to be
         mediaType: String, user friendly view of the mimetype (application/pdf -> pdf f.ex.)
         mimeType: String, the mimetype of the data (application/pdf, application/jpg etc.)
@@ -167,73 +202,88 @@
         console.log("submitButtonFunctions", submitButtonFunctions);
     };
 
-    const removeSurveyOption = (option) => {
-        console.log("Trying to remove item: ", option);
-        const index = surveyOptions.findIndex((e) => e == option);
-        if (index > -1) {
-            const submitFunctionIndex = submitButtonFunctions.findIndex((e) => {
-                return e.uuid == option.uuid;
-            });
-            if (submitFunctionIndex > -1) {
-                submitButtonFunctions.splice(submitFunctionIndex, 1);
-            } else {
-                console.error("Unable to find submitButtonFunction even though surveyObject exists");
+  const removeSurveyOption = (option) => {
+    console.log("Trying to remove item: ", option);
+    const index = surveyOptions.findIndex((e) => e == option);
+    if (index > -1) {
+      const submitFunctionIndex = submitButtonFunctions.findIndex((e) => {
+        return e.uuid == option.uuid;
+      });
+      if (submitFunctionIndex > -1) {
+        submitButtonFunctions.splice(submitFunctionIndex, 1);
+      } else {
+        console.error("Unable to find submitButtonFunction even though surveyObject exists");
+      }
+      const _id = surveyOptions[index]._id;
+      if (surveyOptions[index].created == false) {
+        submitButtonFunctions.push({
+          addtype: "deleteSurveyItem",
+          func: () => {
+            return surveyItemFileService.delete(_id);
+          },
+        });
+      }
+      surveyOptions.splice(index, 1);
+    } else {
+      console.error("Tried removing surveyOption but could not find it in array.");
+    }
+    surveyOptions = surveyOptions;
+  };
+
+  onMount(async () => {
+    warningOnLeaveFunc = actualWarningOnLeaveFunc;
+    allowLeavePageWithoutWarning = false;
+    if (editing) {
+      let params = queryString.parse(window.location.search);
+      surveyID = params.id;
+      console.log("SurveyID from CreateSurvey.svelte: ", surveyID);
+
+      let labels = [...document.getElementsByTagName("label")];
+      labels.forEach((e) => {
+        e.classList.add("active");
+      });
+
+      await surveyService.getSurveyByID(surveyID).then(async (data) => {
+        console.log("surveydata in create_survey", data);
+        if (data.status == 200) {
+          data = data.data;
+          surveyTitleValue = data.title;
+          surveyQuestionValue = data.surveyQuestion;
+          judgeInstructionsValue = data.judgeInstructions;
+          internalDescriptionValue = data.internalDescription;
+          selectedMediaType = data.mediaType;
+          selectedPurpose = data.purpose;
+          selectedActiveLevel = data.active ? "1" : "0";
+          comparisonsPerJudge = data.expectedComparisons != undefined ? data.expectedComparisons : 2;
+
+          let currentUserIsOwnerInSurvey = false;
+          surveyResearchers = [];
+          //TODO: Change this to a await Promise.all style fetch
+          for (let i = 0; i < data.owners.length; i++) {
+            let owner = await userService.getUserByID(data.owners[i].ownerId);
+            data.owners[i].owner_email = owner.email;
+            surveyResearchers.push(data.owners[i]);
+            
+            if(data.owners[i].ownerId == userInfo.userid){
+              currentUserIsOwnerInSurvey = true;
+              disableFields = !data.owners[i].rights.editSurvey;
+              userIsAllowedToManageMembers = data.owners[i].rights.manageMembers;
             }
-            const _id = surveyOptions[index]._id;
-            if (surveyOptions[index].created == false) {
-                submitButtonFunctions.push({
-                    addtype: "deleteSurveyItem",
-                    func: () => {
-                        return surveyItemFileService.delete(_id);
-                    },
-                });
-            }
-            surveyOptions.splice(index, 1);
-        } else {
-            console.error("Tried removing surveyOption but could not find it in array.");
-        }
-        surveyOptions = surveyOptions;
-    };
+          }
 
-    onMount(async () => {
-        allowLeavePageWithoutWarning = false;
-        if (editing) {
-            let params = queryString.parse(window.location.search);
-            surveyID = params.id;
-            console.log("SurveyID from RawSurveyData.svelte: ", surveyID);
+          if(!currentUserIsOwnerInSurvey && userInfo.role !== "admin"){
+            disableFields = true;
+            userIsAllowedToManageMembers = false;
+          }
 
-            let labels = [...document.getElementsByTagName("label")];
-            labels.forEach((e) => {
-                e.classList.add("active");
-            });
+          console.log("Survey researcher", surveyResearchers);
+          surveyResearchers = surveyResearchers;
+          
 
-            await surveyService.getSurveyByID(surveyID).then(async (data) => {
-                console.log("surveydata in create_survey", data);
-                if (data.status == 200) {
-                    data = data.data;
-                    surveyTitleValue = data.title;
-                    surveyQuestionValue = data.surveyQuestion;
-                    judgeInstructionsValue = data.judgeInstructions;
-                    internalDescriptionValue = data.internalDescription;
-                    selectedMediaType = data.mediaType;
-                    selectedPurpose = data.purpose;
-                    selectedActiveLevel = data.active ? "1" : "0";
-                    comparisonsPerJudge = data.expectedComparisons != undefined ? data.expectedComparisons : 2;
-
-                    surveyResearchers = [];
-                    //TODO: Change this to a await Promise.all style fetch
-                    for (let i = 0; i < data.owners.length; i++) {
-                        let owner = await userService.getUserByID(data.owners[i].ownerId);
-                        data.owners[i].owner_email = owner.email;
-                        surveyResearchers.push(data.owners[i]);
-                    }
-                    console.log("Survey researcher", surveyResearchers);
-                    surveyResearchers = surveyResearchers;
-
-                    console.log("compobj:", data.items);
-                    for (let item of data.items) {
-                        console.log("optionbox", data);
-                        /*
+          console.log("compobj:", data.items);
+          for (let item of data.items) {
+            console.log("optionbox", data);
+            /*
                 Special case for plain text items.
                 As they are small compared to images or PDFs, AND they otherwise can't convey
                 their information to the researcher without the actual data.
@@ -386,6 +436,7 @@
                             }
                         });
                         await Promise.all(itemFileResponses);
+                        await changeMembers();
                         surveyService
                             .put(surveyID, info)
                             .then((data) => {
@@ -406,7 +457,8 @@
                                                 "Your link is:\n" + survey_link + "\n It has been copied to your clipboard for you!",
                                                 "success"
                                             );
-                                            navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+                                            selectedMenuListValue = "Surveys";
+                                            navigateWithRefreshToken("/admin_board/surveys").then((data) => {userInfo = data;});
                                         })
                                         .catch((err) => {});
                                 } else {
@@ -456,7 +508,8 @@
                                             "Your link is:\n" + survey_link + "\n It has been copied to your clipboard for you!",
                                             "success"
                                         );
-                                        navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+                                        selectedMenuListValue = "Surveys";
+                                        navigateWithRefreshToken("/admin_board/surveys").then((data) => {userInfo = data;});
                                     });
                                 } else {
                                     swal(
@@ -480,14 +533,17 @@
             });
         }
     };
-
+    // Ensures that all the keys in the formObj have non-null-ish values. Returns an array of a bool (true if ok, false if not) and an error message (empty if ok)
     const validateFormInputs = (formObj) => {
         let errorMessage = "";
         for (let key in formObj) {
             let val = formObj[key];
             if (val === "" || Number.isNaN(val) || val === undefined || val === null) {
+              //Filter out fields that are not obligatory here
+              if(key!="internalDescription"){
                 errorMessage = key + " is not filled out";
                 return [false, errorMessage];
+              }
             } else if (key === "items") {
                 if (val.length < 2) {
                     errorMessage = "The survey must have 2 or more options";
@@ -506,6 +562,7 @@
         return [true, ""];
     };
 
+    //Makes sure that amount of expected comparisons is less than or equal to total number of unique combinations of items
     function validateExpectedComparisons(e) {
         if (e.target.value === "") {
             e.target.value = e.target.value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
@@ -628,12 +685,14 @@
     };
 
     const checkIfAddResearcherByEnter = (e) => {
-        console.log("in checkifadd researcher with keycode", e);
+        //console.log("in checkifadd researcher with keycode", e);
         if (e.keyCode == 13) {
             searchForUsers(e);
         }
     };
 
+
+    // All items in purpose-dropdown
     let purposeItems = [
         { name: "Research", value: "research" },
         { name: "Grading", value: "grading" },
@@ -650,17 +709,17 @@
     ];
     let selectedMediaType = "plain";
 
+    // All items in active-dropdown
     let activeItems = [
         { name: "Yes", value: "1" },
         { name: "No", value: "0" },
     ];
     let selectedActiveLevel = "1";
-
+    // Values to be bound to all the input fields
     let surveyTitleValue;
     let surveyQuestionValue;
     let judgeInstructionsValue;
     let internalDescriptionValue;
-
     let comparisonsPerJudge;
     let search_term;
 
@@ -680,6 +739,7 @@
         { name: "PDF", value: "pdf" },
     ];
 
+    // Booleans for showing the tooltips (icons to the right in the input fields) 
     let showSurveyTitleTooltip,
         showSurveyQuestionTooltip,
         showSurveyJudgeInstructionsTooltip,
@@ -690,6 +750,7 @@
         showAddOptionTooltip,
         showCancelEditingTooltip = false;
 
+    // Translates a mediatype (one of the ones in optionMediaTypeItems.value) to the corresponding 'accept'-string in input fields
     function getInputFieldTypeFromMediaType(mediaType) {
         if (mediaType == "pdf") {
             return "application/pdf";
@@ -710,252 +771,340 @@
         console.log("blurred with val", value);
         value = value;
     };
+  // Updates owners of the survey in the database
+  const changeMembers = () => {
+    console.log("Changing members", surveyResearchers, surveyID);
+    surveyService.putOwners(surveyID, surveyResearchers)
+    .then(res=>{
+      if(disableFields && userIsAllowedToManageMembers){
+        if(res.status < 300){
+          swal(
+            "Successfully edited members!",
+            "Your change of members was successful",
+            "success"
+          );
+          selectedMenuListValue = "Surveys";
+          navigateWithRefreshToken("/admin_board/surveys").then((data) => {userInfo = data;});
+        }
+        else{
+          swal(
+            "Failed to edit members!",
+            "We were not able to edit members",
+            "error"
+          );
+        }
+      }
+    })
+    .catch(err=>{
+      swal(
+        "Could not edit members!",
+        "We were unable to edit members",
+        "error"
+      )
+    })
+  }
+  
+  // Forces user to check a checkbox in order to not get warned about changing items/expectedcomparisons in a survey
+  const warnUserOnEditingItemsInActiveSurvey = () => {
+    if(selectedActiveLevel === "1" && !userHasBeenWarnedOnFocus && editing){
+      let checkBoxContainer = document.createElement("div")
+      let confirmWarningSeen = document.createElement("input")
+      let confirmWarningSeenLabel = document.createElement("label")
+      confirmWarningSeen.type = "checkbox"
+      confirmWarningSeen.checked = false
+      confirmWarningSeen.id = "confirmWarningSeen"
+      confirmWarningSeenLabel.setAttribute("for", "confirmWarningSeen")
+      confirmWarningSeenLabel.innerText = "I understand: "
+      confirmWarningSeenLabel.style = "color:black; display:inline;"
+      checkBoxContainer.appendChild(confirmWarningSeenLabel)
+      checkBoxContainer.appendChild(confirmWarningSeen)
+      swal({
+          title: "Are you sure?",
+          content: checkBoxContainer,
+          text: "Changing the items or expected comparisons of an active survey will jeopardize the integrity of the data you have gathered",                                            
+          icon: "warning",
+          dangerMode: true,
+          buttons: ["Cancel", "OK"]
+      }).then((understood)=>{
+        if(understood){
+          if(confirmWarningSeen.checked == true){
+            userHasBeenWarnedOnFocus = true;
+          }
+        }
+      })
+    }
+  }
+  let userHasChangedItemsOrExpectedComparisons = false;
+  let userHasBeenWarnedOnFocus = !editing;
 
-    $: surveyResearchers & searchResults;
+  $: surveyResearchers & searchResults & disableFields & userIsAllowedToManageMembers;
 </script>
 
 <div id="create_wrapper">
-    <div id="titleWrapper">
-        {#if editing}
-            <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">
-                Edit Survey: {surveyTitleValue}
-            </h1>
-        {:else}
-            <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem; margin: auto;">Create Survey</h1>
-        {/if}
+  <div id="titleWrapper">
+    {#if editing}
+      {#if !userIsAllowedToManageMembers && disableFields}
+        <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">
+          Viewing Survey: {surveyTitleValue}
+        </h1>
+      {:else}
+        <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem">
+          Edit Survey: {surveyTitleValue}
+        </h1>
+      {/if}
+      
+    {:else}
+      <h1 class="text-h1 ma-2 mb-6 align-self-center" style="font-size: 5rem; margin: auto;">Create Survey</h1>
+    {/if}
+  </div>
+  <div id="main_input_wrapper">
+    {#if editing && !disableFields}
+      <Button
+        fab
+        style="right: 2vw; top:7vh; position: fixed; min-width:4vw; min-height:4vw;"
+        on:click={() => {
+          swal({
+            title: "Are you sure?",
+            text: "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
+            icon: "warning",
+            dangerMode: true,
+            buttons: ["Nevermind", "Discard"],
+          }).then((willDiscard) => {
+            if (willDiscard) {
+              navigate("/admin_board/surveys");
+            }
+          });
+        }}
+      >
+        <Tooltip top bind:active={showCancelEditingTooltip}>
+          <Icon class="red-text" path={mdiFileCancel} size="3vw" />
+          <span slot="tip">Cancel editing</span>
+        </Tooltip>
+      </Button>
+    {/if}
+    <Textarea
+      style="margin-top: 2vh; line-height: 20px;"
+      rows={1}
+      autogrow
+      noResize
+      class="text-h5"
+      hint="*Required"
+      disabled={disableFields}
+      bind:value={surveyTitleValue}
+      on:focus={() => console.log("title got focused")}
+    >
+      <div slot="append">
+        <Tooltip top bind:active={showSurveyTitleTooltip}>
+          <Icon path={mdiInformationOutline} />
+          <span slot="tip"
+            >A title for what you're researching. Will not be shown to the judges.<br />
+            For example: 'Preference of snacks'
+          </span>
+        </Tooltip>
+      </div>
+      Survey title
+    </Textarea>
+
+    <Textarea style="margin-top: 2vh;" rows={1} autogrow noResize class="text-h5" hint="*Required" bind:value={surveyQuestionValue} disabled={disableFields}>
+      <div slot="append">
+        <Tooltip top bind:active={showSurveyQuestionTooltip}>
+          <Icon path={mdiInformationOutline} />
+          <span slot="tip"
+            >The question the judges will answer. Will be shown to judges.<br />
+            For example: 'Which snack do you prefer?'
+          </span>
+        </Tooltip>
+      </div>
+      Survey question
+    </Textarea>
+
+    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" hint="*Required" bind:value={judgeInstructionsValue} disabled={disableFields}>
+      <div slot="append">
+        <Tooltip top bind:active={showSurveyJudgeInstructionsTooltip}>
+          <Icon path={mdiInformationOutline} />
+          <span slot="tip"> Extra info you want to give the judges before they answer your survey. </span>
+        </Tooltip>
+      </div>
+      Judge instructions
+    </Textarea>
+
+    <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue} disabled={disableFields}>
+      <div slot="append">
+        <Tooltip top bind:active={showSurveyInternalDescriptionTooltip}>
+          <Icon path={mdiInformationOutline} />
+          <span slot="tip">
+            An internal description of the survey.<br />
+            Will only be shown to co-researchers.
+          </span>
+        </Tooltip>
+      </div>
+      Internal description
+    </Textarea>
+
+    <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">
+      <div style="min-width: 30%;">
+        <Select mandatory items={purposeItems} bind:value={selectedPurpose} disabled={disableFields}>Purpose</Select>
+      </div>
+      <div style="min-width: 30%;">
+        <Select mandatory items={mediaTypeItems} bind:value={selectedMediaType} disabled={disableFields}>Media Type</Select>
+      </div>
+
+      <div style="min-width: 30%;">
+        <Select mandatory items={activeItems} bind:value={selectedActiveLevel} disabled={disableFields}>Active</Select>
+      </div>
     </div>
-    <div id="main_input_wrapper">
-        {#if editing}
-            <Button
-                fab
-                style="right: 2vw; top:7vh; position: fixed; min-width:4vw; min-height:4vw;"
-                on:click={() => {
-                    swal({
-                        title: "Are you sure?",
-                        text: "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
-                        icon: "warning",
-                        dangerMode: true,
-                        buttons: ["Nevermind", "Discard"],
-                    }).then((willDiscard) => {
-                        if (willDiscard) {
-                            navigate("/admin_board/surveys");
-                        }
-                    });
-                }}
-            >
-                <Tooltip top bind:active={showCancelEditingTooltip}>
-                    <Icon class="red-text" path={mdiFileCancel} size="3vw" />
-                    <span slot="tip">Cancel editing</span>
-                </Tooltip>
+
+    <h1 class="text-h4 ma-8" style="text-align:center;">Search for and add co-researchers</h1>
+    <div class="centeredInputFieldWrapper">
+      <TextField
+        type="text"
+        bind:hint={searchHint}
+        on:input={searchForUsers}
+        bind:value={search_term}
+        on:keydown={checkIfAddResearcherByEnter}
+        disabled={!userIsAllowedToManageMembers}
+      >
+        <div slot="append">
+          <Tooltip top bind:active={showSurveySearchForUsersTooltip}>
+            <Icon path={mdiInformationOutline} />
+            <span slot="tip">
+              Search for researchers by name or email.<br />
+              Type in at least 3 characters to get results automatically.<br />
+              Optionally, hit enter after a single character to search.
+            </span>
+          </Tooltip>
+        </div>
+        Add researchers
+      </TextField>
+      {#if userIsAllowedToManageMembers}
+      <ListItemGroup class="blue-text">
+        {#each searchResults as result}
+          <ListItem style="border: 0.1em solid #aaa; border-top:none;" on:click={() => addResearcher(result)}>{result.email}</ListItem>
+        {/each}
+      </ListItemGroup>
+      {/if}
+    </div>
+
+    <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
+      {#each surveyResearchers as researcher}
+        <Card style="width:49%; cursor: default; background-color:rgb(235,235,235);" class="mb-2" hover>
+          {#if (userInfo.role == "admin") || (researcher.ownerId !== userInfo.userid && userIsAllowedToManageMembers)}
+            <Button fab class="float-right" on:click={() => removeResearcher(researcher.owner_email)}
+              ><Icon path={mdiDeleteForever} />
             </Button>
-        {/if}
-        <Textarea
-            style="margin-top: 2vh; line-height: 20px;"
-            rows={1}
-            autogrow
-            noResize
-            class="text-h5"
-            hint="*Required"
-            bind:value={surveyTitleValue}
-            on:focus={() => console.log("title got focused")}
-        >
-            <div slot="append">
-                <Tooltip top bind:active={showSurveyTitleTooltip}>
-                    <Icon path={mdiInformationOutline} />
-                    <span slot="tip"
-                        >A title for what you're researching. Will not be shown to the judges.<br />
-                        For example: 'Preference of snacks'
-                    </span>
-                </Tooltip>
+          {/if}
+            <CardText>
+              <div>Researcher</div>
+              <div class="text--primary text-h5">
+                  {researcher.owner_email}
+              </div>
+              <div class="text--primary text-h8" style="text-align:left;">Rights:</div>
+          </CardText>
+          <CardActions>
+            <div class="d-flex flex-column justfiy-left">
+              <Checkbox bind:checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid || ((userInfo.role !== "admin") && !userIsAllowedToManageMembers)}>
+                Manage members
+              </Checkbox>
+              <Checkbox bind:checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid || ((userInfo.role !== "admin") && !userIsAllowedToManageMembers)}>
+                Edit survey
+              </Checkbox>
+              <Checkbox bind:checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid || ((userInfo.role !== "admin") && !userIsAllowedToManageMembers)}>
+                View results
+              </Checkbox>
             </div>
-            Survey title
-        </Textarea>
-
-        <Textarea style="margin-top: 2vh;" rows={1} autogrow noResize class="text-h5" hint="*Required" bind:value={surveyQuestionValue}>
-            <div slot="append">
-                <Tooltip top bind:active={showSurveyQuestionTooltip}>
-                    <Icon path={mdiInformationOutline} />
-                    <span slot="tip"
-                        >The question the judges will answer. Will be shown to judges.<br />
-                        For example: 'Which snack do you prefer?'
-                    </span>
-                </Tooltip>
-            </div>
-            Survey question
-        </Textarea>
-
-        <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" hint="*Required" bind:value={judgeInstructionsValue}>
-            <div slot="append">
-                <Tooltip top bind:active={showSurveyJudgeInstructionsTooltip}>
-                    <Icon path={mdiInformationOutline} />
-                    <span slot="tip"> Extra info you want to give the judges before they answer your survey. </span>
-                </Tooltip>
-            </div>
-            Judge instructions
-        </Textarea>
-
-        <Textarea style="margin-top: 2vh;" rows={4} autogrow class="text-h6" bind:value={internalDescriptionValue}>
-            <div slot="append">
-                <Tooltip top bind:active={showSurveyInternalDescriptionTooltip}>
-                    <Icon path={mdiInformationOutline} />
-                    <span slot="tip">
-                        An internal description of the survey.<br />
-                        Will only be shown to co-researchers.
-                    </span>
-                </Tooltip>
-            </div>
-            Internal description
-        </Textarea>
-
-        <div class="d-flex flex-rows justify-space-between" style="margin-top: 4vh;">
-            <div style="min-width: 30%;">
-                <Select mandatory items={purposeItems} bind:value={selectedPurpose}>Purpose</Select>
-            </div>
-            <div style="min-width: 30%;">
-                <Select mandatory items={mediaTypeItems} bind:value={selectedMediaType}>Media Type</Select>
-            </div>
-
-            <div style="min-width: 30%;">
-                <Select mandatory items={activeItems} bind:value={selectedActiveLevel}>Active</Select>
-            </div>
-        </div>
-
-        <h1 class="text-h4 ma-8" style="text-align:center;">Search for and add co-researchers</h1>
-        <div class="centeredInputFieldWrapper">
-            <TextField
-                type="text"
-                bind:hint={searchHint}
-                on:input={searchForUsers}
-                bind:value={search_term}
-                on:keydown={checkIfAddResearcherByEnter}
-            >
-                <div slot="append">
-                    <Tooltip top bind:active={showSurveySearchForUsersTooltip}>
-                        <Icon path={mdiInformationOutline} />
-                        <span slot="tip">
-                            Search for researchers by name or email.<br />
-                            Type in at least 3 characters to get results automatically.<br />
-                            Optionally, hit enter after a single character to search.
-                        </span>
-                    </Tooltip>
-                </div>
-                Add researchers
-            </TextField>
-            <ListItemGroup class="blue-text">
-                {#each searchResults as result}
-                    <ListItem style="border: 0.1em solid #aaa; border-top:none;" on:click={() => addResearcher(result)}
-                        >{result.email}</ListItem
-                    >
-                {/each}
-            </ListItemGroup>
-        </div>
-
-        <div class="d-flex mt-4 mb-4 flex-wrap justify-space-between">
-            {#each surveyResearchers as researcher}
-                <Card style="width:49%; cursor: default; background-color:rgb(235,235,235);" class="mb-2" hover>
-                    {#if researcher.ownerId !== userInfo.userid}
-                        <Button fab class="float-right" on:click={() => removeResearcher(researcher.owner_email)}
-                            ><Icon path={mdiDeleteForever} /></Button
-                        >
-                    {/if}
-                    <CardText>
-                        <div>Researcher</div>
-                        <div class="text--primary text-h5">
-                            {researcher.owner_email}
-                        </div>
-                        <div class="text--primary text-h8" style="text-align:left;">Rights:</div>
-                    </CardText>
-                    <CardActions>
-                        <div class="d-flex flex-column justfiy-left">
-                            <Checkbox bind:checked={researcher.rights.manageMembers} disabled={researcher.ownerId == userInfo.userid}>
-                                Manage members
-                            </Checkbox>
-                            <Checkbox bind:checked={researcher.rights.editSurvey} disabled={researcher.ownerId == userInfo.userid}
-                                >Edit survey</Checkbox
-                            >
-                            <Checkbox bind:checked={researcher.rights.viewResults} disabled={researcher.ownerId == userInfo.userid}>
-                                View results
-                            </Checkbox>
-                        </div>
-                    </CardActions>
-                </Card>
-            {/each}
-        </div>
-
-        <div style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;" />
-        <h1 class="text-h4">Items</h1>
-        <div class="d-flex flex-column mt-4 mb-4 align-center">
-            {#each surveyOptions as option}
-                <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
-                    <!--Add new media types by adding {:else if option.mediaType == "yourtype"} below-->
-                    {#if option.mediaType == "plain"}
-                        <TextItem
-                            bind:option
-                            bind:optionMediaTypeItems
-                            functionObject={{
-                                getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
-                                removeOption: removeOption,
-                            }}
-                        />
-                    {:else if option.mediaType == "pdf"}
-                        <PDFItem
-                            bind:option
-                            bind:optionMediaTypeItems
-                            functionObject={{
-                                getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
-                                removeOption: removeOption,
-                            }}
-                        />
-                    {/if}
-                </div>
-            {/each}
-            <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
-                <Card style="cursor: default; height:228px; background-color:rgb(235,235,235);" hover>
-                    <CardText class="flex-column d-flex justify-space-between">
-                        <div class="mb-4">Add item</div>
-                        <Button
-                            fab
-                            style="min-width:110px; min-height:110px;"
-                            class="align-self-center"
-                            on:click={() => {
-                                addSurveyOption(
-                                    "tag" + surveyOptions.length,
-                                    selectedMediaType,
-                                    getInputFieldTypeFromMediaType(selectedMediaType),
-                                    "",
-                                    false,
-                                    false
-                                );
-                                surveyOptions = surveyOptions;
-                                setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 400);
-                            }}
-                        >
-                            <Icon path={mdiPlusCircle} size="110px" />
-                        </Button>
-                    </CardText>
-                </Card>
-            </div>
-        </div>
-        <div class="centeredInputFieldWrapper">
-            <TextField type="number" on:input={validateExpectedComparisons} bind:value={comparisonsPerJudge}>
-                <div slot="append">
-                    <Tooltip top bind:active={showSurveyComparisonsPerJudgeTooltip}>
-                        <Icon path={mdiInformationOutline} />
-                        <span slot="tip">
-                            How many comparisons you want each judge to perform.<br />
-                            Minimum value is 1.<br />
-                            The maximum value is based on the amount of unique combinations of items in the survey.<br />
-                            Current max is {getAmountOfUniqueComparisons(surveyOptions.length)}
-                        </span>
-                    </Tooltip>
-                </div>
-                Expected comparisons per judge
-            </TextField>
-        </div>
-
-        <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={sendForm}>Submit survey</Button>
-        <input type="text" id="dummy" />
+          </CardActions>
+        </Card>
+      {/each}
     </div>
+
+    <div style="border-bottom: 0.2em solid #aaaaaaaa; width:100%; height:1px; margin: 1em 0 1em 0;" />
+    <h1 class="text-h4">Items</h1>
+    <div class="d-flex flex-column mt-4 mb-4 align-center">
+      {#each surveyOptions as option}
+        <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
+          <!--Add new media types by adding {:else if option.mediaType == "yourtype"} below-->
+          {#if option.mediaType == "plain"}
+            <TextItem
+              bind:option
+              bind:optionMediaTypeItems
+              bind:disableFields
+              bind:userHasBeenWarnedOnFocus
+              onFocusFunc={editing ? warnUserOnEditingItemsInActiveSurvey: {}}
+              functionObject={{
+                getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
+                removeOption: removeOption,
+              }}
+            />
+          {:else if option.mediaType == "pdf"}
+            <PDFItem
+              bind:option
+              bind:optionMediaTypeItems
+              bind:disableFields
+              bind:userHasBeenWarnedOnFocus
+              onFocusFunc={editing ? warnUserOnEditingItemsInActiveSurvey: {}}
+              functionObject={{
+                getInputFieldTypeFromMediaType: getInputFieldTypeFromMediaType,
+                removeOption: removeOption,
+              }}
+            />
+          {/if}
+        </div>
+      {/each}
+      {#if !disableFields}
+      <div class="d-flex flex-column mb-2" style="width:95%; margin: auto;">
+        <Card style="cursor: default; height:228px; background-color:rgb(235,235,235);" hover>
+          <CardText class="flex-column d-flex justify-space-between">
+            <div class="mb-4">Add item</div>
+            <Button
+              fab
+              style="min-width:110px; min-height:110px;"
+              class="align-self-center"
+              on:click={() => {
+                warnUserOnEditingItemsInActiveSurvey();
+                if(userHasBeenWarnedOnFocus){
+                  addSurveyOption(
+                    "tag" + surveyOptions.length,
+                    selectedMediaType,
+                    getInputFieldTypeFromMediaType(selectedMediaType),
+                    "",
+                    false,
+                    false
+                  );
+                  surveyOptions = surveyOptions;
+                  setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 400);
+                }
+              }}
+            >
+              <Icon path={mdiPlusCircle} size="110px" />
+            </Button>
+          </CardText>
+        </Card>
+      </div>
+      {/if}
+    </div>
+    <div class="centeredInputFieldWrapper">
+      <TextField type="number" on:input={validateExpectedComparisons} bind:value={comparisonsPerJudge} disabled={disableFields} on:focus={warnUserOnEditingItemsInActiveSurvey}>
+        <div slot="append">
+          <Tooltip top bind:active={showSurveyComparisonsPerJudgeTooltip}>
+            <Icon path={mdiInformationOutline} />
+            <span slot="tip">
+              How many comparisons you want each judge to perform.<br />
+              Minimum value is 1.<br />
+              The maximum value is based on the amount of unique combinations of items in the survey.<br />
+              Current max is {getAmountOfUniqueComparisons(surveyOptions.length)}
+            </span>
+          </Tooltip>
+        </div>
+        Expected comparisons per judge
+      </TextField>
+    </div>
+    {#if !disableFields}
+      <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={sendForm}>Submit survey</Button>
+    {:else if userIsAllowedToManageMembers}
+      <Button outlined id="submitButton" style="height:6vh; font-size:1.2rem" on:click={changeMembers}>Submit member changes</Button>
+    {/if}
+    <input type="text" id="dummy" />
+  </div>
 </div>
 
 <style>

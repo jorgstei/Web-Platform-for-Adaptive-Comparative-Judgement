@@ -19,6 +19,7 @@
     export let surveyActivityStatus = [];
     export let userInfo = undefined
     export let itemName = "item";
+    export let selectedMenuListValue;
     console.log("in table",tableData)
 
     async function updateFilterBy(e, attr){
@@ -94,11 +95,7 @@
                         {/if}
                     {/if}
                     {#if tableAttributes.findIndex(e => e.viewName === 'edit') != -1}
-                        {#if userRights != undefined && userRights != null && userRights[tableData.findIndex(e=>e==row)].editSurvey}
-                        <td class="col" title="Edit survey"><Link to={"edit_survey/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]}><Icon path={mdiSquareEditOutline}></Icon></Link></td>
-                        {:else}
-                        <td class="col disabledLink" title="You are not allowed to edit this survey"><Icon path={mdiSquareEditOutline} style="color: red; cursor: not-allowed;" disabled></Icon></td>
-                        {/if}
+                        <td class="col" title="Edit survey"><Link to={"edit_survey/?id=" + row[tableAttributes.findIndex(e=>e.viewName=="id")]} on:click={()=>{selectedMenuListValue = "Create Survey"}}><Icon path={mdiSquareEditOutline}></Icon></Link></td>
                     {/if}
                 
                     {#if tableAttributes.findIndex(e => e.viewName === 'share') != -1}

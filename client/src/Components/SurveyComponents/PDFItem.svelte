@@ -5,23 +5,30 @@
     import { nodeBufferToBlobURL, nodeBufferToFile } from "../../Utility/nodeBufferToBlobURL";
     import { onMount } from "svelte";
     import PDFView from "./PDFView.svelte";
-    import swal from "sweetalert";
 
     export let option;
     export let optionMediaTypeItems;
     export let functionObject;
-
-    let uploadLabelText = "Choose File";
-    let view = undefined;
+    export let disableFields = false;
+    export let onFocusFunc;
+    export let userHasBeenWarnedOnFocus = false;
+    
+    let uploadLabelText = "Choose File"
+    let view = undefined
 
     onMount(() => {
         console.log("in pdfitem with option", option);
-        let uploadBtn = document.getElementById("pdfupload-btn-" + option.uuid);
-        if (!uploadBtn) {
-            console.error("mytag unable to get uploadBtn");
+        let uploadBtn = document.getElementById("pdfupload-btn-"+option.uuid)
+        if(!uploadBtn){
+            console.error("mytag unable to get uploadBtn")
         }
-        uploadLabelText = option.fileName == "" ? "Choose File" : option.fileName;
-    });
+        uploadLabelText = option.fileName == "" ? "Choose File" : option.fileName
+
+        let selects = [...document.getElementsByClassName("textItemSelect")]
+        selects.forEach((e)=>{
+            e.addEventListener("click", onFocusFunc);
+        })
+    })
 
     function onFileSelected(e) {
         view = undefined;
@@ -73,32 +80,48 @@
     <Row>
         <Col cols={12}>
             <CardText>
-                <Button fab outlined class="float-left" on:click={showOverlay}>
-                    <Icon path={mdiFullscreen} />
+                <Button
+                fab
+                outlined
+                class="float-left"
+                on:click={showOverlay}
+                >
+                    <Icon path={mdiFullscreen}/>
                 </Button>
-
-                <Button fab outlined class="float-right" on:click={() => functionObject.removeOption(option)}>
-                    <Icon path={mdiDeleteForever} />
+                {#if !disableFields}
+                <Button
+                fab
+                outlined
+                class="float-right"
+                on:click={() => functionObject.removeOption(option)}
+                >
+                    <Icon path={mdiDeleteForever}/>
                 </Button>
-
+                {/if}
+            
+                
                 <div>Item</div>
-                <input type="file" accept="application/pdf" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden />
-                <label class="labelBtn" style="width:80%; margin:auto;" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
-
+                <div on:click={onFocusFunc}>
+                    <input type="file" accept="application/pdf" id="pdfupload-btn-{option.uuid}" on:change={onFileSelected} hidden disabled={disableFields}/>
+                    <label class="labelBtn" style="width:80%; margin:auto;" for="pdfupload-btn-{option.uuid}">{uploadLabelText}</label>
+                </div>
                 <TextField
                     hint="*Required"
                     bind:value={option.tag}
-                    on:change={() => {
-                        console.log("edited pdf tag");
-                        option.editedArr["tag"] = "tag";
-                    }}
+                    on:change={() => {console.log("edited pdf tag");option.editedArr["tag"] = "tag"}}
                     class="mt-4"
                     style="min-width:100%;"
+                    disabled={disableFields}
                 >
                     <div slot="append">
-                        <Tooltip top bind:active={option.showTooltip}>
+                        <Tooltip
+                            top
+                            bind:active={option.showTooltip}
+                        >
                             <Icon path={mdiInformationOutline} />
-                            <span slot="tip">The file name or unique tag. Used to identify specific items</span>
+                            <span slot="tip"
+                                >The file name or unique tag. Used to identify specific items</span
+                            >
                         </Tooltip>
                     </div>
                     Item Tag
@@ -107,25 +130,30 @@
                 <Select
                     items={optionMediaTypeItems}
                     bind:value={option.mediaType}
-                    on:change={() => (option.mimeType = functionObject.getInputFieldTypeFromMediaType(option.mediaType))}
-                    class="mt-4">Media Type</Select
-                >
+                    on:change={()=>option.mimeType = functionObject.getInputFieldTypeFromMediaType(option.mediaType)}
+                    disabled={disableFields}
+                    mandatory
+                    class="mt-4 textItemSelect">
+                    Media Type
+                </Select>
             </CardText>
+            
         </Col>
+        
     </Row>
 </Card>
-<Overlay bind:active={option.showOverlay} opacity={1} color={"#eee"} style="cursor:default">
-    <TextField type={"text"} accept={"application/text"} bind:value={option.tag}>Item Tag</TextField>
+<Overlay
+bind:active={option.showOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default"
+>
+    <TextField type={"text"} accept={"application/text"} bind:value={option.tag} disabled={disableFields}>
+        Item Tag
+    </TextField>
     {#if view != undefined}
-        <PDFView iframeId="preview" width="70vh" height="70vh" src={view} />
-        <Button
-            style="width: 30%; margin-top:10vh;"
-            outlined
-            on:click={(e) => {
-                option.showOverlay = false;
-                e.stopPropagation();
-            }}
-        >
+        <PDFView iframeId="preview" width="70vh" height="70vh" src={view}></PDFView>
+        <Button style="width: 30%; margin-top:10vh;" outlined on:click={(e)=>{option.showOverlay = false; e.stopPropagation();}}>
             Close overlay
         </Button>
     {/if}

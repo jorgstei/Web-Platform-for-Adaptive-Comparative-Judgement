@@ -43,13 +43,16 @@
 	let surveyID;
 	let takingSurvey = false;
 	let showJudgeOverlay;
+	let warningOnLeaveFunc;
+	let selectedMenuListValue="";
+	let selectedNavbarListValue;
 
 	$: userInfo;
 </script>
 
 <MaterialApp>
 	<Router>
-		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning/>
+		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedNavbarListValue/>
 		<div class="pt-14" style="height: 100vh">
 			<Route path="/">
 				<LandingPage bind:surveyID />
@@ -72,7 +75,7 @@
 			</Route>
 
 			<Route path="admin_board/*">
-				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning/>
+				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedMenuListValue/>
 			</Route>
 			<Route path="survey">
 				<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>

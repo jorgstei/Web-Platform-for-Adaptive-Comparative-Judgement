@@ -14,21 +14,9 @@
     
     export let userInfo;
     export let allowLeavePageWithoutWarning = true;
-    export let warningOnLeaveFunc = (link)=> {
-        swal({
-            title: "Are you sure?",
-            text:
-                "Are you sure you want to discard your changes to this survey? All unsaved changes will be lost.",
-            icon: "warning",
-            dangerMode: true,
-            buttons: ["Nevermind", "Discard"],
-        }).then((willDiscard) => {
-            if (willDiscard) {
-                allowLeavePageWithoutWarning = true
-                navigate("/admin_board/"+ link);
-            }
-        })
-    }
+    export let warningOnLeaveFunc;
+    export let selectedMenuListValue;
+
     console.log("allow and func in menu", allowLeavePageWithoutWarning, warningOnLeaveFunc);
     const menuItems = [
         {
@@ -56,6 +44,8 @@
 
     let collapsedMenu = false;
 
+    $: selectedMenuListValue;
+
 </script>
 
 {#if userInfo != null && userInfo != undefined}
@@ -66,28 +56,29 @@
             {#if !collapsedMenu}
                 <h4 class="text-h4">Menu</h4>
             {/if}
-            <Button fab style="width:2vw; height: 2vw;" on:click={()=>{collapsedMenu = !collapsedMenu;}}>
+            <div style="cursor:pointer;" on:click={()=>{collapsedMenu = !collapsedMenu;}}>
                 {#if !collapsedMenu}
-                    <Icon size="1vw" path={mdiChevronLeft }></Icon>
+                    <Icon size="2vw" path={mdiChevronLeft} ></Icon>
                 {:else}
-                <Icon path={mdiChevronRight}></Icon>
+                    <Icon size="2vw" path={mdiChevronRight}></Icon>
                 {/if}
-            </Button>
+            </div>
+            
         </div>
         
 
 
     <Divider />
     <List nav dense>
-        <ListItemGroup mandatory>
+        <ListItemGroup mandatory bind:value={selectedMenuListValue}>
             {#each menuItems as item}
                 {#if (item.requireAdmin && userInfo.role === "admin") || !item.requireAdmin}
-                    <ListItem ripple={false} on:click={(e) => {
+                    <ListItem value={item.text} ripple={false} on:click={(e) => {
                             if(allowLeavePageWithoutWarning){
                                 navigateTo("/admin_board/"+item.to);
                             }
                             else{
-                                warningOnLeaveFunc(item.to)
+                                warningOnLeaveFunc("/admin_board/" + item.to)
                             }      
                         }
                         }>

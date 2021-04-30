@@ -32,10 +32,35 @@
   export let editing = false;
   export let disableFields = false;
   export let warningOnLeaveFunc;
+  export let selectedMenuListValue;
 
   const actualWarningOnLeaveFunc = (link) => {
     console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
+    console.log("navigating with link:", link);
     if(userIsAllowedToManageMembers || !disableFields){
+      let linkDivided = link.split("/");
+      let lastPathInLink = linkDivided[linkDivided.length-1];
+      switch (lastPathInLink) {
+        case "surveys":
+          selectedMenuListValue = "Surveys"
+          break;
+        case "invite_researcher":
+          selectedMenuListValue = "Invite"
+          break;
+        case "researchers":
+          selectedMenuListValue = "Users"
+          break;
+        case "create_survey":
+          selectedMenuListValue = "Create Survey"
+          break;
+        case "profile":
+          selectedMenuListValue = "Account"
+          break;
+        default:
+          selectedMenuListValue = "Create Survey"
+          break;
+      }
+      console.log("selected", selectedMenuListValue);
       swal({
         title: "Are you sure?",
         text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
@@ -44,8 +69,11 @@
         buttons: ["Take me back!", "Discard"],
       }).then((willDiscard) => {
         if (willDiscard) {
-          allowLeavePageWithoutWarning = true
+          allowLeavePageWithoutWarning = true;
           navigate(link);
+        }
+        else{
+          selectedMenuListValue = "Create Survey";
         }
       });
     }
@@ -429,7 +457,8 @@
                                                 "Your link is:\n" + survey_link + "\n It has been copied to your clipboard for you!",
                                                 "success"
                                             );
-                                            navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+                                            selectedMenuListValue = "Surveys";
+                                            navigateWithRefreshToken("/admin_board/surveys").then((data) => {userInfo = data;});
                                         })
                                         .catch((err) => {});
                                 } else {
@@ -479,7 +508,8 @@
                                             "Your link is:\n" + survey_link + "\n It has been copied to your clipboard for you!",
                                             "success"
                                         );
-                                        navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+                                        selectedMenuListValue = "Surveys";
+                                        navigateWithRefreshToken("/admin_board/surveys").then((data) => {userInfo = data;});
                                     });
                                 } else {
                                     swal(
@@ -753,7 +783,8 @@
             "Your change of members was successful",
             "success"
           );
-          navigateWithRefreshToken("/admin_board/surveys").then((data) => (userInfo = data));
+          selectedMenuListValue = "Surveys";
+          navigateWithRefreshToken("/admin_board/surveys").then((data) => {userInfo = data;});
         }
         else{
           swal(

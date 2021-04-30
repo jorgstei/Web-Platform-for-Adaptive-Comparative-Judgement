@@ -15,6 +15,7 @@
     export let userInfo;
     export let allowLeavePageWithoutWarning = true;
     export let warningOnLeaveFunc;
+    export let selectedMenuListValue;
 
     console.log("allow and func in menu", allowLeavePageWithoutWarning, warningOnLeaveFunc);
     const menuItems = [
@@ -43,6 +44,8 @@
 
     let collapsedMenu = false;
 
+    $: selectedMenuListValue;
+
 </script>
 
 {#if userInfo != null && userInfo != undefined}
@@ -67,10 +70,10 @@
 
     <Divider />
     <List nav dense>
-        <ListItemGroup mandatory>
+        <ListItemGroup mandatory bind:value={selectedMenuListValue}>
             {#each menuItems as item}
                 {#if (item.requireAdmin && userInfo.role === "admin") || !item.requireAdmin}
-                    <ListItem ripple={false} on:click={(e) => {
+                    <ListItem value={item.text} ripple={false} on:click={(e) => {
                             if(allowLeavePageWithoutWarning){
                                 navigateTo("/admin_board/"+item.to);
                             }

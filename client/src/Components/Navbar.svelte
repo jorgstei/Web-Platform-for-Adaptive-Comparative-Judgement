@@ -11,7 +11,7 @@
     export let showJudgeOverlay;
     export let allowLeavePageWithoutWarning = true;
     export let warningOnLeaveFunc;
-
+    export let selectedNavbarListValue;
     /*
         Allow tab navigation to click the elements with space or enter
         This will affect both "Navbar" items and "Menu" items.
@@ -19,8 +19,8 @@
     let makeNavBarElementsTabbable = () => {
         [...document.getElementsByClassName("s-list-item link")]
         .forEach(e => {
-            console.log("Found element to put onkeyup")
-            console.log(e)
+            //console.log("Found element to put onkeyup")
+            //console.log(e)
             e.onkeyup = tabSpaceOrEnter 
         })  
     }

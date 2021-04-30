@@ -9,6 +9,7 @@
     import swal from "sweetalert";
     import { dateFromObjectId } from "../Utility/dateFromObjectId";
     import {Select, Row, Col, ButtonGroup, ButtonGroupItem} from "svelte-materialify"
+import { surveyItemFileService } from "../Services/SurveyItemFileService";
 
     export let userInfo;
 
@@ -30,7 +31,9 @@
         });
     });
 
+    // Linear ranking
     let linearRankingHeaders = [
+        { fieldName: "", viewName: "tag" },
         { fieldName: "", viewName: "option" },
         { fieldName: "", viewName: "infit" },
         { fieldName: "", viewName: "outfit" },
@@ -38,6 +41,8 @@
         { fieldName: "", viewName: "theta" },
     ];
     let linearRanking = null;
+
+    // By judge
     let allJudgesHeaders = [
         { fieldName: "", viewName: "judge id" },
         { fieldName: "", viewName: "answers" },
@@ -51,7 +56,10 @@
         { fieldName: "", viewName: "delete" },
     ];
     let allJudges = null;
+
+    // By item
     let allItemsHeaders = [
+        { fieldName: "", viewName: "tag" },
         { fieldName: "", viewName: "option" },
         { fieldName: "", viewName: "infit" },
         { fieldName: "", viewName: "outfit" },
@@ -64,20 +72,26 @@
     ];
     let allItems2DArray = null;
 
+    
+    // Raw data
+    let answerValues = [];
+    let answerHeaders = [
+        { fieldName: "", viewName: "judge id" },
+        { fieldName: "", viewName: "left item" },
+        { fieldName: "", viewName: "right item" },
+        { fieldName: "", viewName: "result" },
+    ];
+
+    // Default content view
     let currentContentView = "linearRanking";
 
     let surveyStatistics = null;
 
-    let answerValues = [];
-    let answerHeaders = [
-        { fieldName: "", viewName: "judge id" },
-        { fieldName: "", viewName: "left option" },
-        { fieldName: "", viewName: "right option" },
-        { fieldName: "", viewName: "result" },
-    ];
+    //Object that maps keys (item id) to values (item tag)
+    let itemIdToTag = {};
 
     let getEstimate = async (newJSON, answers) => {
-        surveyService
+        await surveyService
             .estimate(newJSON)
             .then(async (response) => {
                 if (response.status == 200) {
@@ -122,8 +136,13 @@
                             ]);
                         } 
                         else {
+                            let itemFile = await surveyItemFileService.getView(answerWithSameId.data);
+                            console.log("itemfile", itemFile);
+                            itemIdToTag[answerWithSameId._id] = itemFile.data.tag;
+                            console.log("andtags", itemIdToTag);
                             console.log("linrank2d arr getting pushed, linrank[i] is", linearRanking[i]);
                             linearRanking2DArray.push([
+                                itemFile.data.tag,
                                 answerWithSameId.data,
                                 linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
                                 linearRanking[i].outfit === undefined ? "N/A": linearRanking[i].outfit,
@@ -131,6 +150,7 @@
                                 linearRanking[i].theta === undefined ? "N/A": linearRanking[i].theta,
                             ]);
                             allItems2DArray.push([
+                                itemFile.data.tag,
                                 answerWithSameId.data,
                                 linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
                                 linearRanking[i].outfit === undefined ? "N/A": linearRanking[i].outfit,
@@ -223,7 +243,18 @@
                         "Transformed answer values, attempting to send to analyzing module:\n",
                         answerValues
                     );
-                    await getEstimate(newJSON, answers);
+                    await getEstimate(newJSON, answers)
+                    
+                    console.log("ansvals", answerValues);
+                    answerValues.forEach((answer)=>{
+                        itemIdToTag[answer[1]] !== undefined ? answer[1] = itemIdToTag[answer[1]]: {};
+                        // Adding left tag to answervalues
+                        //(itemIdToTag[answer[1]] !== undefined || itemIdToTag[answer[1]] !== null) ? answer.splice(1, 0, itemIdToTag[answer[1]]): answer.splice(1, 0, "N/A");
+                        itemIdToTag[answer[2]] !== undefined ? answer[2] = itemIdToTag[answer[2]]: {};
+                        // Adding right tag to answervalues
+                        //(itemIdToTag[answer[3]] !== undefined || itemIdToTag[answer[3]] !== null) ? answer.splice(2, 0, itemIdToTag[answer[3]]): answer.splice(2, 0, "N/A");
+                    })
+                    console.log("ansvals2", answerValues);
                     answerValues = answerValues;
                 } else {
                     swal(
@@ -323,16 +354,17 @@
         console.log("In download func");
         console.log("rows: ", rows);
         let headersString = "";
-        headers.forEach((e) => (headersString += e.viewName + ","));
-        let csvContent = "SEP=, \r\n" + headersString + "\r\n";
+        headers.forEach((e) => (headersString += '"'+e.viewName + '",'));
+        let csvContent = "SEP=, \r\n" + headersString + '\r\n';
         rows.forEach((e) => {
-            csvContent += e.join(",") + "\r\n";
+            csvContent += '"' + e.join('","') + '"\r\n';
         });
         let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8" });
         saveAs(blob, filename + ".csv");
     };
 
     //Download as csv buttons
+    //Raw data
     let csvDownloadRawDataButton = document.createElement("button");
     csvDownloadRawDataButton.innerHTML = "Download as .csv";
     csvDownloadRawDataButton.style.float = "";
@@ -343,6 +375,14 @@
         );
         downloadFunc(answerHeaders, answerValues, survey.title + "_raw_data");
     };
+
+    let resultInfo = document.createElement("p");
+    resultInfo.innerHTML = "Note: A result of 0 means right item won. 1 means left item won."
+    resultInfo.style.display = "inline";
+    resultInfo.style.marginLeft = "1vw";
+    let rawDataWrapper = document.createElement("div");
+    rawDataWrapper.appendChild(csvDownloadRawDataButton);
+    rawDataWrapper.appendChild(resultInfo);
 
     let csvDownloadByItemButton = document.createElement("button");
     csvDownloadByItemButton.innerHTML = "Download as .csv";
@@ -465,7 +505,7 @@
                 bind:tableData={answerValues}
                 bind:userInfo
                 tableAttributes={answerHeaders}
-                element={csvDownloadRawDataButton}
+                element={rawDataWrapper}
             />
         {:else}
             <h3>

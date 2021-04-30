@@ -10,6 +10,7 @@
 
     export let userInfo;
     export let allowLeavePageWithoutWarning;
+    export let selectedMenuListValue;
     allowLeavePageWithoutWarning = true;
 
     let loadingData = true;
@@ -81,6 +82,7 @@
     let activeStatus = [];
     let data = [];
     onMount(async () => {
+        selectedMenuListValue = "Surveys";
         if (userInfo == null) {
             return;
         } else {
@@ -179,6 +181,7 @@
             bind:filterBy={filterBy}
             bind:tableData={data2DArray}
             bind:userInfo
+            bind:selectedMenuListValue
             itemName = "survey"
             tableAttributes={dataHeaders}
             {userRights}

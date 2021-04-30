@@ -108,9 +108,9 @@ import { onMount } from "svelte";
                             bind:active={option.showTooltip}
                         >
                             <Icon path={mdiInformationOutline} />
-                            <span slot="tip"
-                                >Item text</span
-                            >
+                            <span slot="tip">
+                                Item text
+                            </span>
                         </Tooltip>
                     </div>
                     Item value

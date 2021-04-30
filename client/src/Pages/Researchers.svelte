@@ -9,6 +9,7 @@
   let loadingData = true;
   export let userInfo;
   export let allowLeavePageWithoutWarning;
+  export let selectedMenuListValue;
   allowLeavePageWithoutWarning = true;
 
   console.log("in researchers");
@@ -47,6 +48,7 @@
   let data2DArray;
   let data = [];
   onMount(async () => {
+    selectedMenuListValue = "Users";
     console.log("Researchers data: ", data);
   });
 
@@ -82,6 +84,7 @@
       bind:filterBy={filterBy}
       bind:userInfo
       bind:tableData={data2DArray}
+      bind:selectedMenuListValue
       itemName = "researcher"
       {tableAttributes}
       deleteFunc={async (id, deleteTransientData) => {

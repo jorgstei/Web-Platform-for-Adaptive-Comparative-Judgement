@@ -8,10 +8,12 @@
 
     export let userInfo = null;
     export let allowLeavePageWithoutWarning;
+    export let selectedMenuListValue;
     allowLeavePageWithoutWarning = true;
 
     let numberOfSurveys = undefined
     onMount(() => {
+        selectedMenuListValue = "Account";
         surveyService.getCount().then(response => {
             if(response.status < 300){
                 numberOfSurveys = response.data

@@ -16,38 +16,41 @@
   //A function that alerts the user when they navigate out of edit/create survey
   export let warningOnLeaveFunc;
 
+  export let selectedMenuListValue;
+
   $: userInfo;
+  $: selectedMenuListValue;
 </script>
 
 <Router url="admin_board/">
   <main class="d-flex flex-row">
     {#if userInfo != null && userInfo != undefined && userInfo.email != null}
       <div id="menuWrapper">
-        <Menu {userInfo} bind:allowLeavePageWithoutWarning={allowLeavePageWithoutWarning} bind:warningOnLeaveFunc={warningOnLeaveFunc}/>
+        <Menu {userInfo} bind:allowLeavePageWithoutWarning={allowLeavePageWithoutWarning} bind:warningOnLeaveFunc={warningOnLeaveFunc} bind:selectedMenuListValue/>
       </div>
       <div class="contentWrapper flex-grow-1">
         <Route path="profile">
-          <Profile bind:userInfo bind:allowLeavePageWithoutWarning/>
+          <Profile bind:userInfo bind:allowLeavePageWithoutWarning bind:selectedMenuListValue/>
         </Route>
         <Route path="researchers">
-          <Researchers bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>
+          <Researchers bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:selectedMenuListValue/>
         </Route>
 
         <Route path="invite_researcher">
-          <InviteResearcher bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>
+          <InviteResearcher bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:selectedMenuListValue/>
         </Route>
 
         <Route path="surveys">
-          <Surveys bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>
+          <Surveys bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:selectedMenuListValue/>
         </Route>
         <Route path="create_survey">
-          <CreateSurvey bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc disableFields={false}/>
+          <CreateSurvey bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc disableFields={false} bind:selectedMenuListValue/>
         </Route>
         <Route path="survey_data">
           <RawSurveyData bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>
         </Route>
         <Route path="edit_survey">
-          <CreateSurvey bind:userInfo={userInfo} editing={true} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc/>
+          <CreateSurvey bind:userInfo={userInfo} editing={true} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedMenuListValue/>
         </Route>
         <Route path="change_password">
           <LoginPage bind:userInfo={userInfo} changePassword={true}/>

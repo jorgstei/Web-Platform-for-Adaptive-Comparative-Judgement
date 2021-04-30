@@ -15,7 +15,7 @@
     import TextView from '../Components/SurveyComponents/TextView.svelte';
     import PDFView from '../Components/SurveyComponents/PDFView.svelte';
     import { mdiFullscreen } from "@mdi/js";
-
+    import clamp from "clamp-js"
 
     /*
         TODO: Currently if a judge refreshes the page, they have no way
@@ -34,6 +34,7 @@
     let question = undefined
     let completed = false
     let navwrap = document.getElementById("navWrapper");
+    let clampables = []
 
     let survey;
     if(navwrap){
@@ -42,9 +43,18 @@
 
     let randomPair = [];
     
-    let counter = 0;
+    let counter = -1;
     let maxCounter = 10;
     let progressPercent = 100*counter/maxCounter;
+
+    let showLeftItemOverlay = false;
+    let showRightItemOverlay = false;
+
+    const in_duration = 800;
+    const in_delay = 300;
+    const out_duration = 800;
+    const out_delay = 300;
+    const transition_x = 300;
 
     let leftChoiceClicked = () => {
         const answer = 
@@ -94,11 +104,6 @@
     }
 
     onMount(async () => {
-        console.log("in onmount in survey with height: " + window.screen.height, "current overflowy is:", document.getElementsByTagName("body")[0].style.overflowY);
-        if(window.screen.height > 700){
-            console.log("it was true??")
-            document.getElementsByTagName("body")[0].style.overflowY = "hidden";
-        }
         let params = queryString.parse(window.location.search);
         if(params?.takeSurvey == 1 && params?.surveyID != undefined){
             surveyID = params.surveyID;
@@ -152,7 +157,7 @@
                             left._id = item.left._id;
                             await surveyItemFileService.get(item.left.data)
                             .then(res => {
-                                left.data = URL.createObjectURL(nodeBufferToFile(res.data.data.data, "application/pdf"));
+                                left.data = URL.createObjectURL(nodeBufferToFile(res.data.data, "application/pdf"));
                             })
                         }
                         else{
@@ -163,7 +168,7 @@
                             await surveyItemFileService.get(item.right.data)
                             .then(res => {
                                 right._id = item.right._id;
-                                right.data = URL.createObjectURL(nodeBufferToFile(res.data.data.data, "application/pdf"));
+                                right.data = URL.createObjectURL(nodeBufferToFile(res.data.data, "application/pdf"));
                             })
                         }
                         else{
@@ -194,13 +199,11 @@
         let arrowHandler = (e) => {
             switch (e.keyCode) {
                 case 37:
-                    console.log("left arrow");
                     leftChoiceClicked();
                     main.removeEventListener("keyup", arrowHandler);
                     setTimeout(()=>{main.addEventListener("keyup", arrowHandler)}, 1000)
                     break;
                 case 39:
-                    console.log("right arrow");
                     rightChoiceClicked();
                     main.removeEventListener("keyup", arrowHandler);
                     setTimeout(()=>{main.addEventListener("keyup", arrowHandler)}, 1000)
@@ -210,21 +213,34 @@
             }
         }
         main.addEventListener("keyup", arrowHandler);
+        clampText()
+        counter++;
     });
 
+    /*
+        This function will prevent overflow and add "..." at the end of the text
+    */
+    let clampText = () => {
+        clampables = [...document.getElementsByClassName("card-text")]
+        for(let i = 0; i < clampables.length; i++){
+            let height = (clampables[i].parentElement.clientHeight)+"px"
+            clampables[i].style = `max-height: ${height}`
+            clamp(clampables[i], {clamp: height})
+        }
+    }
+    /*
+        When this component gets destroyed we change the booleans for the parent to show the correct state.
+    */
     onDestroy(()=>{
         takingSurvey = false;
         showJudgeOverlay = false;
-        document.getElementsByTagName("body")[0].style.overflowY = "scroll";
     })
     
 
-    const in_duration = 800;
-    const in_delay = 300;
-    const out_duration = 800;
-    const out_delay = 300;
-    const transition_x = 300;
-
+    /*
+        When we mouse over or leave the cards we change the elevation to "show" that the item is hovered.
+        (Might be confused for a button despite the cursor being default)
+    */
     const changeElevation = (e)=> {
         let nodeToCheck = e.target;
         if(nodeToCheck.classList.contains("cardWrapper")){
@@ -243,10 +259,17 @@
         }
     }
 
-    let showLeftItemOverlay = false;
-    let showRightItemOverlay = false;
+    /*
+        If the size of our window changes, we should reclamp the text
+    */
+    window.addEventListener("resize", () => {
+        clampText();
+    })
+    
 
     $: survey;
+    $: counter && clampText()
+    $: randomPair && clampText()
     // apply to left and right cards for animation, currently messes up rerendering pdfs
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
@@ -260,33 +283,41 @@
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
 
+    <Overlay
+        bind:active={showJudgeOverlay}
+        opacity={1}
+        color={"#eee"}
+        style="cursor:default;"
+    >
+    <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
+    </Overlay>
     <div id="container" class="d-flex flex-row justify-space-between">
-        <Overlay
-            bind:active={showJudgeOverlay}
-            opacity={1}
-            color={"#eee"}
-            style="cursor:default;"
-        >
-        <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
-        </Overlay>
         <!-- Add new media types with {:else if ...} Remember to do this to both left and right card-->
         {#if randomPair.length != 0 && randomPair[counter] != undefined}
-            <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
+            <div class="cardWrapper" on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
                     <div style="text-align: center; height:85%">
+                        <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                         {#if randomPair[counter].left.type == "plain"}
-                            <TextView textID={randomPair[counter].left.data} headerSizeNumber="3"></TextView>
+                            <TextView class="card-text" style="overflow: hidden; height:100%" textID={randomPair[counter].left.data}></TextView>
+                            <Overlay
+                            bind:active={showLeftItemOverlay}
+                            opacity={1}
+                            color={"#eee"}
+                            style="cursor:default;">
+                                <TextView class="overlay-item" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
+                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+                            </Overlay>
                         {:else if randomPair[counter].left.type == "pdf"}
-                            <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="100%"></PDFView>
                             <Overlay
                             bind:active={showLeftItemOverlay}
                             opacity={1}
                             color={"#eee"}
                             style="cursor:default;">
-                            <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
-                            <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
-                        </Overlay>
+                                <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
+                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+                            </Overlay>
                         {/if}
                     </div>
                     <CardActions>
@@ -297,12 +328,19 @@
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
                     <div style="text-align: center; height:85%">
+                        <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                         {#if randomPair[counter].right.type == "plain"}
-                            <TextView textID={randomPair[counter].right.data} headerSizeNumber="3"></TextView>
+                        <TextView class="card-text" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
+                            <Overlay
+                            bind:active={showRightItemOverlay}
+                            opacity={1}
+                            color={"#eee"}
+                            style="cursor:default;">
+                                <TextView class="overlay-item" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
+                                <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
+                            </Overlay>
                         {:else if randomPair[counter].right.type == "pdf"}
-                            <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="100%"></PDFView>
-
 
                             <Overlay
                             bind:active={showRightItemOverlay}
@@ -352,6 +390,7 @@
         width: 100vw;
         max-width: 100%;
         height: 100%;
+        overflow: hidden;
     }
     #container {
         margin: auto;
@@ -371,5 +410,36 @@
     h1{
         padding-top: 5vh;
         text-align: center;
+    }
+    :global(.overlay-item){
+        height: 90vh;
+        width: 90vw;
+        text-align: center;
+        text-justify: center;
+        align-content: center;
+        justify-content: center;
+    }
+    .card-text {
+        text-align: left;
+        text-overflow: ellipsis;
+        overflow: hidden; 
+    }
+    /* Small Screens (mobile, tablet)*/
+    @media (min-width: 0px) and (max-width: 768px) {
+        .card-text  {
+            font-size: 0.75rem;
+        }
+    }
+    /* Medium Screens (laptops, desktops)*/
+    @media (min-width: 769px) and (max-width: 1199px) {
+        .card-text  {
+            font-size: 1.25rem;
+        }
+    }
+    /* Large Screens (1200p and above)*/
+    @media (min-width: 1200px) {
+        .card-text  {
+            font-size: 1.5em;
+        }
     }
 </style>

@@ -41,6 +41,7 @@ export default {
 	},
 	plugins: [
 		replace({
+			//Misspelled on purpose due to not working with the proper spelling
 			processs: JSON.stringify({
 				envv: {
 					apiBasePath: production ? "https://compair.it.ntnu.no:3000/api" : "http://localhost:3000/api",

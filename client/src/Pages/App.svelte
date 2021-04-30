@@ -37,7 +37,6 @@
 				userInfo = data.data;
 			} else {
 				console.log("RefreshToken failed");
-				userInfo = null;
 			}
 		});
 	}

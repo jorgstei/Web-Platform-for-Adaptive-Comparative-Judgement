@@ -25,6 +25,7 @@
     "@mdi/js": "^5.9.55",
     "@zerodevx/svelte-toast": "^0.1.4",
     "axios": "^0.21.1",
+    "clamp-js": "^0.7.0",
     "file-saver": "^2.0.5",
     "js-sha512": "^0.8.0",
     "pdfjs-dist": "^2.7.570",

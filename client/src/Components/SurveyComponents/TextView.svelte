@@ -3,7 +3,6 @@
     import {surveyItemFileService} from "../../Services/SurveyItemFileService";
 
     export let textID;
-    export let headerSizeNumber;
 
     let textContent = "";
 
@@ -20,6 +19,6 @@
     })
 </script>
 
-<h1 class="text--primary text-h{headerSizeNumber}">
+<div class={$$props.class} style="{$$props.style};">
     {textContent}
-</h1>
+</div>

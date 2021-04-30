@@ -60,7 +60,7 @@
                 fileFromServer = res.data
                 //testf = new File([Uint8Array.from(fileFromServer.data.data)], "MyPdf.pdf", {type: "application/pdf"})
                 //fileToDisplay = URL.createObjectURL(testf)
-                fileToDisplay = nodeBufferToBlobURL(fileFromServer.data.data, "application/pdf")
+                fileToDisplay = nodeBufferToBlobURL(fileFromServer.data, "application/pdf")
                 console.log("fileToDisplay",fileToDisplay)
             }
             else{

@@ -299,13 +299,13 @@
                     <div style="text-align: center; height:85%">
                         <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                         {#if randomPair[counter].left.type == "plain"}
-                            <TextView class="card-text" style="overflow: hidden; height:100%" textID={randomPair[counter].left.data}></TextView>
+                            <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].left.data}></TextView>
                             <Overlay
                             bind:active={showLeftItemOverlay}
                             opacity={1}
                             color={"#eee"}
                             style="cursor:default;">
-                                <TextView class="overlay-item" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
+                                <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
                                 <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
                             </Overlay>
                         {:else if randomPair[counter].left.type == "pdf"}
@@ -330,13 +330,13 @@
                     <div style="text-align: center; height:85%">
                         <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                         {#if randomPair[counter].right.type == "plain"}
-                        <TextView class="card-text" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
+                        <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
                             <Overlay
                             bind:active={showRightItemOverlay}
                             opacity={1}
                             color={"#eee"}
                             style="cursor:default;">
-                                <TextView class="overlay-item" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
+                                <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
                                 <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
                             </Overlay>
                         {:else if randomPair[counter].right.type == "pdf"}
@@ -419,26 +419,26 @@
         align-content: center;
         justify-content: center;
     }
-    .card-text {
+    :global(.card-text) {
         text-align: left;
         text-overflow: ellipsis;
         overflow: hidden; 
     }
     /* Small Screens (mobile, tablet)*/
     @media (min-width: 0px) and (max-width: 768px) {
-        .card-text  {
-            font-size: 0.75rem;
+        :global(.card-text-scale)  {
+            font-size: 1rem;
         }
     }
     /* Medium Screens (laptops, desktops)*/
     @media (min-width: 769px) and (max-width: 1199px) {
-        .card-text  {
+        :global(.card-text-scale)  {
             font-size: 1.25rem;
         }
     }
     /* Large Screens (1200p and above)*/
     @media (min-width: 1200px) {
-        .card-text  {
+        :global(.card-text-scale)  {
             font-size: 1.5em;
         }
     }

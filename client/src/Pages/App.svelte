@@ -40,12 +40,13 @@
 			}
 		});
 	}
+
 	let surveyID;
 	let takingSurvey = false;
 	let showJudgeOverlay;
 	let warningOnLeaveFunc;
 	let selectedMenuListValue="";
-	let selectedNavbarListValue;
+	let selectedNavbarListValue="";
 
 	$: userInfo;
 </script>
@@ -55,34 +56,34 @@
 		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedNavbarListValue/>
 		<div class="pt-14" style="height: 100vh">
 			<Route path="/">
-				<LandingPage bind:surveyID />
+				<LandingPage bind:surveyID bind:selectedNavbarListValue/>
 			</Route>
 
 			<Route path="login">
-				<LoginPage newUser="false" bind:userInfo />
+				<LoginPage newUser="false" bind:userInfo bind:selectedNavbarListValue/>
 			</Route>
 
 			<Route path="forgotten_password">
-				<ForgottenPassword bind:userInfo />
+				<ForgottenPassword bind:userInfo bind:selectedNavbarListValue/>
 			</Route>
 
 			<Route path="about">
-				<AboutProject />
+				<AboutProject bind:selectedNavbarListValue/>
 			</Route>
 
-			<Route path="register_account">
+			<Route path="register_account" bind:selectedNavbarListValue>
 				<RegisterAccount />
 			</Route>
 
 			<Route path="admin_board/*">
-				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedMenuListValue/>
+				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedMenuListValue bind:selectedNavbarListValue/>
 			</Route>
 			<Route path="survey">
 				<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 			</Route>
 		</div>
 	</Router>
-	<SvelteToast options={{ reversed: true, intro: { y: 192 } }} />
+	<SvelteToast options={{ reversed: false, intro: { y: 192 } }} />
 </MaterialApp>
 
 <style>

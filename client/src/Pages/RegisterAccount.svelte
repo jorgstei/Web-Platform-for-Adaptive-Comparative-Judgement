@@ -6,7 +6,10 @@
     import { Icon, Tooltip, TextField, Button } from "svelte-materialify";
     import { pwResearcherRequirement, pwAdminRequirement } from "../Utility/passwordRequirement";
     import { mdiInformationOutline, mdiEyeOff, mdiEye } from "@mdi/js";
+    import { onMount } from "svelte";
 
+    export let selectedNavbarListValue;
+    
     let params = queryString.parse(window.location.search);
     if (params.token == null || params.token == undefined) {
         navigate("/");
@@ -60,7 +63,7 @@
 
     const validatePasswordFields = [ruleValidatePasswordComplexity];
 
-    // Checks the validity of fields. Optional third parameter for password 2.
+    // Checks the validity of fields. Optional fifth parameter for password 2.
     const checkValues = (firstName, lastName, email, pw1, pw2 = pw1) => {
         let valuesAreValid = true;
         let errormsg = "";
@@ -99,6 +102,9 @@
             register();
         }
     };
+    onMount(()=>{
+        selectedNavbarListValue = selectedNavbarListValue;
+    })
 
     let firstName,
         lastName,

@@ -35,11 +35,13 @@
   export let selectedMenuListValue;
 
   const actualWarningOnLeaveFunc = (link) => {
-    console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
+    //console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
     console.log("navigating with link:", link);
+    //Make sure that user actually has the rights to change anything before warning them about possible discarded changes
     if(userIsAllowedToManageMembers || !disableFields){
       let linkDivided = link.split("/");
       let lastPathInLink = linkDivided[linkDivided.length-1];
+      //Change selectedMenuListValue such that the right tab gets focused in 
       switch (lastPathInLink) {
         case "surveys":
           selectedMenuListValue = "Surveys"
@@ -60,7 +62,7 @@
           selectedMenuListValue = "Create Survey"
           break;
       }
-      console.log("selected", selectedMenuListValue);
+      //console.log("Selected menu list value in create survey", selectedMenuListValue);
       swal({
         title: "Are you sure?",
         text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
@@ -243,6 +245,7 @@
         e.classList.add("active");
       });
 
+      // Get survey and set variables
       await surveyService.getSurveyByID(surveyID).then(async (data) => {
         console.log("surveydata in create_survey", data);
         if (data.status == 200) {
@@ -342,6 +345,7 @@
         }
     });
 
+    //Returns a number indicating how many possible ways you can uniquely combine arrayLength number of items in pairs
     const getAmountOfUniqueComparisons = (arrayLength) => {
         let toAdd = 1;
         let amountOfUniqueComparisons = 0;
@@ -352,6 +356,7 @@
         return amountOfUniqueComparisons;
     };
 
+    //Submit survey
     const sendForm = async () => {
         let optionsData = [];
 
@@ -381,7 +386,7 @@
         */
 
         let [everyFieldFilled, errorMessage] = validateFormInputs(info);
-        console.log(errorMessage);
+
         if (!everyFieldFilled) {
             swal("Invalid input", "Every field is obligatory. " + errorMessage, "error");
         } else {
@@ -435,8 +440,11 @@
                                 itemFileResponses.push();
                             }
                         });
+                        //Wait for all item files to be uploaded
                         await Promise.all(itemFileResponses);
+                        //Update owners
                         await changeMembers();
+                        //Update survey
                         surveyService
                             .put(surveyID, info)
                             .then((data) => {
@@ -447,7 +455,7 @@
                                         window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + surveyID;
                                     let dummy = document.getElementById("dummy");
                                     dummy.value = survey_link;
-                                    console.log("Navigator object: ", navigator, "\nNavigator.clipboard", navigator.clipboard);
+                                    //console.log("Navigator object: ", navigator, "\nNavigator.clipboard", navigator.clipboard);
 
                                     navigator.clipboard
                                         .writeText(survey_link)
@@ -482,6 +490,7 @@
                                 );
                             });
                     } else {
+                      // User is creating a new survey, not editing an existing one
                         info.items = [];
                         surveyService
                             .postSurvey(info)
@@ -496,16 +505,15 @@
                                         console.error("Error when posting item files:", error)
                                     );
                                     console.log("postSurvey data: ", data);
-                                    const survey_link =
-                                        window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + data.loc;
+                                    const survey_link = window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + data.loc;
+
                                     let dummy = document.getElementById("dummy");
                                     dummy.value = survey_link;
-                                    console.log(dummy.value);
-                                    console.log(navigator, navigator.clipboard);
+
                                     navigator.clipboard.writeText(survey_link).then(() => {
                                         swal(
                                             "Successfully created survey!",
-                                            "Your link is:\n" + survey_link + "\n It has been copied to your clipboard for you!",
+                                            "Your link is:\n" + survey_link + "\nIt has been copied to your clipboard for you!",
                                             "success"
                                         );
                                         selectedMenuListValue = "Surveys";
@@ -563,6 +571,7 @@
     };
 
     //Makes sure that amount of expected comparisons is less than or equal to total number of unique combinations of items
+    //Changes expected comparisons value to a valid number if it is not valid
     function validateExpectedComparisons(e) {
         if (e.target.value === "") {
             e.target.value = e.target.value.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
@@ -601,35 +610,37 @@
         }
     };
 
+    // Adds a new card for a researcher. This function is not responsible for the database call.
     const addResearcher = (researcher) => {
-        console.log("researcher in add: ", researcher);
-        if (researcher != null && researcher != undefined) {
-            if (surveyResearchers.find((e) => e.owner_email == researcher.email) === undefined) {
-                console.log("researcher is not already added", researcher, "vs ", surveyResearchers);
-                surveyResearchers.push({
-                    ownerId: researcher._id,
-                    owner_email: researcher.email,
-                    obligatory: false,
-                    rights: {
-                        manageMembers: false,
-                        editSurvey: false,
-                        viewResults: true,
-                    },
-                });
-                surveyResearchers = surveyResearchers;
-                console.log("added researcher to surveyResearchers", surveyResearchers);
-                search_term = "";
-                searchResults = [];
-            } else {
-                swal("Researcher is already added").then(() => {
-                    search_term = "";
-                    searchResults = [];
-                });
-                return;
-            }
-        }
+      //console.log("researcher in add researcher: ", researcher);
+      if (researcher != null && researcher != undefined) {
+          if (surveyResearchers.find((e) => e.owner_email == researcher.email) === undefined) {
+              console.log("researcher is not already added", researcher, " vs ", surveyResearchers);
+              surveyResearchers.push({
+                  ownerId: researcher._id,
+                  owner_email: researcher.email,
+                  obligatory: false,
+                  rights: {
+                      manageMembers: false,
+                      editSurvey: false,
+                      viewResults: true,
+                  },
+              });
+              surveyResearchers = surveyResearchers;
+              console.log("added researcher to surveyResearchers", surveyResearchers);
+              search_term = "";
+              searchResults = [];
+          }
+          else {
+              swal("Researcher is already added").then(() => {
+                  search_term = "";
+                  searchResults = [];
+              });
+              return;
+          }
+      }
     };
-
+    //Removes researcher based on whether their email matches
     const removeResearcher = (researcherEmail) => {
         //console.log("Survey researchers before deletion: ", surveyResearchers);
         let index = surveyResearchers.findIndex((e) => {
@@ -683,7 +694,7 @@
             if (search_term !== oldSearchTerm) searchResults = [];
         }
     };
-
+    //Searches for researchers when the user hits enter in the search field
     const checkIfAddResearcherByEnter = (e) => {
         //console.log("in checkifadd researcher with keycode", e);
         if (e.keyCode == 13) {
@@ -715,6 +726,7 @@
         { name: "No", value: "0" },
     ];
     let selectedActiveLevel = "1";
+
     // Values to be bound to all the input fields
     let surveyTitleValue;
     let surveyQuestionValue;
@@ -771,6 +783,7 @@
         console.log("blurred with val", value);
         value = value;
     };
+
   // Updates owners of the survey in the database
   const changeMembers = () => {
     console.log("Changing members", surveyResearchers, surveyID);
@@ -804,7 +817,7 @@
     })
   }
   
-  // Forces user to check a checkbox in order to not get warned about changing items/expectedcomparisons in a survey
+  // Forces user to check a checkbox in order to not get warned about changing items/expectedcomparisons in an active survey
   const warnUserOnEditingItemsInActiveSurvey = () => {
     if(selectedActiveLevel === "1" && !userHasBeenWarnedOnFocus && editing){
       let checkBoxContainer = document.createElement("div")

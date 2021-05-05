@@ -3,7 +3,7 @@
     import {userService} from "../Services/UserService";
     import {AppBar, List, ListItemGroup, ListItem, Icon, Button} from "svelte-materialify"
     import { mdiInformationOutline } from "@mdi/js";
-    import { afterUpdate, onMount } from "svelte";
+    import { onMount } from "svelte";
 
     export let refreshToken;
     export let userInfo;

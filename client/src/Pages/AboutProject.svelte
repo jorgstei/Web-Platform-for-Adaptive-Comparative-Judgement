@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
-
+  export let selectedNavbarListValue;
+  
   onMount(()=>{
     selectedNavbarListValue = "About";
   })

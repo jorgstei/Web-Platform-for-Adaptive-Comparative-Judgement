@@ -37,14 +37,17 @@ mongoose.connect(mongoConnectionString,
             const lastName = firstName
             const role = "admin"
             const adminObj = {email, firstName, lastName, hashed, salt, role}
-            const createAdminResult = await User.create(adminObj)
+            await User.create(adminObj)
         }
         else{
             console.log("Found existing admin user.")
         }
         
     })
-    .catch((err) => console.log("Error occured while connecting to MongoDB: ", err))
+    .catch((err) => {
+        console.log("Error occured while connecting to MongoDB: ")
+        exit(0)
+    })
 
 server.use(cors({
     origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000", "http://compair.it.ntnu.no"
@@ -78,6 +81,7 @@ const userRoute = require('./routes/user_route')
 server.use("/api/user", userRoute)
 
 const surveyItemFileRoute = require('./routes/survey_item_file_route')
+const { exit } = require('process')
 server.use("/api/surveyitemfile", surveyItemFileRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){

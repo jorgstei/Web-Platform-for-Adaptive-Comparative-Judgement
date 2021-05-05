@@ -8,7 +8,6 @@
 	import LandingPage from "./Landing_page.svelte";
 	import AboutProject from "./AboutProject.svelte";
 	import CreateSurvey from "./CreateSurvey.svelte";
-	import UserServiceTest from "../test_pages/UserServiceTest.svelte";
 	import AdminBoard from "./AdminBoard.svelte";
 	import RegisterAccount from "./RegisterAccount.svelte";
 	import ForgottenPassword from "./ForgottenPassword.svelte";

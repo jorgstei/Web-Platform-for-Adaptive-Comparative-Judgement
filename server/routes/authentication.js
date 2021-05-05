@@ -130,7 +130,7 @@ router.post("/login", async (req, res) => {
         res.status(401).json({message: "Incorrect username or password"})
     } catch (error) {
         console.log("Error: ", error)
-        res.sendStatus(500).json({message: "Internal Server Error"})
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 

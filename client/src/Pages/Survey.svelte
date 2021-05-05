@@ -5,7 +5,7 @@
     import IntroductionToSurvey from "./IntroductionToSurvey.svelte"
     import {navigate} from "svelte-routing";
     import {navigateWithRefreshToken} from "../Utility/naviagte"
-    import { onDestroy, onMount } from "svelte";
+    import { afterUpdate, onDestroy, onMount } from "svelte";
     import swal from "sweetalert";
     import { Button, Card, CardText, Overlay, Icon, CardActions, ProgressLinear } from 'svelte-materialify';
     import { fade, fly } from 'svelte/transition';
@@ -265,11 +265,13 @@
     window.addEventListener("resize", () => {
         clampText();
     })
+
+    afterUpdate(() => {
+        clampText();
+    })
     
 
     $: survey;
-    $: counter && clampText()
-    $: randomPair && clampText()
     // apply to left and right cards for animation, currently messes up rerendering pdfs
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
@@ -296,8 +298,8 @@
         {#if randomPair.length != 0 && randomPair[counter] != undefined}
             <div class="cardWrapper" on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; height:100%; position: relative; cursor: default;" outlined class="grey lighten-3 elevation-8">
-                    <div style="text-align: center; height:85%">
-                        <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
+                    <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showLeftItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
+                    <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].left.type == "plain"}
                             <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].left.data}></TextView>
                             <Overlay
@@ -327,8 +329,8 @@
             </div>
             <div class="cardWrapper"  on:mouseover={changeElevation} on:mouseleave={changeElevation}>
                 <Card style="min-width:100%; height:100%; position: relative; cursor: default;" hover outlined class="grey lighten-3 elevation-8">
-                    <div style="text-align: center; height:85%">
-                        <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
+                    <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
+                    <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].right.type == "plain"}
                         <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
                             <Overlay
@@ -420,7 +422,7 @@
         justify-content: center;
     }
     :global(.card-text) {
-        text-align: left;
+        text-align: center;
         text-overflow: ellipsis;
         overflow: hidden; 
     }

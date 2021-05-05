@@ -19,6 +19,6 @@
     })
 </script>
 
-<div class={$$props.class} style="{$$props.style};">
+<div class={$$props.class} style="{$$props.style}; margin: auto; text-align: center">
     {textContent}
 </div>

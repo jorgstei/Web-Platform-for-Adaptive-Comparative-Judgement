@@ -1,6 +1,4 @@
 <script>    
-    import pdfjs from "pdfjs-dist"
-    import pdfjsWorkerEntry from "pdfjs-dist/build/pdf.worker.entry"
     import { onMount } from "svelte";
 
     /*

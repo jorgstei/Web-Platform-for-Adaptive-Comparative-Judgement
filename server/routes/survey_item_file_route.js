@@ -1,6 +1,7 @@
 const { Router } = require('express')
 const Survey = require('../models/Survey')
 const SurveyItemFile = require("../models/SurveyItemFile")
+const SurveyAnswer = require("../models/SurveyAnswer")
 const { auth } = require('./authentication')
 const me = require('mongo-escape').escape
 
@@ -109,20 +110,32 @@ router.post("/:id", auth, async (req, res) => {
 })
 
 router.delete("/:id", auth, async (req, res) => {
+    /*
+        This route should use transactions if available, because of calls to multiple different collections.
+    */
     const me_id = me(req.params.id)
     SurveyItemFile.deleteOne({_id: me_id})
     .then(async deleteOneResponse => {
-        const surveyUpdateResponse = await Survey.updateOne({"items.data": me_id}, {$pull: {
+        const survey = await Survey.findOne({"items.data": me_id})
+        console.log("survey: ", survey)
+        const item = survey?.items?.find(e => e.data == me_id)
+        if(item == undefined){
+            console.log("Unable to find item with matching ItemFile ID")
+        }
+        else{
+            const surveyAnswerDeleteResponse = await SurveyAnswer.deleteMany({$or: [ {leftOption: item._id}, {rightOption: item._id}]})
+            console.log("surveyAnswerDeleteResponse: ", surveyAnswerDeleteResponse)
+        }
+        await Survey.updateOne({"items.data": me_id}, {$pull: {
             items: {
                 data: me_id
             }
         }})
-        console.log("Delete one response (file):",deleteOneResponse)
-        console.log("SsurveyUpdateResponse:", surveyUpdateResponse)
+
         res.status(204).json({message: "Successfully deleted item."})
     })
     .catch(error =>{
-        console.log(error)
+        console.log("error deleting survey item file")
         res.status(500).json({message: "Internal Server Error"})
     })
 })

@@ -1,5 +1,11 @@
 <script>
+  import { onMount } from "svelte";
+
+  onMount(()=>{
+    selectedNavbarListValue = "About";
+  })
 </script>
+
 <main>
   <h1>About this project</h1>
   <div id="about1" class="textbox">

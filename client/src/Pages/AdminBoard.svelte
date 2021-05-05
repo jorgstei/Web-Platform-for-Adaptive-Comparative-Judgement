@@ -8,6 +8,7 @@
   import RawSurveyData from "./RawSurveyData.svelte";
   import LoginPage from "./LoginPage.svelte";
   import Profile from "./Profile.svelte";
+import { onMount } from "svelte";
   
   //userInfo contains email, userid and role when we are logged in. Should be null otherwise
   export let userInfo;
@@ -17,6 +18,12 @@
   export let warningOnLeaveFunc;
 
   export let selectedMenuListValue;
+  export let selectedNavbarListValue;
+
+  onMount(()=>{
+    console.log("Set selected navbar to board");
+    selectedNavbarListValue = "Board";
+  })
 
   $: userInfo;
   $: selectedMenuListValue;

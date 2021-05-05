@@ -6,6 +6,7 @@
 	import swal from "sweetalert";
 
 	export let surveyID;
+	export let selectedNavbarListValue;
 
 	let validate = async () => {
 		let code = document.getElementsByClassName("bigInput")[0].value;
@@ -42,11 +43,14 @@
 	onMount(()=>{
         document.getElementsByTagName("body")[0].style.overflowY = "hidden";
 		document.getElementsByTagName("body")[0].style.overflowX = "hidden";
+		selectedNavbarListValue = "Home";
+		console.log("Set selectednavbar", selectedNavbarListValue);
     })
     onDestroy(()=>{
         document.getElementsByTagName("body")[0].style.overflowY = "scroll";
 		document.getElementsByTagName("body")[0].style.overflowX = "scroll";
     })
+	$:selectedNavbarListValue;
 </script>
 
 <main>

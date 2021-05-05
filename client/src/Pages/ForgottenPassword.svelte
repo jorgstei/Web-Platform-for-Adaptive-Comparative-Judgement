@@ -10,8 +10,9 @@
 
     export let userInfo;
     export let resetPassword = false;
+    export let selectedNavbarListValue;
     let token = null;
-    //https://emailregex.com/, might be inefficient, but it haven't failed us yet
+    //https://emailregex.com/, might be inefficient, but it hasn't failed us yet
     const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
     let params = queryString.parse(window.location.search);
     if (params.token == null || params.token == undefined) {
@@ -23,8 +24,10 @@
     }
     let showErrorField = false;
     let email;
+    //Passwords 1 and 2
     let pw1;
     let pw2;
+    //Booleans for whether to show the passwords or not
     let showpw1;
     let showpw2;
 
@@ -40,7 +43,10 @@
                             "Success",
                             "If there is a user registered with this email, a mail has been sent with a link to reset the password.",
                             "success"
-                        ).then(() => navigate("/login"));
+                        ).then(() => {
+                            selectedNavbarListValue = "Log in";
+                            navigate("/login")
+                        });
                     } else {
                         document.getElementById("errorField").innerHTML = "Invalid email. Please try to re-enter your email.";
                     }
@@ -53,6 +59,7 @@
         }
     };
 
+
     const changeThePassword = () => {
         const errorField = document.getElementById("errorField");
         let [formIsValid, errormsg] = checkValues();
@@ -64,6 +71,7 @@
                     if (res.status == 204) {
                         swal("Success", "Your password has been changed!\nYou will now be logged out", "success").then(() => {
                             userInfo = null;
+                            selectedNavbarListValue = "Home";
                             navigate("/");
                         });
                     } else {
@@ -80,6 +88,7 @@
         }
     };
 
+    //Returns an object with a bool .valid and a string .msg which is the error message
     function checkResetPasswordFields() {
         // Checks if each field has a value
         if (email === "" || pw1 === "" || pw2 === "") {
@@ -121,6 +130,7 @@
         };
     }
 
+    //Returns an object with a bool .valid and a string .msg which is the error message
     function checkSendForgottenpasswordLinkFields() {
         if (email.length > 64) {
             return {
@@ -174,7 +184,8 @@
         document.getElementById("errorField").innerHTML = "";
     };
 
-    let show = false;
+
+    let showEmailTooltip = false;
 </script>
 
 <main>
@@ -193,7 +204,7 @@
             <TextField class="ma-2" bind:value={email} on:keydown={loginOnEnterPress} on:input={clearErrorField}>
                 Email
                 <div slot="append">
-                    <Tooltip top bind:active={show}>
+                    <Tooltip top bind:active={showEmailTooltip}>
                         <Icon path={mdiInformationOutline} />
                         <span slot="tip">Enter your email</span>
                     </Tooltip>

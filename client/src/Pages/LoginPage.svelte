@@ -7,23 +7,24 @@
     import { mdiEyeOff, mdiEye } from "@mdi/js";
     import { pwResearcherRequirement, pwAdminRequirement } from "../Utility/passwordRequirement";
 
-    let oldPasswordShow = false;
-    let newPw1Show = false;
-    let newPw2Show = false;
 
-    /*
-        Input field variables
-    */
+    export let userInfo;
+    export let changePassword = false;
+    export let selectedNavbarListValue;
+    export let allowLeavePageWithoutWarning;
+    allowLeavePageWithoutWarning = true;
+    
+    //Input field variables
     let email;
     let oldPw;
     let newPw1;
     let newPw2;
 
-    export let userInfo;
-    export let changePassword = false;
-    export let allowLeavePageWithoutWarning;
-    allowLeavePageWithoutWarning = true;
-    console.log("loginPage changePassword: ", changePassword);
+    //Tooltip booleans
+    let oldPasswordShow = false;
+    let newPw1Show = false;
+    let newPw2Show = false;
+
     //https://emailregex.com/, might be inefficient, but it haven't failed us yet
     const email_regex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
@@ -38,6 +39,7 @@
                     if (res != null && res.status == 200) {
                         userInfo = res.data;
                         console.log(userInfo);
+                        selectedNavbarListValue = "Board";
                         navigate("/admin_board/profile");
                     } else {
                         console.log(res);

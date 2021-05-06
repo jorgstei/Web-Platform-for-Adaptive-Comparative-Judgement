@@ -134,7 +134,7 @@
         overflow-y: auto;
         height: 100%;
         text-align: center;
-        margin: auto;
+        margin: 0;
         width: 100%;
         padding: 0
     }
@@ -162,10 +162,10 @@
     /* Medium Screens (laptops, desktops)*/
     @media (min-width: 769px) and (max-width: 1199px) {
         .question-header {
-            font-size: 3.5rem;
+            font-size: 3rem;
         }
         .question-text {
-            font-size: 2.5rem;
+            font-size: 2.25rem;
         }
         .instruction-text, .extra-info-text  {
             font-size: 1.25rem;
@@ -174,10 +174,10 @@
     /* Large Screens (1200p and above)*/
     @media (min-width: 1200px) {
         .question-header {
-            font-size: 4.5rem;
+            font-size: 3.5rem;
         }
         .question-text {
-            font-size: 3.5rem;
+            font-size: 3rem;
         }
         .instruction-text, .extra-info-text  {
             font-size: 1.5em;

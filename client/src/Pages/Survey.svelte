@@ -105,7 +105,7 @@
     }
 
     beforeUpdate(() => {
-        document.scrollTo(0,0);
+        console.log("FINDME beforeupdate")
         window.scrollTo(0,0);
     })
 

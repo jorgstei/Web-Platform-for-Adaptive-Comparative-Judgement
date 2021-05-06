@@ -30,7 +30,7 @@
     export let surveyID;
     export let takingSurvey;
     export let showJudgeOverlay = false;
-    export let surveyQuestionInNavBar;
+    export let surveyQuestionInNavBar = "";
 
     let question = undefined
     let completed = false
@@ -105,7 +105,7 @@
     }
 
     onMount(async () => {
-        window.addEventListener( 'touchmove', () => {})
+        document.ontouchmove = () => e.preventDefault();
         let params = queryString.parse(window.location.search);
         if(params?.takeSurvey == 1 && params?.surveyID != undefined){
             surveyID = params.surveyID;
@@ -237,6 +237,9 @@
     onDestroy(()=>{
         takingSurvey = false;
         showJudgeOverlay = false;
+        document.ontouchmove = (e) => {
+            return true;
+        }
     })
     
 
@@ -395,18 +398,16 @@
 <style>
     .cardWrapper {
         width:48%; height:100%;
-        transition: border 500ms ease-out;
     }
     main {
-        margin:auto;
-        margin-top: 0;
+        margin:0;
         width: 100vw;
         max-width: 100%;
         height: 100%;
         overflow: hidden;
     }
     #container {
-        margin: auto;
+        margin: 0;
         padding-top: 0.5vh;
         width: 100%;
         height: 90%;

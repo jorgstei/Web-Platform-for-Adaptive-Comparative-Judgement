@@ -42,8 +42,8 @@
 
 	let surveyID;
 	let takingSurvey = false;
-	let showJudgeOverlay;
-	let warningOnLeaveFunc;
+	let showJudgeOverlay = false;
+	let warningOnLeaveFunc = () => {};
 	let selectedMenuListValue="";
 	let selectedNavbarListValue="";
 	let surveyQuestionInNavBar="";

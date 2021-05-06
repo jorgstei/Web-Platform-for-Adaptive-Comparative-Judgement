@@ -315,10 +315,10 @@ style="cursor:default; z-index: 999;">
         {#if randomPair[counter].left.type == "plain"}
         <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
         {:else if randomPair[counter].left.type == "pdf"}
-        <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
+        <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100%" height="90%"></PDFView>
         {/if}
         <div style="display: flex; align-content: center; justify-content: center;">
-            <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+            <Button style="margin: 1%" outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
         </div>
     </div>
 </Overlay>
@@ -333,10 +333,10 @@ style="cursor:default;">
     {#if randomPair[counter].right.type == "plain"}
         <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
     {:else if randomPair[counter].right.type == "pdf"}
-        <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100vw" height="90vh"></PDFView>
+        <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100%" height="90%"></PDFView>
     {/if}
     <div style="display: flex; align-content: center; justify-content: center;">
-        <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
+        <Button style="margin: 1%" outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
     </div>
 </div>
 </Overlay>

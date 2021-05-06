@@ -311,13 +311,15 @@ bind:active={showLeftItemOverlay}
 opacity={1}
 color={"#eee"}
 style="cursor:default; z-index: 999;">
-    {#if randomPair[counter].left.type == "plain"}
+    <div class="overlay-item">
+        {#if randomPair[counter].left.type == "plain"}
         <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
-    {:else if randomPair[counter].left.type == "pdf"}
+        {:else if randomPair[counter].left.type == "pdf"}
         <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
-    {/if}
-    <div style="display: flex; align-content: center; justify-content: center;">
-        <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+        {/if}
+        <div style="display: flex; align-content: center; justify-content: center;">
+            <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+        </div>
     </div>
 </Overlay>
 
@@ -327,6 +329,7 @@ bind:active={showRightItemOverlay}
 opacity={1}
 color={"#eee"}
 style="cursor:default;">
+<div class="overlay-item">
     {#if randomPair[counter].right.type == "plain"}
         <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
     {:else if randomPair[counter].right.type == "pdf"}
@@ -335,6 +338,7 @@ style="cursor:default;">
     <div style="display: flex; align-content: center; justify-content: center;">
         <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
     </div>
+</div>
 </Overlay>
 {/if}
 <main id="surveyWrapper" tabindex="0">
@@ -369,7 +373,7 @@ style="cursor:default;">
                     <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                     <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].right.type == "plain"}
-                        <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
+                            <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
                         {:else if randomPair[counter].right.type == "pdf"}
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="100%"></PDFView>
                         {/if}

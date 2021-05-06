@@ -12,8 +12,8 @@ async function sendMail(mailOptions) {
     if (process.env.MAIL_PW != undefined && process.env.MAIL_USER != undefined) {
         const transporter = nodemailer.createTransport(
             {
-                host: "smtp.ansatt.ntnu.no",
-                port: 587,
+                host: process.env.MAIL_SERVER,
+                port: process.env.MAIL_PORT,
                 secure: false,
                 requireTLS: true,
                 auth: {
@@ -35,8 +35,8 @@ async function sendMail(mailOptions) {
     else {
         const transporter = nodemailer.createTransport(
             {
-                host: "smtp.ansatt.ntnu.no",
-                port: 25,
+                host: process.env.MAIL_SERVER,
+                port: process.env.MAIL_PORT,
                 secure: false,
                 requireTLS: true,
                 tls: {

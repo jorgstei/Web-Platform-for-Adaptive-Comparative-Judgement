@@ -439,9 +439,9 @@ style="cursor:default;">
     }
     :global(.overlay-item){
         height: 90vh;
-        width: 90vw;
+        width: 95vw;
         max-height: 90vh;
-        max-width: 90vw;
+        max-width: 100vw;
         display: flex;
         flex-direction: column;
         text-align: center;

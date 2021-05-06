@@ -5,7 +5,7 @@
     import IntroductionToSurvey from "./IntroductionToSurvey.svelte"
     import {navigate} from "svelte-routing";
     import {navigateWithRefreshToken} from "../Utility/naviagte"
-    import { afterUpdate, onDestroy, onMount } from "svelte";
+    import { afterUpdate, beforeUpdate, onDestroy, onMount } from "svelte";
     import swal from "sweetalert";
     import { Button, Card, CardText, Overlay, Icon, CardActions, ProgressLinear } from 'svelte-materialify';
     import { fade, fly } from 'svelte/transition';
@@ -103,6 +103,11 @@
             completed = true
         }
     }
+
+    beforeUpdate(() => {
+        document.scrollTo(0,0);
+        window.scrollTo(0,0);
+    })
 
     onMount(async () => {
         document.ontouchmove = () => e.preventDefault();

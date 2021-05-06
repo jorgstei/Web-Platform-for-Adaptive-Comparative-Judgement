@@ -294,23 +294,57 @@
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
 </script>
+<Overlay
+bind:active={showJudgeOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default;"
+>
+<IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
+</Overlay>
+
+<!--Add new media types with {:else if ...} Remember to do this to both left and right card-->
+<!--Left overlay-->
+{#if randomPair.length != 0 && randomPair[counter] != undefined}
+<Overlay
+bind:active={showLeftItemOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default; z-index: 999;">
+    {#if randomPair[counter].left.type == "plain"}
+        <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
+    {:else if randomPair[counter].left.type == "pdf"}
+        <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
+    {/if}
+    <div style="display: flex; align-content: center; justify-content: center;">
+        <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+    </div>
+</Overlay>
+
+<!--Right overlay-->
+<Overlay
+bind:active={showRightItemOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default;">
+    {#if randomPair[counter].right.type == "plain"}
+        <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
+    {:else if randomPair[counter].right.type == "pdf"}
+        <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100vw" height="90vh"></PDFView>
+    {/if}
+    <div style="display: flex; align-content: center; justify-content: center;">
+        <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
+    </div>
+</Overlay>
+{/if}
 <main id="surveyWrapper" tabindex="0">
     {#if counter < maxCounter}
     {#key counter}
     
-    <div style="width:100%; margin:auto; padding-top:5%">
+    <div style="width:100%; margin:auto;">
         <ProgressLinear id="survey-progressbar" value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
-
-    <Overlay
-        bind:active={showJudgeOverlay}
-        opacity={1}
-        color={"#eee"}
-        style="cursor:default;"
-    >
-    <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
-    </Overlay>
 
     <div id="container" class="d-flex flex-row justify-space-between">
         <!-- Add new media types with {:else if ...} Remember to do this to both left and right card-->
@@ -321,24 +355,8 @@
                     <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].left.type == "plain"}
                             <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].left.data}></TextView>
-                            <Overlay
-                            bind:active={showLeftItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
-                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {:else if randomPair[counter].left.type == "pdf"}
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="100%"></PDFView>
-                            <Overlay
-                            bind:active={showLeftItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
-                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {/if}
                     </div>
                     <CardActions>
@@ -352,25 +370,8 @@
                     <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].right.type == "plain"}
                         <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
-                            <Overlay
-                            bind:active={showRightItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
-                                <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {:else if randomPair[counter].right.type == "pdf"}
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="100%"></PDFView>
-
-                            <Overlay
-                            bind:active={showRightItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100vw" height="90vh"></PDFView>
-                                <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {/if}
                     </div>
                     
@@ -398,14 +399,14 @@
             }}>Return to home</Button>
         </div>
     {/if}
-
 </main>
 
 <style>
     .cardWrapper {
-        width:48%; height:85%;
+        width:48%; height:90%;
     }
     main {
+        position:fixed;
         margin:0;
         width: 100%;
         max-width: 100vw;

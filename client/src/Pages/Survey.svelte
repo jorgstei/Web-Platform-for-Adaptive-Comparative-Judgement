@@ -440,6 +440,10 @@ style="cursor:default;">
     :global(.overlay-item){
         height: 90vh;
         width: 90vw;
+        max-height: 90vh;
+        max-width: 90vw;
+        display: flex;
+        flex-direction: column;
         text-align: center;
         text-justify: center;
         align-content: center;

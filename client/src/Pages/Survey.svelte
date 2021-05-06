@@ -298,7 +298,7 @@
     {#if counter < maxCounter}
     {#key counter}
     
-    <div style="width:100%; margin:auto;">
+    <div style="width:100%; margin:auto; padding-top:5%">
         <ProgressLinear id="survey-progressbar" value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>

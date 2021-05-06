@@ -4,6 +4,7 @@
     import {AppBar, List, ListItemGroup, ListItem, Icon, Button} from "svelte-materialify"
     import { mdiInformationOutline } from "@mdi/js";
     import { onMount } from "svelte";
+    import clamp from "clamp-js"
 
     export let refreshToken;
     export let userInfo;
@@ -12,7 +13,7 @@
     export let allowLeavePageWithoutWarning = true;
     export let warningOnLeaveFunc;
     export let selectedNavbarListValue;
-    export let surveyQuestionInNavBar;
+    export let surveyQuestionInNavBar = "";
     /*
         Allow tab navigation to click the elements with space or enter
         This will affect both "Navbar" items and "Menu" items.
@@ -80,13 +81,22 @@
             e.target.click()
         }
     }
+
+    const clampSurveyQuestion = () => {
+        let questionContainer = document.getElementById("navbar-surveyquestion")
+        if(questionContainer != undefined && questionContainer != null){
+            console.log("FINDME clampSurveyQuestion")
+            clamp(questionContainer, {clamp: 1})
+        }
+    }
+
     //Changes to userInfo might trigger the navbar to change state, 
     //because of this we need to update the new elements to support tab navigation
+    $: surveyQuestionInNavBar && clampSurveyQuestion();
     $: userInfo && makeNavBarElementsTabbable();
     $: warningOnLeaveFunc;
     $: selectedNavbarListValue;
 </script>
-
 
 <AppBar class="" style="position:fixed;width:100%; padding:0;">
     <div slot="icon" style="height:100%; width:auto; cursor: pointer;" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
@@ -94,7 +104,7 @@
     </div>
     
     {#if takingSurvey}
-        <div style="width: 50vw; height: inherit; text-align: center; display:flex; align-items: center; justify-content: center; font-size:x-large">
+        <div id="navbar-surveyquestion" style="width: 50vw; height: inherit; text-align: center; display:flex; align-items: center; justify-content: center; font-size:x-large;">
             {surveyQuestionInNavBar}
         </div>
         <div style="position:fixed; right:1vw;">

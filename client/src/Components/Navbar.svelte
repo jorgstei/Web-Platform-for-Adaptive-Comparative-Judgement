@@ -12,6 +12,7 @@
     export let allowLeavePageWithoutWarning = true;
     export let warningOnLeaveFunc;
     export let selectedNavbarListValue;
+    export let surveyQuestionInNavBar;
     /*
         Allow tab navigation to click the elements with space or enter
         This will affect both "Navbar" items and "Menu" items.
@@ -87,12 +88,15 @@
 </script>
 
 
-<AppBar class=" d-flex flex-row align-content-right justify-content-right" style="position:fixed;width:100%; padding:0;">
+<AppBar class="" style="position:fixed;width:100%; padding:0;">
     <div slot="icon" style="height:100%; width:auto; cursor: pointer;" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
         <img src="/img/Compair.svg" style="height: 100%; width:100%; min-height:50%;" alt="Compair logo"/>
     </div>
     
     {#if takingSurvey}
+        <div style="width: 50vw; height: inherit; text-align: center; display:flex; align-items: center; justify-content: center; font-size:x-large">
+            {surveyQuestionInNavBar}
+        </div>
         <div style="position:fixed; right:1vw;">
             <Button outlined on:click={()=>{showJudgeOverlay = true}}>
                 <Icon size="1.5vw" path={mdiInformationOutline}></Icon>

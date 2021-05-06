@@ -30,6 +30,7 @@
     export let surveyID;
     export let takingSurvey;
     export let showJudgeOverlay = false;
+    export let surveyQuestionInNavBar;
 
     let question = undefined
     let completed = false
@@ -123,6 +124,7 @@
                             console.log("Survey data from onMount in survey: ", surveyData);
                             question = surveyData.surveyQuestion;
                             survey = surveyData;
+                            surveyQuestionInNavBar = question;
                         }
                         else{
                             swal("Error", "An error occured while getting the survey information. Please retry, and if the problem persists contact an administrator.\nResponse: "+surveyData.data.message, "error").then(() => navigate("/"))

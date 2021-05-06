@@ -46,13 +46,14 @@
 	let warningOnLeaveFunc;
 	let selectedMenuListValue="";
 	let selectedNavbarListValue="";
+	let surveyQuestionInNavBar="";
 
 	$: userInfo;
 </script>
 
 <MaterialApp>
 	<Router>
-		<Navbar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedNavbarListValue/>
+		<Navbar bind:surveyQuestionInNavBar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedNavbarListValue/>
 		<div class="pt-14" style="height: 100vh">
 			<Route path="/">
 				<LandingPage bind:surveyID bind:selectedNavbarListValue/>
@@ -78,7 +79,7 @@
 				<AdminBoard bind:userInfo bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedMenuListValue bind:selectedNavbarListValue/>
 			</Route>
 			<Route path="survey">
-				<Survey bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
+				<Survey bind:surveyQuestionInNavBar bind:surveyID bind:userInfo bind:takingSurvey bind:showJudgeOverlay/>
 			</Route>
 		</div>
 	</Router>

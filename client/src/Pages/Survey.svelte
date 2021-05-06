@@ -403,13 +403,14 @@
 
 <style>
     .cardWrapper {
-        width:48%; height:100%;
+        width:48%; height:85%;
     }
     main {
         margin:0;
-        width: 100vw;
-        max-width: 100%;
+        width: 100%;
+        max-width: 100vw;
         height: 100%;
+        max-height: 100vh;
         overflow: hidden;
     }
     #container {

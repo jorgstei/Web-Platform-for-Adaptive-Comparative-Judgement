@@ -107,6 +107,7 @@
     beforeUpdate(() => {
         console.log("FINDME beforeupdate")
         window.scrollTo(0,0);
+        window.scrollBy(-window.innerHeight)
     })
 
     onMount(async () => {

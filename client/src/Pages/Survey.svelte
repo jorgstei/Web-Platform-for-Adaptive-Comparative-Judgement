@@ -104,11 +104,6 @@
         }
     }
 
-    beforeUpdate(() => {
-        console.log("FINDME beforeupdate")
-        window.scrollTo(0,1);
-    })
-
     onMount(async () => {
         document.ontouchmove = () => e.preventDefault();
         let params = queryString.parse(window.location.search);
@@ -278,18 +273,23 @@
     })
 
     afterUpdate(() => {
+        let height = window.height;
+        let width = window.width;
+        window.resizeTo(width-1, height-1);
         clampText();
+        window.scrollTo(0,1);
+        window.resizeTo(height, width);
+    }) 
+    beforeUpdate(() => {
+        let height = window.height;
+        let width = window.width;
+        console.log("FINDME beforeupdate")
+        window.resizeTo(width-1, height-1);
+        window.scrollTo(0,1);
+        window.resizeTo(height, width);
     })
 
-    const scrollProgressBarIntoView = () => {
-        console.log("FINDME")
-        window.scrollTo(0,0)
-        setTimeout(() => window.scrollTo(0,0), 1000)
-    }
-    
-
     $: survey;
-    $: showJudgeOverlay && scrollProgressBarIntoView();
     // apply to left and right cards for animation, currently messes up rerendering pdfs
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
@@ -302,7 +302,7 @@
         <ProgressLinear id="survey-progressbar" value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
-    <!---
+
     <Overlay
         bind:active={showJudgeOverlay}
         opacity={1}
@@ -311,7 +311,7 @@
     >
     <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
     </Overlay>
-    -->
+
     <div id="container" class="d-flex flex-row justify-space-between">
         <!-- Add new media types with {:else if ...} Remember to do this to both left and right card-->
         {#if randomPair.length != 0 && randomPair[counter] != undefined}

@@ -302,7 +302,7 @@
         <ProgressLinear id="survey-progressbar" value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
-
+    <!---
     <Overlay
         bind:active={showJudgeOverlay}
         opacity={1}
@@ -311,6 +311,7 @@
     >
     <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
     </Overlay>
+    -->
     <div id="container" class="d-flex flex-row justify-space-between">
         <!-- Add new media types with {:else if ...} Remember to do this to both left and right card-->
         {#if randomPair.length != 0 && randomPair[counter] != undefined}

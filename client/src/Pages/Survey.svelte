@@ -105,6 +105,7 @@
     }
 
     onMount(async () => {
+        window.addEventListener( 'touchmove', () => {})
         let params = queryString.parse(window.location.search);
         if(params?.takeSurvey == 1 && params?.surveyID != undefined){
             surveyID = params.surveyID;
@@ -273,10 +274,9 @@
     })
 
     const scrollProgressBarIntoView = () => {
-        let scrollBarElement = document.getElementById("survey-progressbar")
-        if(scrollBarElement != null && scrollBarElement != undefined){
-            scrollBarElement.scrollIntoView(true)
-        }
+        console.log("FINDME")
+        window.scrollTo(0,0)
+        setTimeout(() => window.scrollTo(0,0), 1000)
     }
     
 
@@ -378,6 +378,7 @@
             <h1 class="text-h2" style="margin-bottom:5vh;">Thank you for participating!</h1>
             <h2 class="text-h3">We greatly appreciate it :)</h2>
             <Button style="margin-top:5vh;" outlined on:click={()=>{
+                takingSurvey = false;
                 if(navwrap){
                     navwrap.style.display = "initial";
                 }

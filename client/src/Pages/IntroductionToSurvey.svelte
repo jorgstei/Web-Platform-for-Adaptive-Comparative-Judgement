@@ -124,7 +124,7 @@
         </Card>
     </div>
     <Button outlined style="width: 30%; height: 5vh; margin-top: 2.5vh; margin-bottom:5vh;" class="align-self-center" 
-        on:click={() => {showJudgeOverlay = !showJudgeOverlay}}
+        on:click={() => {showJudgeOverlay = false;  setTimeout(() => {window.scrollTo(0,0); console.log("FINDME scrolling")}, 300)}}
     >Continue</Button>      
     </div>
 </main>

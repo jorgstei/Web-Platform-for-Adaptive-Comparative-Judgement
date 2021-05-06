@@ -15,7 +15,7 @@
     export let selectedNavbarListValue;
     export let surveyQuestionInNavBar = "";
 
-    let appBarStyle = "position:fixed;width:100%; padding:0;"
+    
 
     /*
         Allow tab navigation to click the elements with space or enter
@@ -32,7 +32,6 @@
 
     onMount(() => {
         makeNavBarElementsTabbable();
-        window.addEventListener( 'touchmove', () => {})
     })
 
     const navigateWithRefreshToken = (to) => {

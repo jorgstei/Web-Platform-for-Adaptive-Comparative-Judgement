@@ -14,6 +14,9 @@
     export let warningOnLeaveFunc;
     export let selectedNavbarListValue;
     export let surveyQuestionInNavBar = "";
+
+    let appBarStyle = "position:fixed;width:100%; padding:0;"
+
     /*
         Allow tab navigation to click the elements with space or enter
         This will affect both "Navbar" items and "Menu" items.
@@ -29,6 +32,7 @@
 
     onMount(() => {
         makeNavBarElementsTabbable();
+        window.addEventListener( 'touchmove', () => {})
     })
 
     const navigateWithRefreshToken = (to) => {

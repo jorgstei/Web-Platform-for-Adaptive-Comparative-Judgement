@@ -6,3 +6,5 @@ node_modules/
 apidoc/
 REST-tests/
 docker/
+docker-compose.yml
+docker-compose.yaml

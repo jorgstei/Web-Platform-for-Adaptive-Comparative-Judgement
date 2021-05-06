@@ -271,9 +271,17 @@
     afterUpdate(() => {
         clampText();
     })
+
+    const scrollProgressBarIntoView = () => {
+        let scrollBarElement = document.getElementById("survey-progressbar")
+        if(scrollBarElement != null && scrollBarElement != undefined){
+            scrollBarElement.scrollIntoView(true)
+        }
+    }
     
 
     $: survey;
+    $: showJudgeOverlay && scrollProgressBarIntoView();
     // apply to left and right cards for animation, currently messes up rerendering pdfs
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
@@ -283,7 +291,7 @@
     {#key counter}
     
     <div style="width:100%; margin:auto;">
-        <ProgressLinear value={progressPercent} height="1vh"></ProgressLinear>
+        <ProgressLinear id="survey-progressbar" value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
 

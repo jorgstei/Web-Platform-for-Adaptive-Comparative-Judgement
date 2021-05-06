@@ -19,7 +19,7 @@ body {
 	max-width: 100%;
 	height: auto;
 	min-height: 100%;
-	overflow: auto;
+	overflow-x: auto;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 

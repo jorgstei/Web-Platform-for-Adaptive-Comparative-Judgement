@@ -117,7 +117,7 @@
                 <div class="extra-info-text mt-4" style="justify-self: center">
                     You can also use the arrow keys to choose between options:
                     <br>
-                    <img style="height: 10vh; width:auto; margin-top:1vh; align-self: center;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
+                    <img style="height: 10vh; width:auto; margin-top:1vh; align-self: center;"src="/img/arrowKeys.PNG" alt="You can also use the arrow keys to choose between options.">
                 </div>
             </div>
         </div>

@@ -78,7 +78,7 @@
                     <div class="text--primary text-h4 mt-4">
                         You can also use the arrow keys to choose between options:
                         <br>
-                        <img style="height: 10vh; width:auto; margin-top:1vh;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
+                        <img style="height: 10vh; width:auto; margin-top:1vh;"src="/img/arrowKeys.PNG" alt="You can also use the arrow keys to choose between options.">
                     </div>
                 </CardText>
             </Card>

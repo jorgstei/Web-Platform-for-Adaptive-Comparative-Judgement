@@ -9,7 +9,7 @@
     import swal from "sweetalert";
     import { dateFromObjectId } from "../Utility/dateFromObjectId";
     import {Select, Row, Col, ButtonGroup, ButtonGroupItem} from "svelte-materialify"
-import { surveyItemFileService } from "../Services/SurveyItemFileService";
+    import { surveyItemFileService } from "../Services/SurveyItemFileService";
 
     export let userInfo;
 
@@ -90,6 +90,10 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
     //Object that maps keys (item id) to values (item tag)
     let itemIdToTag = {};
 
+    //Backup count for judges in case estimate function returns 500
+    let judgeCount = 0;
+
+    // Gets the statistics for the survey
     let getEstimate = async (newJSON, answers) => {
         await surveyService
             .estimate(newJSON)
@@ -101,10 +105,11 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                         surveyStatistics
                     );
                     allJudges = response.data.judges;
+                    // Sort the result from estimate-service by theta to get linear ranking
                     linearRanking = surveyStatistics.result.sort((a, b) => {
                         return b.theta - a.theta;
                     });
-
+                    // Transform result from estimate to array form such that we can enter them into the table
                     let linearRanking2DArray = [];
                     allItems2DArray = [];
                     for (let i = 0; i < linearRanking.length; i++) {
@@ -113,10 +118,11 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                             "Linrank individual: ",
                             linearRanking[i].individual
                         );
-                        let answerWithSameId = survey.items.find(
+                        let itemWithSameId = survey.items.find(
                             (obj) => obj._id == linearRanking[i].individual
                         );
-                        if ( answerWithSameId == undefined || answerWithSameId == null) {
+                        console.log("anssameid", itemWithSameId);
+                        if ( itemWithSameId == undefined || itemWithSameId == null) {
                             linearRanking2DArray.push([
                                 "none",
                                 "NaN",
@@ -136,14 +142,14 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                             ]);
                         } 
                         else {
-                            let itemFile = await surveyItemFileService.getView(answerWithSameId.data);
-                            console.log("itemfile", itemFile);
-                            itemIdToTag[answerWithSameId._id] = itemFile.data.tag;
-                            console.log("andtags", itemIdToTag);
-                            console.log("linrank2d arr getting pushed, linrank[i] is", linearRanking[i]);
+                            
+                            let itemFile = await surveyItemFileService.getView(itemWithSameId.data);
+                            itemIdToTag[itemWithSameId._id] = itemFile.data.tag;
+
+                            console.log("2D array for linearRanking getting pushed to ", linearRanking[i]);
                             linearRanking2DArray.push([
                                 itemFile.data.tag,
-                                answerWithSameId.data,
+                                itemWithSameId.data,
                                 linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
                                 linearRanking[i].outfit === undefined ? "N/A": linearRanking[i].outfit,
                                 linearRanking[i].score === undefined ? "N/A": linearRanking[i].score,
@@ -151,7 +157,7 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                             ]);
                             allItems2DArray.push([
                                 itemFile.data.tag,
-                                answerWithSameId.data,
+                                itemWithSameId.data,
                                 linearRanking[i].infit === undefined ? "N/A": linearRanking[i].infit,
                                 linearRanking[i].outfit === undefined ? "N/A": linearRanking[i].outfit,
                                 linearRanking[i].propscore === undefined ? "N/A": linearRanking[i].propscore,
@@ -199,6 +205,7 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                     );
                     allJudges = allJudges2DArray;
                 } else {
+                    currentContentView = "rawdata";
                     swal(
                         "Error",
                         "Error analyzing survey data: " + response.data.message +".\nA likely cause of this is too few answers for the survey, or little variance in the answers.",
@@ -208,6 +215,7 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
             })
             .catch((error) => {
                 console.log(error)
+                currentContentView = "rawdata";
                 swal(
                     "Error",
                     "An error occured when fetching statistics for the survey",
@@ -223,9 +231,9 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                 console.log("Survey answers: ", answers);
                 if (answers.status == 200) {
                     answers = answers.data;
-                    // Transform JSON and try to get answer
+                    // Transform answers from db to JSON and to array form
                     let newJSON = [];
-                    answers.forEach((e) => {
+                    answers.forEach(async (e) => {
                         newJSON.push({
                             judgeName: e.judgeId,
                             left: e.leftOption,
@@ -243,18 +251,28 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                         "Transformed answer values, attempting to send to analyzing module:\n",
                         answerValues
                     );
-                    await getEstimate(newJSON, answers)
-                    
-                    console.log("ansvals", answerValues);
+
+                    await getEstimate(newJSON, answers) 
+
+                    //Essentially, if getEstimate failed..
+                    //Loops through and counts all unique judges
+                    if(surveyStatistics == null){
+                        let allUniqueJudges = [];
+                        newJSON.forEach((ans)=>{
+                            if(allUniqueJudges.findIndex(e=>e==ans.judgeName) == -1){
+                                allUniqueJudges.push(ans.judgeName);
+                            }
+                        })
+                        judgeCount = allUniqueJudges.length;
+                    }
+
+                    console.log("All answers in array form:", answerValues);
                     answerValues.forEach((answer)=>{
+                        // Replacing left id in answervalues with its tag if a tag exists
                         itemIdToTag[answer[1]] !== undefined ? answer[1] = itemIdToTag[answer[1]]: {};
-                        // Adding left tag to answervalues
-                        //(itemIdToTag[answer[1]] !== undefined || itemIdToTag[answer[1]] !== null) ? answer.splice(1, 0, itemIdToTag[answer[1]]): answer.splice(1, 0, "N/A");
+                        // Replacing right id in answervalues with its tag if a tag exists
                         itemIdToTag[answer[2]] !== undefined ? answer[2] = itemIdToTag[answer[2]]: {};
-                        // Adding right tag to answervalues
-                        //(itemIdToTag[answer[3]] !== undefined || itemIdToTag[answer[3]] !== null) ? answer.splice(2, 0, itemIdToTag[answer[3]]): answer.splice(2, 0, "N/A");
                     })
-                    console.log("ansvals2", answerValues);
                     answerValues = answerValues;
                 } else {
                     swal(
@@ -351,8 +369,7 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
      *
      */
     let downloadFunc = (headers, rows, filename) => {
-        console.log("In download func");
-        console.log("rows: ", rows);
+        console.log("In download as CSV with headers: ", headers, "and rows:", rows);
         let headersString = "";
         headers.forEach((e) => (headersString += '"'+e.viewName + '",'));
         let csvContent = "SEP=, \r\n" + headersString + '\r\n';
@@ -439,7 +456,7 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
 <div class="d-flex flex-column align-center">
     {#if surveyStatistics != null}
         <div style="border:1px solid #aaa; width:60%; margin-bottom:4vh;">
-            <Row class="align-start" noGutters style="width:1+0%;">
+            <Row class="align-start" noGutters style="width:100%;">
                 <Col>
                   <div class="font-weight-bold">Reliability</div>
                 </Col>
@@ -461,7 +478,7 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                   <div class="">{surveyStatistics.rel}</div>
                 </Col>
                 <Col>
-                  <div class="">{surveyStatistics.result.length}</div>
+                  <div class="">{survey.items.length}</div>
                 </Col>
                 <Col>
                     <div class="">{survey.expectedComparisons}</div>
@@ -481,6 +498,49 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
             <ButtonGroupItem value="byItem">By item</ButtonGroupItem>
             <ButtonGroupItem value="rawdata">Raw data</ButtonGroupItem>
         </ButtonGroup>
+
+    {:else if survey.items != undefined}
+    <div style="border:1px solid #aaa; width:60%; margin-bottom:4vh;">
+        <Row class="align-start" noGutters style="width:1+0%;">
+            <Col>
+              <div class="font-weight-bold">Reliability</div>
+            </Col>
+            <Col>
+              <div class="font-weight-bold">Number of items</div>
+            </Col>
+            <Col>
+                <div class="font-weight-bold">Expected comparisons per judge</div>
+            </Col>
+            <Col>
+              <div class="font-weight-bold">Number of answers</div>
+            </Col>
+            <Col>
+                <div class="font-weight-bold">Number of judges</div>
+            </Col>
+        </Row>
+        <Row class="align-start" noGutters style="width:100%; border-top: 1px solid #aaa;">
+            <Col>
+              <div class="">N/A</div>
+            </Col>
+            <Col>
+              <div class="">{survey?.items.length}</div>
+            </Col>
+            <Col>
+                <div class="">{survey?.expectedComparisons}</div>
+            </Col>
+            <Col>
+              <div class="">{answerValues.length}</div>
+            </Col>
+            <Col>
+                <div class="">{judgeCount}</div>
+            </Col>
+        </Row>
+    </div>
+    
+    <ButtonGroup mandatory tile activeClass="primary-color" bind:value={currentContentView}>
+        <ButtonGroupItem value="rawdata">Raw data</ButtonGroupItem>
+    </ButtonGroup>
+
     {/if}
 
     
@@ -507,8 +567,15 @@ import { surveyItemFileService } from "../Services/SurveyItemFileService";
                 tableAttributes={answerHeaders}
                 element={rawDataWrapper}
             />
+        {:else if answerValues != null && answerValues.length == 0}
+            <Table
+            bind:tableData={answerValues}
+            bind:userInfo
+            tableAttributes={answerHeaders}
+            element={rawDataWrapper}
+            />
         {:else}
-            <h3>
+            <h3 class="text-h5">
                 This survey is yet to be answered. Come back once you've
                 gathered some participants, or taken the test yourself!
             </h3>

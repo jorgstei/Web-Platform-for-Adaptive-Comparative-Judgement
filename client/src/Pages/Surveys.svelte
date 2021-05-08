@@ -25,7 +25,6 @@
         filterName: "dateCreated",
         counter: 0,
     };
-    console.log("in surveys");
     let dataHeaders = [
         {
             fieldName: "title",
@@ -86,7 +85,7 @@
         if (userInfo == null) {
             return;
         } else {
-            console.log("userinfo in surveys", userInfo);
+            console.log("In surveys. User has info:", userInfo);
         }
     });
 

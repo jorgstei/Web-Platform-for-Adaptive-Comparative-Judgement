@@ -38,10 +38,6 @@
                 )
             }
         })
-        let table = document.getElementsByClassName("main_table")[0];
-        if(table){
-            console.log("Table width: ", table.style);
-        }
     })
 
     function filter(){
@@ -60,7 +56,7 @@
             loadingData = false;
         })
         userService.refreshToken().then(res => res?.status == 200 ? userInfo = res.data : userInfo = null)
-        console.trace()
+        //console.trace()
     }
 
     function updatedFilterBy(){

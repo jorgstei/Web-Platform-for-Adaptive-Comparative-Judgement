@@ -106,19 +106,19 @@
                 Home
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
-                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/admin_board/profile")} value="Board">
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/admin_board/profile")} value="Board">
                     Board
                 </ListItem>
             {/if}
-            <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/about")} value="About">
+            <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/about")} value="About">
                 About
             </ListItem>
             {#if userInfo != null && userInfo.role !== "judge"}
-                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => logout()} value="Log out">
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => logout()} value="Log out">
                     Log out
                 </ListItem>
             {:else}
-                <ListItem role="button" ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/login")} value="Log in">
+                <ListItem ripple={false} style="margin: 0; padding: 0 0 0 8;" on:click={() => navigateWithRefreshToken("/login")} value="Log in">
                     Log in
                 </ListItem>
             {/if}

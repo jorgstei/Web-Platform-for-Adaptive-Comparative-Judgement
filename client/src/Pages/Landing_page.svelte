@@ -44,7 +44,6 @@
         document.getElementsByTagName("body")[0].style.overflowY = "hidden";
 		document.getElementsByTagName("body")[0].style.overflowX = "hidden";
 		selectedNavbarListValue = "Home";
-		console.log("Set selectednavbar", selectedNavbarListValue);
     })
     onDestroy(()=>{
         document.getElementsByTagName("body")[0].style.overflowY = "scroll";

@@ -20,7 +20,6 @@
     export let userInfo = undefined
     export let itemName = "item";
     export let selectedMenuListValue;
-    console.log("in table",tableData)
 
     async function updateFilterBy(e, attr){
         if(!attr.fieldName==""){
@@ -34,7 +33,7 @@
         
     }
     function printTableData(){
-        console.log("tableData in Table:",tableData)
+        console.log("Updated tableData in Table: ",tableData)
     }
     $: tableData && printTableData()
     $: tableAttributes
@@ -51,7 +50,7 @@
     }
 
     console.log("refresh")
-    let logDir = ()=> console.log("Dir is: ", dir);
+    let logDir = ()=> console.log("Direction changed. It is currently: ", dir);
 
     $:dir && logDir();
     

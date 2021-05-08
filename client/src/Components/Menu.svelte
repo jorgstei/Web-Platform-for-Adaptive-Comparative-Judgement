@@ -17,7 +17,6 @@
     export let warningOnLeaveFunc;
     export let selectedMenuListValue;
 
-    console.log("allow and func in menu", allowLeavePageWithoutWarning, warningOnLeaveFunc);
     const menuItems = [
         {
             text:"Account", icon: mdiAccount, to:"profile", requireAdmin: false
@@ -35,7 +34,7 @@
             text:"Surveys", icon: mdiBookMultiple, to: "surveys", requireAdmin: false
         },
     ]
-    console.log("in menu", userInfo)
+    console.log("In menu. User has info:", userInfo)
     
     
     let navigateTo = (to) => {

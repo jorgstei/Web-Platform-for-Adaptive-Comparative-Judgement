@@ -21,7 +21,6 @@ import { onMount } from "svelte";
   export let selectedNavbarListValue;
 
   onMount(()=>{
-    console.log("Set selected navbar to board");
     selectedNavbarListValue = "Board";
   })
 
@@ -51,7 +50,7 @@ import { onMount } from "svelte";
           <Surveys bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:selectedMenuListValue/>
         </Route>
         <Route path="create_survey">
-          <CreateSurvey bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc disableFields={false} bind:selectedMenuListValue/>
+          <CreateSurvey bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc disableFields={false} bind:selectedMenuListValue bind:selectedNavbarListValue/>
         </Route>
         <Route path="survey_data">
           <RawSurveyData bind:userInfo={userInfo} bind:allowLeavePageWithoutWarning/>

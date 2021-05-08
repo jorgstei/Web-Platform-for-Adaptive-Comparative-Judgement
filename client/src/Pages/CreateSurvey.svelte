@@ -33,6 +33,7 @@
   export let disableFields = false;
   export let warningOnLeaveFunc;
   export let selectedMenuListValue;
+  export let selectedNavbarListValue;
 
   const actualWarningOnLeaveFunc = (link) => {
     //console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
@@ -42,6 +43,7 @@
       let linkDivided = link.split("/");
       let lastPathInLink = linkDivided[linkDivided.length-1];
       //Change selectedMenuListValue such that the right tab gets focused in 
+      console.log("Last path in link", lastPathInLink);
       switch (lastPathInLink) {
         case "surveys":
           selectedMenuListValue = "Surveys"
@@ -76,6 +78,7 @@
         }
         else{
           selectedMenuListValue = "Create Survey";
+          selectedNavbarListValue = "Board";
         }
       });
     }

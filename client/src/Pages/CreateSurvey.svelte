@@ -36,14 +36,11 @@
   export let selectedNavbarListValue;
 
   const actualWarningOnLeaveFunc = (link) => {
-    //console.log("rights in warning on leave", userIsAllowedToManageMembers, disableFields);
-    console.log("navigating with link:", link);
     //Make sure that user actually has the rights to change anything before warning them about possible discarded changes
     if(userIsAllowedToManageMembers || !disableFields){
       let linkDivided = link.split("/");
       let lastPathInLink = linkDivided[linkDivided.length-1];
       //Change selectedMenuListValue such that the right tab gets focused in 
-      console.log("Last path in link", lastPathInLink);
       switch (lastPathInLink) {
         case "surveys":
           selectedMenuListValue = "Surveys"
@@ -64,7 +61,6 @@
           selectedMenuListValue = "Create Survey"
           break;
       }
-      //console.log("Selected menu list value in create survey", selectedMenuListValue);
       swal({
         title: "Are you sure?",
         text: "Are you sure you want to discard your new survey? All unpublished changes will be lost.",
@@ -167,7 +163,6 @@
             editedArr: [],
         };
         surveyOptions.push(data);
-        console.log("mytag surveyOptions in addSurveyOption:", surveyOptions);
 
         submitButtonFunctions.push({
             addtype: "surveyItem",
@@ -177,38 +172,29 @@
                     return e.uuid == uuid;
                 });
                 if (foundObject != null && foundObject != undefined) {
-                    console.log("mytag foundObject.editedArr: ", foundObject.editedArr);
                     if (foundObject.created == false && Object.keys(foundObject.editedArr).length == 0) {
-                        console.log("mytag not created, no editedArr", foundObject);
                         return Promise.resolve();
                     } else if (foundObject != null && foundObject != undefined && foundObject.created == true) {
-                        console.log("mytag created: ", foundObject);
                         return surveyService.uploadFile(foundObject.data, surveyId, foundObject.tag);
                     } else if (foundObject != null && foundObject != undefined && Object.keys(foundObject.editedArr).length > 0) {
-                        console.log("mytag editedArr: ", foundObject);
                         let promises = [];
                         for (let fieldName in foundObject.editedArr) {
-                            console.log("mytag2, patching with: ", fieldName, " value: ", foundObject[fieldName]);
                             promises.push(surveyItemFileService.patch(fieldName, foundObject[fieldName], foundObject._id));
                         }
 
                         return promises;
                     } else {
-                        console.error("mytag DOING ABSOLUTELY NOTHING");
                         return Promise.reject(new Error("Could not find data to upload"));
                     }
                 } else {
-                    console.error("Failed to find surveyOption to upload");
                     return Promise.reject(new Error("Could not find data to upload"));
                 }
             },
         });
         surveyOptions = surveyOptions;
-        console.log("submitButtonFunctions", submitButtonFunctions);
     };
 
   const removeSurveyOption = (option) => {
-    console.log("Trying to remove item: ", option);
     const index = surveyOptions.findIndex((e) => e == option);
     if (index > -1) {
       const submitFunctionIndex = submitButtonFunctions.findIndex((e) => {
@@ -216,8 +202,6 @@
       });
       if (submitFunctionIndex > -1) {
         submitButtonFunctions.splice(submitFunctionIndex, 1);
-      } else {
-        console.error("Unable to find submitButtonFunction even though surveyObject exists");
       }
       const _id = surveyOptions[index]._id;
       if (surveyOptions[index].created == false) {
@@ -229,8 +213,6 @@
         });
       }
       surveyOptions.splice(index, 1);
-    } else {
-      console.error("Tried removing surveyOption but could not find it in array.");
     }
     surveyOptions = surveyOptions;
   };
@@ -241,7 +223,6 @@
     if (editing) {
       let params = queryString.parse(window.location.search);
       surveyID = params.id;
-      console.log("SurveyID from CreateSurvey.svelte: ", surveyID);
 
       let labels = [...document.getElementsByTagName("label")];
       labels.forEach((e) => {
@@ -250,7 +231,6 @@
 
       // Get survey and set variables
       await surveyService.getSurveyByID(surveyID).then(async (data) => {
-        console.log("surveydata in create_survey", data);
         if (data.status == 200) {
           data = data.data;
           surveyTitleValue = data.title;
@@ -282,13 +262,9 @@
             userIsAllowedToManageMembers = false;
           }
 
-          console.log("Survey researcher", surveyResearchers);
           surveyResearchers = surveyResearchers;
           
-
-          console.log("compobj:", data.items);
           for (let item of data.items) {
-            console.log("optionbox", data);
             /*
                 Special case for plain text items.
                 As they are small compared to images or PDFs, AND they otherwise can't convey
@@ -312,7 +288,7 @@
                                         item.fileName
                                     );
                                 } else {
-                                    console.error("Couldn't load view of item.");
+                                    swal("Error", "Couldn't load view item data.", "error");
                                 }
                             });
                         } else {
@@ -331,7 +307,7 @@
                                         item.fileName
                                     );
                                 } else {
-                                    console.error("Couldn't load view of item.");
+                                  swal("Error", "Couldn't load view item data.", "error");
                                 }
                             });
                         }
@@ -372,21 +348,13 @@
             surveyQuestion: surveyQuestionValue,
             expectedComparisons: parseInt(comparisonsPerJudge, 10),
             judgeInstructions: judgeInstructionsValue,
-            internalDescription: internalDescriptionValue,
+            internalDescription: internalDescriptionValue == "" ? " " : internalDescriptionValue,
             purpose: selectedPurpose,
             mediaType: selectedMediaType,
             active: selectedActiveLevel === "1",
             items: optionsData,
             owners: surveyResearchers,
         };
-
-        console.log("CREATE SURVEY INFO OBJ", info);
-        /*
-        info.items.forEach(item=>{
-            console.log(item);
-            validateFileType(item.data, item.mediaType);
-        })
-        */
 
         let [everyFieldFilled, errorMessage] = validateFormInputs(info);
 
@@ -453,12 +421,10 @@
                             .then((data) => {
                                 if (data.status < 300) {
                                     data = data.data;
-                                    console.log("surveyService put data: ", data);
                                     const survey_link =
                                         window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + surveyID;
                                     let dummy = document.getElementById("dummy");
                                     dummy.value = survey_link;
-                                    //console.log("Navigator object: ", navigator, "\nNavigator.clipboard", navigator.clipboard);
 
                                     navigator.clipboard
                                         .writeText(survey_link)
@@ -483,7 +449,6 @@
                                 }
                             })
                             .catch((err) => {
-                                console.log(err);
                                 swal(
                                     "Failed to edit survey.",
                                     "Error:\n" +
@@ -505,9 +470,8 @@
                                         itemFileResponses.push(e.func(data.loc));
                                     });
                                     await Promise.all(itemFileResponses).catch((error) =>
-                                        console.error("Error when posting item files:", error)
+                                        swal("Error", "Error creating survey.", "error")
                                     );
-                                    console.log("postSurvey data: ", data);
                                     const survey_link = window.location.href.split("/admin_board")[0] + "/survey?takeSurvey=1&surveyID=" + data.loc;
 
                                     let dummy = document.getElementById("dummy");
@@ -532,7 +496,6 @@
                                 }
                             })
                             .catch((err) => {
-                                console.log(err);
                                 swal(
                                     "Failed to create survey.",
                                     "Please try again, and contact an administator if it still doesn't work. Error:\n" + err,
@@ -570,6 +533,11 @@
                 }
             }
         }
+        for(let i = 0; i < surveyOptions.length; i++){
+          if(surveyOptions[i]?.data == undefined || surveyOptions[i]?.data == null || surveyOptions[i]?.data == ""){
+            return [false, "One of the items does not have a value"];
+          }
+        }
         return [true, ""];
     };
 
@@ -581,14 +549,11 @@
         }
         const input = e.target.value;
         const parsed = parseInt(input, 10);
-        console.log("validating expected comparisons with input", input);
         if (isNaN(parsed) && input !== "") {
-            console.log("validateExpectedComparisons invalid input:", input);
             e.target.value = 1;
             return;
         } else if (typeof parsed == "number") {
             const max = getAmountOfUniqueComparisons(surveyOptions.length);
-            console.log("parsed is: ", parsed, "max is", max);
             if (parsed > max) {
                 comparisonsPerJudge = max;
             } else if (parsed < 0) {
@@ -597,28 +562,10 @@
         }
     }
 
-    const validateFileType = (file, expectedFiletype) => {
-        console.log("validating file type with file", { expectedFiletype, file });
-        if (expectedFiletype == "text") {
-            console.log("it was just text");
-            return true;
-        } else {
-            if (expectedFiletype == "pdf") {
-                console.log("file should be pdf");
-                console.log(file.type, file.type === "application/pdf");
-            } else if (expectedFiletype == "image") {
-                console.log("file should be img");
-                console.log(file.type, file.type === "application/image/*");
-            }
-        }
-    };
-
     // Adds a new card for a researcher. This function is not responsible for the database call.
     const addResearcher = (researcher) => {
-      //console.log("researcher in add researcher: ", researcher);
       if (researcher != null && researcher != undefined) {
           if (surveyResearchers.find((e) => e.owner_email == researcher.email) === undefined) {
-              console.log("researcher is not already added", researcher, " vs ", surveyResearchers);
               surveyResearchers.push({
                   ownerId: researcher._id,
                   owner_email: researcher.email,
@@ -630,7 +577,6 @@
                   },
               });
               surveyResearchers = surveyResearchers;
-              console.log("added researcher to surveyResearchers", surveyResearchers);
               search_term = "";
               searchResults = [];
           }
@@ -645,43 +591,26 @@
     };
     //Removes researcher based on whether their email matches
     const removeResearcher = (researcherEmail) => {
-        //console.log("Survey researchers before deletion: ", surveyResearchers);
         let index = surveyResearchers.findIndex((e) => {
             return researcherEmail === e.owner_email && !e.obligatory;
         });
-        console.log(index, surveyResearchers);
         surveyResearchers.splice(index, 1);
         surveyResearchers = surveyResearchers;
-        console.log("Survey researchers after deletion: ", surveyResearchers);
-    };
-
-    const changeResearcherRights = (e, rightToChange) => {
-        let researcherEmailWithCheckBox = e.target.parentElement.parentElement.parentElement.childNodes[0].childNodes[0].innerHTML;
-        let index = surveyResearchers.findIndex((e) => {
-            return e.owner_email == researcherEmailWithCheckBox;
-        });
-        surveyResearchers[index].rights[rightToChange] = !surveyResearchers[index].rights[rightToChange];
-        console.log("CHANGED RESEARCHERS RIGHT", rightToChange, "TO: ", surveyResearchers[index].rights);
     };
 
     const searchForUsers = (e) => {
-        console.log("searching for ", search_term);
         if (search_term !== undefined && search_term !== "" && search_term !== oldSearchTerm) {
             const timeSinceLastSearch = new Date().getTime() - epochMsAtLastSearch;
-
-            console.log("epochMsAtLastSearch:", epochMsAtLastSearch, ", timeSinceLastSearch:", timeSinceLastSearch, "keyCode: ", e.keyCode);
             //Check that the search string is at least 3 chars long, is different than the last search term
             //and that at least half a second has gone by since the last search, or that the user manually hit enter to search
             //this is to reduce stress on the backend, save on bandwith and otherwise improve the latency of searching.
             if ((search_term.length > 2 && timeSinceLastSearch > 500) || (e.keyCode === 13 && timeSinceLastSearch > 500)) {
                 oldSearchTerm = search_term;
                 epochMsAtLastSearch = new Date().getTime();
-                console.log("Searching for: ", search_term);
                 userService
                     .search(search_term, { limit: 5 })
                     .then((result) => {
                         if (result.status < 300) {
-                            console.log("Search result: ", result);
                             searchResults = result.data;
                             if (searchResults.length == 0) {
                                 searchHint = "No results for " + search_term;
@@ -690,16 +619,14 @@
                             }
                         }
                     })
-                    .catch((err) => console.log(err));
+                    .catch((err) => swal("Error Searching", "An error occured while searching for users, please try again.", "error"));
             }
         } else {
-            console.log("Search term was ", search_term);
             if (search_term !== oldSearchTerm) searchResults = [];
         }
     };
     //Searches for researchers when the user hits enter in the search field
     const checkIfAddResearcherByEnter = (e) => {
-        //console.log("in checkifadd researcher with keycode", e);
         if (e.keyCode == 13) {
             searchForUsers(e);
         }
@@ -777,19 +704,11 @@
     }
 
     const ruleValidateFieldFilled = (v) => {
-        console.log("test result:", v);
         return v.length > 0 || "Field is obligatory";
-    };
-    let fieldFilledRules = [ruleValidateFieldFilled];
-
-    const activateRules = (value) => {
-        console.log("blurred with val", value);
-        value = value;
     };
 
   // Updates owners of the survey in the database
   const changeMembers = () => {
-    console.log("Changing members", surveyResearchers, surveyID);
     surveyService.putOwners(surveyID, surveyResearchers)
     .then(res=>{
       if(disableFields && userIsAllowedToManageMembers){
@@ -907,7 +826,6 @@
       hint="*Required"
       disabled={disableFields}
       bind:value={surveyTitleValue}
-      on:focus={() => console.log("title got focused")}
     >
       <div slot="append">
         <Tooltip top bind:active={showSurveyTitleTooltip}>

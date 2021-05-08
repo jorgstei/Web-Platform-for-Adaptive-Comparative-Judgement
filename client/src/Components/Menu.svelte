@@ -48,7 +48,7 @@
 </script>
 
 {#if userInfo != null && userInfo != undefined}
-<NavigationDrawer bind:mini={collapsedMenu} style="position:fixed; padding-bottom: 10vh; margin-top:5vh;padding-top:5vh;z-index:2;" miniWidth="4vw;">
+<NavigationDrawer bind:mini={collapsedMenu} style="position:fixed; padding-bottom: 10vh; margin-top:5vh;padding-top:5vh;z-index:2; background-color: #fcfcfc" miniWidth="4vw;">
 
 
         <div class="d-flex flex-row justify-space-between">

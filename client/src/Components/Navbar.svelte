@@ -4,6 +4,7 @@
     import {AppBar, List, ListItemGroup, ListItem, Icon, Button} from "svelte-materialify"
     import { mdiInformationOutline } from "@mdi/js";
     import { onMount } from "svelte";
+    import clamp from "clamp-js"
 
     export let refreshToken;
     export let userInfo;
@@ -12,6 +13,10 @@
     export let allowLeavePageWithoutWarning = true;
     export let warningOnLeaveFunc;
     export let selectedNavbarListValue;
+    export let surveyQuestionInNavBar = "";
+
+    
+
     /*
         Allow tab navigation to click the elements with space or enter
         This will affect both "Navbar" items and "Menu" items.
@@ -27,6 +32,7 @@
 
     onMount(() => {
         makeNavBarElementsTabbable();
+        clampSurveyQuestion();
     })
 
     const navigateWithRefreshToken = (to) => {
@@ -79,6 +85,16 @@
             e.target.click()
         }
     }
+
+    const clampSurveyQuestion = () => {
+        let questionContainer = document.getElementById("navbar-surveyquestion")
+        if(questionContainer != undefined && questionContainer != null){
+            console.log("FINDME clampSurveyQuestion")
+            clamp(questionContainer, {clamp: 1})
+        }
+    }
+
+    $: surveyQuestionInNavBar && clampSurveyQuestion();
     //Changes to userInfo might trigger the navbar to change state, 
     //because of this we need to update the new elements to support tab navigation
     $: userInfo && makeNavBarElementsTabbable();
@@ -86,13 +102,15 @@
     $: selectedNavbarListValue;
 </script>
 
-
-<AppBar class=" d-flex flex-row align-content-right justify-content-right" style="position:fixed;width:100%; padding:0;">
-    <div slot="icon" style="height:100%; width:auto; cursor: pointer;" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
+<div class="navbar" style="position:fixed;width:100%; padding:0; height: 56px;">
+    <div style="height:100%; width:auto; cursor: pointer; padding-left: 1vw" on:click={()=>{takingSurvey = false; showJudgeOverlay = false; navigate("/")}}>
         <img src="/img/Compair.svg" style="height: 100%; width:100%; min-height:50%;" alt="Compair logo"/>
     </div>
     
     {#if takingSurvey}
+        <div id="navbar-surveyquestion">
+            {surveyQuestionInNavBar}
+        </div>
         <div style="position:fixed; right:1vw;">
             <Button outlined on:click={()=>{showJudgeOverlay = true}}>
                 <Icon size="1.5vw" path={mdiInformationOutline}></Icon>
@@ -126,8 +144,28 @@
         </ListItemGroup>
     </List>
     {/if}
-</AppBar>
+</div>
 
 <style>
-
+    .navbar{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #f5f5f5;
+        z-index: 5;
+    }
+    #navbar-surveyquestion {
+        display:block; 
+        align-items: center; 
+        justify-content: center; 
+        font-size:x-large;
+        text-align: center;
+        text-overflow: ellipsis;
+        padding-top: 10px;
+        overflow: hidden; 
+        width: calc(90% - 364px);
+        height: 56px;
+        max-height: 56px;
+        white-space: nowrap;
+    }
 </style>

@@ -41,13 +41,9 @@
 		}
 	}
 	onMount(()=>{
-        document.getElementsByTagName("body")[0].style.overflowY = "hidden";
-		document.getElementsByTagName("body")[0].style.overflowX = "hidden";
 		selectedNavbarListValue = "Home";
     })
     onDestroy(()=>{
-        document.getElementsByTagName("body")[0].style.overflowY = "scroll";
-		document.getElementsByTagName("body")[0].style.overflowX = "scroll";
     })
 	$:selectedNavbarListValue;
 </script>

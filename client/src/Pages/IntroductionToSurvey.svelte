@@ -78,7 +78,7 @@
                     <div class="text--primary text-h4 mt-4">
                         You can also use the arrow keys to choose between options:
                         <br>
-                        <img style="height: 10vh; width:auto; margin-top:1vh;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
+                        <img style="height: 10vh; width:auto; margin-top:1vh;"src="/img/arrowKeys.PNG" alt="You can also use the arrow keys to choose between options.">
                     </div>
                 </CardText>
             </Card>
@@ -117,14 +117,14 @@
                 <div class="extra-info-text mt-4" style="justify-self: center">
                     You can also use the arrow keys to choose between options:
                     <br>
-                    <img style="height: 10vh; width:auto; margin-top:1vh; align-self: center;"src="../img/arrowKeys.png" alt="You can also use the arrow keys to choose between options.">
+                    <img style="height: 10vh; width:auto; margin-top:1vh; align-self: center;"src="/img/arrowKeys.PNG" alt="You can also use the arrow keys to choose between options.">
                 </div>
             </div>
         </div>
         </Card>
     </div>
     <Button outlined style="width: 30%; height: 5vh; margin-top: 2.5vh; margin-bottom:5vh;" class="align-self-center" 
-        on:click={() => {showJudgeOverlay = !showJudgeOverlay}}
+        on:click={() => {showJudgeOverlay = false;  setTimeout(() => {window.scrollTo(0,0); console.log("FINDME scrolling")}, 300)}}
     >Continue</Button>      
     </div>
 </main>
@@ -134,7 +134,7 @@
         overflow-y: auto;
         height: 100%;
         text-align: center;
-        margin: auto;
+        margin: 0;
         width: 100%;
         padding: 0
     }
@@ -162,10 +162,10 @@
     /* Medium Screens (laptops, desktops)*/
     @media (min-width: 769px) and (max-width: 1199px) {
         .question-header {
-            font-size: 3.5rem;
+            font-size: 3rem;
         }
         .question-text {
-            font-size: 2.5rem;
+            font-size: 2.25rem;
         }
         .instruction-text, .extra-info-text  {
             font-size: 1.25rem;
@@ -174,10 +174,10 @@
     /* Large Screens (1200p and above)*/
     @media (min-width: 1200px) {
         .question-header {
-            font-size: 4.5rem;
+            font-size: 3.5rem;
         }
         .question-text {
-            font-size: 3.5rem;
+            font-size: 3rem;
         }
         .instruction-text, .extra-info-text  {
             font-size: 1.5em;

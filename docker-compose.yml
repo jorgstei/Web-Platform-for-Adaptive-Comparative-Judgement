@@ -10,7 +10,7 @@ services:
     env_file: ./server/.env
     ports:
       #Bind ports for REST-API
-      - "xyz:xyz"
+      - "3000:3000"
     volumes:
       #Bind a volume for your certificates
       - /etc/letsencrypt/archive/yourdomain:/project/certs
@@ -20,7 +20,7 @@ services:
     build: ./client
     ports:
       #Bind ports for frontend
-      - "zyx:zyx"
+      - "443:5000"
     depends_on: 
       - acj-db
       - acj-backend

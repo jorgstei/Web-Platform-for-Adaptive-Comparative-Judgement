@@ -5,7 +5,7 @@
     import IntroductionToSurvey from "./IntroductionToSurvey.svelte"
     import {navigate} from "svelte-routing";
     import {navigateWithRefreshToken} from "../Utility/naviagte"
-    import { afterUpdate, onDestroy, onMount } from "svelte";
+    import { afterUpdate, beforeUpdate, onDestroy, onMount } from "svelte";
     import swal from "sweetalert";
     import { Button, Card, CardText, Overlay, Icon, CardActions, ProgressLinear } from 'svelte-materialify';
     import { fade, fly } from 'svelte/transition';
@@ -30,6 +30,7 @@
     export let surveyID;
     export let takingSurvey;
     export let showJudgeOverlay = false;
+    export let surveyQuestionInNavBar = "";
 
     let question = undefined
     let completed = false
@@ -104,6 +105,7 @@
     }
 
     onMount(async () => {
+        document.ontouchmove = () => e.preventDefault();
         let params = queryString.parse(window.location.search);
         if(params?.takeSurvey == 1 && params?.surveyID != undefined){
             surveyID = params.surveyID;
@@ -123,6 +125,7 @@
                             console.log("Survey data from onMount in survey: ", surveyData);
                             question = surveyData.surveyQuestion;
                             survey = surveyData;
+                            surveyQuestionInNavBar = question;
                         }
                         else{
                             swal("Error", "An error occured while getting the survey information. Please retry, and if the problem persists contact an administrator.\nResponse: "+surveyData.data.message, "error").then(() => navigate("/"))
@@ -234,6 +237,9 @@
     onDestroy(()=>{
         takingSurvey = false;
         showJudgeOverlay = false;
+        document.ontouchmove = (e) => {
+            return true;
+        }
     })
     
 
@@ -267,32 +273,83 @@
     })
 
     afterUpdate(() => {
+        let height = window.height;
+        let width = window.width;
+        window.resizeTo(width-1, height-1);
         clampText();
+        window.scrollTo(0,1);
+        window.resizeTo(height, width);
+    }) 
+    beforeUpdate(() => {
+        let height = window.height;
+        let width = window.width;
+        console.log("FINDME beforeupdate")
+        window.resizeTo(width-1, height-1);
+        window.scrollTo(0,1);
+        window.resizeTo(height, width);
     })
-    
 
     $: survey;
     // apply to left and right cards for animation, currently messes up rerendering pdfs
     // in:fly={{ x: -transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: -transition_x, duration: out_duration, delay:out_delay}}
     // in:fly={{ x: transition_x, duration: in_duration, delay:in_delay }} out:fly={{ x: transition_x, duration: out_duration, delay:out_delay}}
 </script>
+<Overlay
+bind:active={showJudgeOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default;"
+>
+<IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
+</Overlay>
+
+<!--Add new media types with {:else if ...} Remember to do this to both left and right card-->
+<!--Left overlay-->
+{#if randomPair.length != 0 && randomPair[counter] != undefined}
+<Overlay
+bind:active={showLeftItemOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default; z-index: 999;">
+    <div class="overlay-item">
+        {#if randomPair[counter].left.type == "plain"}
+        <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
+        {:else if randomPair[counter].left.type == "pdf"}
+        <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100%" height="90%"></PDFView>
+        {/if}
+        <div style="display: flex; align-content: center; justify-content: center;">
+            <Button style="margin: 1%" outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
+        </div>
+    </div>
+</Overlay>
+
+<!--Right overlay-->
+<Overlay
+bind:active={showRightItemOverlay}
+opacity={1}
+color={"#eee"}
+style="cursor:default;">
+<div class="overlay-item">
+    {#if randomPair[counter].right.type == "plain"}
+        <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
+    {:else if randomPair[counter].right.type == "pdf"}
+        <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100%" height="90%"></PDFView>
+    {/if}
+    <div style="display: flex; align-content: center; justify-content: center;">
+        <Button style="margin: 1%" outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
+    </div>
+</div>
+</Overlay>
+{/if}
 <main id="surveyWrapper" tabindex="0">
     {#if counter < maxCounter}
     {#key counter}
     
     <div style="width:100%; margin:auto;">
-        <ProgressLinear value={progressPercent} height="1vh"></ProgressLinear>
+        <ProgressLinear id="survey-progressbar" value={progressPercent} height="1vh"></ProgressLinear>
         <p class="text-h6" style="text-align:center">{"Comparison " + (counter+1) + "/"+maxCounter}</p>
     </div>
 
-    <Overlay
-        bind:active={showJudgeOverlay}
-        opacity={1}
-        color={"#eee"}
-        style="cursor:default;"
-    >
-    <IntroductionToSurvey bind:survey={survey} bind:showJudgeOverlay={showJudgeOverlay}/>
-    </Overlay>
     <div id="container" class="d-flex flex-row justify-space-between">
         <!-- Add new media types with {:else if ...} Remember to do this to both left and right card-->
         {#if randomPair.length != 0 && randomPair[counter] != undefined}
@@ -302,24 +359,8 @@
                     <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].left.type == "plain"}
                             <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].left.data}></TextView>
-                            <Overlay
-                            bind:active={showLeftItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].left.data}></TextView>
-                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {:else if randomPair[counter].left.type == "pdf"}
                             <PDFView src={randomPair[counter].left.data} iframeId="lefOption" width="100%" height="100%"></PDFView>
-                            <Overlay
-                            bind:active={showLeftItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <PDFView src={randomPair[counter].left.data} iframeId="lefOptionOverlay" width="100vw" height="90vh"></PDFView>
-                                <Button outlined on:click={()=>showLeftItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {/if}
                     </div>
                     <CardActions>
@@ -332,26 +373,9 @@
                     <div style="float: right; cursor:pointer; margin:0;padding:0;" on:click={()=>showRightItemOverlay = true}><Icon path={mdiFullscreen}></Icon></div>
                     <div style="text-align: center; display:flex; align-items: center; justify-content: center; height:85%; margin: auto;">
                         {#if randomPair[counter].right.type == "plain"}
-                        <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
-                            <Overlay
-                            bind:active={showRightItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <TextView class="overlay-item card-text-scale" style="overflow: auto" textID={randomPair[counter].right.data}></TextView>
-                                <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
-                            </Overlay>
+                            <TextView class="card-text card-text-scale" style="overflow: hidden; height:100%" textID={randomPair[counter].right.data}></TextView>
                         {:else if randomPair[counter].right.type == "pdf"}
                             <PDFView src={randomPair[counter].right.data} iframeId="rightOption" width="100%" height="100%"></PDFView>
-
-                            <Overlay
-                            bind:active={showRightItemOverlay}
-                            opacity={1}
-                            color={"#eee"}
-                            style="cursor:default;">
-                                <PDFView src={randomPair[counter].right.data} iframeId="rightOptionOverlay" width="100vw" height="90vh"></PDFView>
-                                <Button outlined on:click={()=>showRightItemOverlay = false}>Continue</Button>
-                            </Overlay>
                         {/if}
                     </div>
                     
@@ -368,6 +392,7 @@
             <h1 class="text-h2" style="margin-bottom:5vh;">Thank you for participating!</h1>
             <h2 class="text-h3">We greatly appreciate it :)</h2>
             <Button style="margin-top:5vh;" outlined on:click={()=>{
+                takingSurvey = false;
                 if(navwrap){
                     navwrap.style.display = "initial";
                 }
@@ -378,24 +403,23 @@
             }}>Return to home</Button>
         </div>
     {/if}
-
 </main>
 
 <style>
     .cardWrapper {
-        width:48%; height:100%;
-        transition: border 500ms ease-out;
+        width:48%; height:90%;
     }
     main {
-        margin:auto;
-        margin-top: 0;
-        width: 100vw;
-        max-width: 100%;
+        position:fixed;
+        margin:0;
+        width: 100%;
+        max-width: 100vw;
         height: 100%;
+        max-height: 100vh;
         overflow: hidden;
     }
     #container {
-        margin: auto;
+        margin: 0;
         padding-top: 0.5vh;
         width: 100%;
         height: 90%;
@@ -415,7 +439,11 @@
     }
     :global(.overlay-item){
         height: 90vh;
-        width: 90vw;
+        width: 95vw;
+        max-height: 90vh;
+        max-width: 100vw;
+        display: flex;
+        flex-direction: column;
         text-align: center;
         text-justify: center;
         align-content: center;

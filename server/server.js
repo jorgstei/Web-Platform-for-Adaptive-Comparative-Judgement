@@ -50,9 +50,8 @@ mongoose.connect(mongoConnectionString,
     })
 
 server.use(cors({
-    origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://acj.heroesunknown.net:5000", "http://compair.it.ntnu.no"
+    origin: ["http://localhost:5000", "http://127.0.0.1:5000", "http://compair.it.ntnu.no"
     , "https://compair.it.ntnu.no", "https://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:5000", "http://compair.it.ntnu.no:1030"
-    , "http://10.0.0.41", "http://10.0.0.41:5000"
     ],
     credentials: true
 }))
@@ -61,7 +60,7 @@ server.use(bodyParser.json({limit: "16mb"}))
 server.use(cookieParser())
 
 server.use(fileUpload({
-    debug: true,
+    debug: false,
     createParentPath: true,
     limits:{
         fileSize: 16 * 1024 * 1024, //16 MB file size limit TODO: Should this be part of server .env?

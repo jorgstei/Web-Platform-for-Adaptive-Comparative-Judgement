@@ -72,6 +72,13 @@ const auth = (req, res, next) => {
     }
 }
 
+/**
+ * @api {get} /logout
+ * @apiName GETLogout
+ * @apiGroup Auth
+ * @apiVersion 0.1.0
+ * @apiSuccess (200) 200 ok.
+ */
 router.get("/logout", async (req, res) => {
     res.set({
         "Cache-Control": "no-cache",
@@ -82,6 +89,13 @@ router.get("/logout", async (req, res) => {
     return;
 })
 
+/**
+ * @api {get} /logout/judge
+ * @apiName GETLogoutJudge
+ * @apiGroup Auth
+ * @apiVersion 0.1.0
+ * @apiSuccess (200) 200 ok.
+ */
 router.get("/logout/judge", async (req, res) => {
     res.set({
         "Cache-Control": "no-cache",
@@ -92,6 +106,17 @@ router.get("/logout/judge", async (req, res) => {
     return;
 })
 
+/**
+ * @api {post} /login
+ * @apiName POSTLogin
+ * @apiGroup Auth
+ * @apiVersion 0.1.0
+ * @apiSuccess (200) {String} email The authorized users email
+ * @apiSuccess (200) {String} userid The authorized users id
+ * @apiSuccess (200) {String} role The authorized users role
+ * @apiError (401) {String} message Occurs when username or password is wrong.
+ * @apiError (500) {String} message Internal Server Error.
+ */
 router.post("/login", async (req, res) => {
     console.log("Called get /login")
     console.log("login body: ", req.body)
@@ -129,11 +154,21 @@ router.post("/login", async (req, res) => {
         }
         res.status(401).json({message: "Incorrect username or password"})
     } catch (error) {
-        console.log("Error: ", error)
+        console.log("Internal Server Error in /login route")
         res.status(500).json({message: "Internal Server Error"})
     }
 })
 
+/**
+ * @api {post} /refresh-token
+ * @apiName POSTRefreshToken
+ * @apiGroup Auth
+ * @apiVersion 0.1.0
+ * @apiSuccess (200) {String} email The authorized users email
+ * @apiSuccess (200) {String} userid The authorized users id
+ * @apiSuccess (200) {String} role The authorized users role
+ * @apiError (401) User is not logged in, no cookies received, or token has expired.
+ */
 router.post("/refresh-token", async (req, res) => {
     console.log("Called post /refresh-token")
     if (!req.headers.cookie) {
@@ -191,6 +226,16 @@ router.post("/refresh-token", async (req, res) => {
     }   
 })
 
+/**
+ * @api {post} /refresh-judge-token
+ * @apiName POSTRefreshJudgeToken
+ * @apiGroup Auth
+ * @apiVersion 0.1.0
+ * @apiSuccess (200) {String} email The authorized users email
+ * @apiSuccess (200) {String} userid The authorized users id
+ * @apiSuccess (200) {String} role The authorized users role
+ * @apiError (401) User is not logged in, no cookies received, or token has expired.
+ */
 router.post("/refresh-judge-token", async (req, res) => {
     const cookies = req.cookies
     if (cookies["judge-token"]) {
@@ -231,11 +276,21 @@ router.post("/refresh-judge-token", async (req, res) => {
     }
 })
 
+/**
+ * @api {post} /login/judge
+ * @apiName POSTLoginJudge
+ * @apiGroup Auth
+ * @apiVersion 0.1.0
+ * @apiParam (Body) requestedSurveyID The ID or assosiated PIN for the survey
+ * @apiSuccess (200) {String} email Always null for judges
+ * @apiSuccess (200) {String} userid Randomly generated ObjectId for anonymous judges
+ * @apiSuccess (200) {String} role Always "judge" for judges
+ * @apiError (401) {String} message Occurs when username or password is wrong.
+ */
 router.post("/login/judge", async (req, res) => {
     console.log("Called get /login/judge")
     const { requestedSurveyID } = req.body
     try {
-        //TODO actually use requestedSurveyID :)
         if (requestedSurveyID) {
             const now = new Date(Date.now())
             const exp = new Date(now)

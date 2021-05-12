@@ -170,16 +170,13 @@ router.post("/login", async (req, res) => {
  * @apiError (401) User is not logged in, no cookies received, or token has expired.
  */
 router.post("/refresh-token", async (req, res) => {
-    console.log("Called post /refresh-token")
     if (!req.headers.cookie) {
         res.sendStatus(401)
-        console.log("Sent status 401 because no cookies");
         return
     }
     const cookies = req.cookies
     if (!cookies["access-token"]) {
         res.sendStatus(401)
-        console.log("Sent status 401 because no cookies #2");
         return
     }
     if(cookies["access-token"]) {
@@ -187,14 +184,12 @@ router.post("/refresh-token", async (req, res) => {
             if (err) {
                 console.log(err)
                 res.sendStatus(401);
-                console.log("Sent status 401 couldnt verify");
                 return
             }
             else {
                 const userDoc = await User.findOne({ _id: decoded.userid })
                 if (!userDoc) {
                     res.sendStatus(401)
-                    console.log("Sent status 401 because no userDoc");
                     return
                 }
                 const now = new Date(Date.now())

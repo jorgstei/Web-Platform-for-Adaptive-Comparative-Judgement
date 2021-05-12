@@ -746,13 +746,11 @@ router.get("/function/sort", auth, async (req, res) => {
         res.status(403).json({ message: "Forbidden" });
         return;
     }
-    console.log("survey/function/sort called");
     const { field, skip, limit, direction } = req.query;
     const me_field = field.replace("$", "");
     const me_skip = Number(me(skip));
     const me_limit = Number(me(limit));
     const me_direction = Number(me(direction));
-    console.log(me_field);
 
     if (me_field === undefined || me_skip === undefined || me_field === "" || me_limit === undefined || me_direction === undefined) {
         res.status(400).json({ message: "Missing one of the required parameters." });
@@ -966,6 +964,20 @@ router.post("/function/search/:term", auth, async (req, res) => {
     }
 });
 
+/**
+ * @api {post} /survey/function/upload_item/:id
+ * @apiName POSTUploadItem
+ * @apiGroup Survey
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The suvey ID to upload the item to
+ * @apiParam (Query) tag The user defined tag for this item
+ * @apiParam (Body) file The fule to upload (must have valid mime-type, must be binary, convertible to Node Buffer)
+ * @apiSuccess (201) {String} loc The ID of the newly created Item File
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (422) message File not provided, or file size too large.
+ * @apiError (500) message Internal Server Error.
+ */
 router.post("/function/upload_item/:id", auth, async (req, res) => {
     if (
         !req.auth["user"]?.role === "admin" &&

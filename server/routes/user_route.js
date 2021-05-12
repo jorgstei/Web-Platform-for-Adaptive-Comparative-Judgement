@@ -42,7 +42,6 @@ function acceptablePassword(password, role) {
     Only for use with non-critical information such as email
 */
 function hashNoSalt(data) {
-    console.log("data", data);
     return sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(data));
 }
 /*
@@ -94,7 +93,6 @@ function createForgottenPasswordToken(to) {
     We verify the token and check that the email provided is the same as the one belonging to the account
 */
 async function verifyForgottenPassword(token, email) {
-    console.log("Verifying token...");
     return jwt.verify(token, process.env.JWTForgottenPasswordSecret, async (err, decoded) => {
         if (err) {
             console.log("Couldn't verify forgotten password token:", err);
@@ -145,7 +143,6 @@ async function verifyUserRegistration(token, email) {
  * @apiError (500) 500 Internal Server Error
  */
 router.get("/function/count", auth, async (req, res) => {
-    console.log("Get count of users");
     try {
         if (req.auth["user"]?.role !== "admin") {
             res.status(403).json({ message: "Forbidden" });
@@ -192,7 +189,6 @@ router.get("/function/sort", auth, async (req, res) => {
         return;
     }
     const { field, skip, limit, direction } = req.query;
-    console.log(req.query);
     const me_field = me(field);
     const me_skip = Number(me(skip));
     const me_limit = Number(me(limit));
@@ -231,7 +227,7 @@ router.get("/function/sort", auth, async (req, res) => {
             })
             .then((result) => res.json(result));
     } catch (error) {
-        console.log("Error sorting users:", error);
+        console.log("Error occured in GETUserSort");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -256,13 +252,11 @@ router.get("/function/sort", auth, async (req, res) => {
 router.post("/search/:term", auth, async (req, res) => {
     const term = req.params.term.replace("$", "");
     const regex = escapeStringRegexp(term);
-    console.log(req.body);
     const { limit } = me(req.body);
     if (regex.length > 64) {
         res.status(422).json({ message: "Max search term length is 64 characters." });
         return;
     }
-    var timeStart = process.hrtime();
     try {
         const users = await User.find({
             $or: [
@@ -276,11 +270,9 @@ router.post("/search/:term", auth, async (req, res) => {
             .select(["-hashed", "-salt"]);
         res.json(users);
     } catch (error) {
-        console.log("Error while searching users:", error);
+        console.log("Error occured in GETUserSearch.");
         res.status(500).json({ message: "Internal Server Error" });
     }
-    var timeEnd = process.hrtime(timeStart);
-    console.log("Search with term:", regex, ", took: ", timeEnd[1] / 1000000, "ms");
 });
 
 /**
@@ -294,9 +286,7 @@ router.post("/search/:term", auth, async (req, res) => {
  */
 router.post("/forgotten_my_password", async (req, res) => {
     const { email } = req.body;
-    console.log("Called forgotten my password with email:", email);
     const userDoc = await User.findOne({ email: { $eq: email } });
-    console.log("Forgotten my password userDoc: ", userDoc);
     if (userDoc?._id == null) {
         res.sendStatus(204); //We send 204 despite "not finding the user" in order to protect registered users emails
         return;
@@ -320,13 +310,12 @@ router.post("/forgotten_my_password", async (req, res) => {
             html: body_intro + body_invite_link + body_outro,
         };
         const emailResponse = await sendMail(emailOptions);
-        console.log("Mail response:", emailResponse);
         if (emailResponse.accepted.length == 0) {
             res.status(500).json({ message: "Failed to send mail to address: " + email });
         }
         res.sendStatus(204);
     } catch (error) {
-        console.log("forgotten password error: ", error);
+        console.log("Error occured in POSTForgottenPasswordLink");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -345,11 +334,9 @@ router.post("/forgotten_my_password", async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.patch("/forgotten_password", async (req, res) => {
-    console.log("User PATCH (forgotten) password");
     try {
         const { email, newPassword, token } = req.body;
         const [real, issuedAt] = await verifyForgottenPassword(token, email);
-        console.log("Real:", real, ", issuedAt:", issuedAt);
         //If the user supplied email address doesn't match with the one stored in the token, HTTP 422 and early return
         if (!real) {
             res.status(422).json({ message: "Wrong email provided." });
@@ -375,7 +362,7 @@ router.patch("/forgotten_password", async (req, res) => {
         userDoc.save();
         res.sendStatus(204);
     } catch (error) {
-        console.log(error);
+        console.log("Error occured in PATCHForgottenPassword.");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -399,7 +386,6 @@ router.post("/invite_link", auth, async (req, res) => {
     }
     const { email, role } = req.body;
     const userDoc = await User.findOne({ email: { $eq: email } });
-    console.log("user/invite_link, email:", email, "userDoc:", userDoc);
     if (userDoc?._id != null) {
         console.log("Tried inviting user that already exists");
         res.status(422).json({ message: "User with that email already exists." });
@@ -428,10 +414,9 @@ router.post("/invite_link", auth, async (req, res) => {
             html: body_intro + body_invite_link + body_outro,
         };
         const emailResponse = await sendMail(emailOptions);
-        console.log("Mail response:", emailResponse);
         res.status(204).json({ message: "Ok, No Content" });
     } catch (error) {
-        console.log("user registration error: ", error);
+        console.log("Error occured in POSTUserInviteLink.");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -452,7 +437,6 @@ router.post("/invite_link", auth, async (req, res) => {
  * @apiUse AuthMiddleware
  */
 router.get("/", auth, async (req, res) => {
-    console.log("Called get all for User");
     try {
         if (req.auth["user"]?.role !== "admin") {
             res.status(403).json({ message: "Forbidden" });
@@ -464,6 +448,7 @@ router.get("/", auth, async (req, res) => {
         }
         res.json(users);
     } catch (error) {
+        console.log("Error occured in GETAllUsers")
         res.status(404).json({ message: "Empty collection" });
     }
 });
@@ -485,7 +470,6 @@ router.get("/", auth, async (req, res) => {
  * @apiError (404) {String} message Could not find user.
  */
 router.get("/:id", auth, async (req, res) => {
-    console.log("Called get user by id");
     try {
         if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
             res.status(403).json({ message: "Forbidden" });
@@ -512,15 +496,12 @@ router.get("/:id", auth, async (req, res) => {
  * @apiParam {String} token    The token is generated when the user is invited and is part of the invite link.
  * @apiSuccess (201) {String} loc The newly created users ID
  * @apiPermission AdminOrResearcher
- * @apiUse AuthMiddleware
  * @apiError (403) {String} 403 Forbidden
- * @apiError (404) {String} message Could not find user.
  * @apiError (409) {String} Error This registration link has already been used.
+ * @apiError (422) {String} message Password too weak, wrong email provided or link has expired.
  */
 router.post("/", async (req, res) => {
-    console.log("called post one for User");
     const { email, password, firstName, lastName, token } = req.body;
-    console.log(req.body);
     const [real, role] = await verifyUserRegistration(token, email);
     if (!real || role == null) {
         res.status(422).json({ message: "Invite link has expired, or the wrong email was profided" });
@@ -550,7 +531,7 @@ router.post("/", async (req, res) => {
         }
         res.status(201).json({ loc: user._id });
     } catch (error) {
-        console.log("Eror creating user: ", error);
+        console.log("Error occured in POSTUser.");
         res.status(500).json({ message: "Internal Server Error: Could not save the object." });
     }
 });
@@ -569,7 +550,6 @@ router.post("/", async (req, res) => {
  * @apiError (422) {String} 422 Unprocessable Entity, <code>email</code> is not a valid email address.
  */
 router.patch("/:id/email", auth, async (req, res) => {
-    console.log("User PUT email");
     const email_regex = /[^,\/\\\s@]+\@[^,\/\\\s@]+.[^,\/\\\s@]+/;
     if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== req.params.id) {
         res.status(403).json({ message: "Forbidden" });
@@ -590,6 +570,7 @@ router.patch("/:id/email", auth, async (req, res) => {
         await doc.save();
         res.sendStatus(204);
     } catch (error) {
+        console.log("Error occured in PATCHUserEmail.")
         res.status(404).json({ message: "Could not find user." });
     }
 });
@@ -608,7 +589,6 @@ router.patch("/:id/email", auth, async (req, res) => {
  * @apiError (500) {String} 500 Internal Server Error
  */
 router.patch("/:id/change_password", auth, async (req, res) => {
-    console.log("User PATCH password");
     if (req.auth["user"]?.userid !== req.params.id) {
         res.status(403).json({ error: "Forbidden" });
         return;
@@ -633,7 +613,7 @@ router.patch("/:id/change_password", auth, async (req, res) => {
         userDoc.save();
         res.sendStatus(204);
     } catch (error) {
-        console.log(error);
+        console.log("Error occured in PATCHUserPassword");
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
@@ -648,60 +628,63 @@ router.patch("/:id/change_password", auth, async (req, res) => {
  * @apiUse AuthMiddleware
  * @apiError (403) {String} 403 Forbidden
  * @apiError (404) {String} message Could not find user.
+ * @apiError (500) {String} message Internal Server Error
  */
 router.delete("/:id", auth, async (req, res) => {
     /*
         FIXME: This route should use transactions because it deals with multiple collections
     */
-    console.log("Called delete user by id with userid: " + req.params.id);
-    if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== req.params.id) {
-        res.status(403).json({ message: "Forbidden" });
-        return;
-    }
-    let deleteTransientData = false;
-    console.log("delete req.body:", req.body);
-    if (req.auth["user"]?.role == "admin" && req.body?.deleteTransientData == true) {
-        deleteTransientData = true;
-    }
-    console.log("findme deleteTransientData after check:", deleteTransientData);
-    if (deleteTransientData) {
-        const result = await User.deleteOne({ _id: req.params.id });
-        await Survey.deleteMany({
-            $and: [{ "owners.ownerId": { $eq: req.params.id } }, { owners: { $size: 1 } }],
-        });
-        await Survey.updateMany(
-            { "owners.owner_id": { $eq: req.params.id } },
-            {
-                $pull: {
-                    owners: {
-                        owner_id: req.params.id,
-                    },
-                },
-            }
-        );
-        if (result.deletedCount == 1) {
-            res.sendStatus(204);
-        } else {
-            res.status(404).json({ message: "Could not find user." });
-        }
-    } else {
-        const result = await User.deleteOne({ _id: req.params.id });
-        await Survey.updateMany(
-            { "owners.owner_id": req.params.id },
-            {
-                $pull: {
-                    owners: {
-                        owner_id: req.params.id,
-                    },
-                },
-            }
-        );
-        if (result.deletedCount == 1) {
-            res.sendStatus(204);
-        } else {
-            res.status(404).json({ message: "Could not find user." });
-        }
-    }
+   try {
+       if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== req.params.id) {
+           res.status(403).json({ message: "Forbidden" });
+           return;
+       }
+       let deleteTransientData = false;
+       if (req.auth["user"]?.role == "admin" && req.body?.deleteTransientData == true) {
+           deleteTransientData = true;
+       }
+       if (deleteTransientData) {
+           const result = await User.deleteOne({ _id: req.params.id });
+           await Survey.deleteMany({
+               $and: [{ "owners.ownerId": { $eq: req.params.id } }, { owners: { $size: 1 } }],
+           });
+           await Survey.updateMany(
+               { "owners.owner_id": { $eq: req.params.id } },
+               {
+                   $pull: {
+                       owners: {
+                           owner_id: req.params.id,
+                       },
+                   },
+               }
+           );
+           if (result.deletedCount == 1) {
+               res.sendStatus(204);
+           } else {
+               res.status(404).json({ message: "Could not find user." });
+           }
+       } else {
+           const result = await User.deleteOne({ _id: req.params.id });
+           await Survey.updateMany(
+               { "owners.owner_id": req.params.id },
+               {
+                   $pull: {
+                       owners: {
+                           owner_id: req.params.id,
+                       },
+                   },
+               }
+           );
+           if (result.deletedCount == 1) {
+               res.sendStatus(204);
+           } else {
+               res.status(404).json({ message: "Could not find user." });
+           }
+       }
+   } catch (error) {
+       console.log("Error occured in DELETEUser.")
+       res.status(500).json({message: "Internal Server Error"})
+   }
 });
 
 module.exports = router;

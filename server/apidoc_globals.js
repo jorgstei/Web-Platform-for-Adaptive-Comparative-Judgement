@@ -18,6 +18,11 @@
  * Require admin or research user to access.
  */
 
+ /**
+  * @apiDefine Judge
+  * Require judge token to access
+  */
+
 /**
  * @apiDefine AdminOwnerOrJudge 
  * Require admin user, being the owner, or having a judge token in order to access the resource.

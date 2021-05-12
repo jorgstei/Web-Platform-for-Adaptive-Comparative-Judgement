@@ -54,7 +54,7 @@
 <MaterialApp>
 	<Router>
 		<Navbar bind:surveyQuestionInNavBar bind:refreshToken bind:userInfo bind:takingSurvey bind:showJudgeOverlay bind:allowLeavePageWithoutWarning bind:warningOnLeaveFunc bind:selectedNavbarListValue/>
-		<div class="pt-14" style="height: 100vh">
+		<div class="pt-14" style="height: 100vh; overflow: auto">
 			<Route path="/">
 				<LandingPage bind:surveyID bind:selectedNavbarListValue/>
 			</Route>

@@ -90,26 +90,7 @@ async function generateUniqueHashCode(data) {
     return result;
 }
 
-//TODO: document api
-router.post("/function/estimate", auth, async (req, res) => {
-    console.log("Called survey/function/estimate");
-    if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
-        res.status(401).json({ message: "Forbidden" });
-        return;
-    }
-    axios({
-        headers: { "Content-Type": "text/plain" },
-        method: "post",
-        url: process.env.estimateServicePath,
-        data: req.body,
-        withCredentials: false,
-    })
-        .then((response) => res.status(200).json(response.data))
-        .catch((response) => {
-            console.log(response);
-            res.status(500).json({ message: "Internal Server Error" });
-        });
-});
+
 
 /**
  * @apiDefine SuccessGetFullSurveyArray
@@ -155,6 +136,41 @@ router.post("/function/estimate", auth, async (req, res) => {
  */
 
 /**
+ * @api {POST} /api/survey/function/estimate
+ * @apiName POSTSurveyEstimate
+ * @apiGroup Survey
+ * @apiVersion 0.1.0
+ * @apiParam (Body) {Object[]} An array with SurveyAnswer objects
+ * @apiParam (Body) {String} surveyanswers.judgeId the ID of the judge that created this answer
+ * @apiParam (Body) {String} surveyanswers.leftOption the ID of the Survey.item that was in the left position
+ * @apiParam (Body) {String} surveyanswers.rightOption the ID of the Survey.item that was in the right position
+ * @apiParam (Body) {Number=0,1} surveyanswers.winner 1 means the left option was picked, 0 means the right option was picked.
+ * @apiParam (Body) {Object} result The response from the analyse-module
+ * @apiError (500) {String} message Internal Server Error
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ */
+router.post("/function/estimate", auth, async (req, res) => {
+    console.log("Called survey/function/estimate");
+    if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
+        res.status(401).json({ message: "Forbidden" });
+        return;
+    }
+    axios({
+        headers: { "Content-Type": "text/plain" },
+        method: "post",
+        url: process.env.estimateServicePath,
+        data: req.body,
+        withCredentials: false,
+    })
+        .then((response) => res.status(200).json(response.data))
+        .catch((response) => {
+            console.log(response);
+            res.status(500).json({ message: "Internal Server Error" });
+        });
+});
+
+/**
  * @api {get} /api/survey
  * @apiName GetAllSurveys
  * @apiGroup Survey
@@ -187,6 +203,7 @@ router.get("/", auth, async (req, res) => {
  * @apiName GetAllSurveysForUser
  * @apiGroup Survey
  * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The ID of the survey
  * @apiUse SuccessGetFullSurveyArray
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
@@ -240,7 +257,19 @@ router.get("/function/count", auth, async (req, res) => {
     }
 });
 
-//Get random item pair from survey by id
+/**
+ * @api {get} /api/survey/items_to_compare/:id
+ * @apiName GETItemsToCompareForSurvey
+ * @apiGroup Survey
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) id The id of the survey you want 
+ * @apiSuccess (200) {Object[]} data
+ * @apiSuccess (200) {String} data.type The type of this item (pdf, plain, etc.)
+ * @apiSuccess (200) {String} data.data The ID of the corresponding SurveyItemFile entry.
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (500) 500 Internal Server Error
+ */
 router.get("/items_to_compare/:id", auth, async (req, res) => {
     console.log("called get random pair from survey by id for item");
     try {
@@ -315,6 +344,7 @@ router.get("/items_to_compare/:id", auth, async (req, res) => {
  * @apiGroup Survey
  * @apiVersion 0.1.0
  * @apiUse SuccessGetFullSurvey
+ * @apiParam (Parameter) id The ID of the Survey.
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
  * @apiError (403) 403 Forbidden
@@ -348,9 +378,11 @@ router.get("/:id", auth, async (req, res) => {
  * @apiName GetSurveyForJudgeById
  * @apiGroup Survey
  * @apiVersion 0.1.0
+ * @apiParam (Paramter) id Either the full ObjectId id of the survey, or the PIN assosiated with this survey.
  * @apiSuccess (200) {String} judgeInstructions The instructions provided to the judge
  * @apiSuccess (200) {String} surveyQuestion The question the researchers want answers to/the judge needs to answer
- * @apiPermission AdminOrOwner
+ * @apiSuccess (200) {String} _id The id of the survey.
+ * @apiPermission AdminOwnerOrJudge
  * @apiUse AuthMiddleware
  * @apiError (403) 403 Forbidden
  * @apiError (404) 404 Not Found
@@ -406,6 +438,16 @@ router.get("/judge/:id", auth, async (req, res) => {
     }
 });
 
+/**
+ * @api {get} /api/survey/function/checkPIN/:PIN
+ * @apiName GETCheckPin
+ * @apiGroup Survey
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) PIN The PIN code you wish to check the validity of
+ * @apiSuccess (200) 200 ok
+ * @apiError (404) {String} message There is no survey with this PIN.
+ * @apiError (500) {String} Internal Server Error
+ */
 router.get("/function/checkPIN/:PIN", async (req, res) => {
     console.log("Called check if pin exists as judge");
     try {
@@ -521,12 +563,6 @@ router.put("/:id/owners", auth, async (req, res) => {
  * @apiGroup Survey
  * @apiVersion 0.1.0
  * @apiParam (Parameter) {String} id The ID of the survey to update
- * @apiParam (Body) {Object[]} owners An array of owners objects
- * @apiParam (Body) {String} owners.ownerId The database ID for this owner (user)
- * @apiParam (Body) {Object[]} owners.rights An array of rights objects
- * @apiParam (Body) {Boolean} owners.rights.manageMembers Should this owner be allowed to add new owners, and change owners rights?
- * @apiParam (Body) {Boolean} owners.rights.editSurvey Should this owner be allowed to edit the other fields in this survey?
- * @apiParam (Body) {Boolean} owners.rights.viewResults Should this owner be allowed to view the results of this survey? (judges answers, stats, analytics)
  * @apiParam (Body) {Object[]} surveys.items An array of Item objects, these are the options judges choose between
  * @apiParam (Body) {String} surveys.items.type A string defining what type of item this item is (f.ex. text, pdf, latex)
  * @apiParam (Body) {String} surveys.items.data For raw text, this will be the text to display. For other <code>items.type</code> it will be a URL to the resource.
@@ -591,10 +627,9 @@ router.put("/:id", auth, async (req, res) => {
                 mediaType,
             }
         );
-        console.log("surveyReplaceResult:", surveyReplaceResult);
         res.sendStatus(200);
     } catch (error) {
-        console.log(error);
+        console.log("Error occured in PUTSurveyById");
         res.status(500).json({ message: "Internal Server Error: Could not save the object." });
     }
 });
@@ -602,7 +637,7 @@ router.put("/:id", auth, async (req, res) => {
 
 /**
  * @api {delete} /api/survey/:id
- * @apiName DeleteSurvey
+ * @apiName DELETESurvey
  * @apiGroup Survey
  * @apiVersion 0.1.0
  * @apiParam (Parameter) {String} id The ID of the survey to update
@@ -614,6 +649,9 @@ router.put("/:id", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.delete("/:id", auth, async (req, res) => {
+    /*
+        This function should use transactions if they become available
+    */
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id });
         console.log(surveyDoc.owners);
@@ -654,7 +692,7 @@ router.delete("/:id", auth, async (req, res) => {
             }
         }
     } catch (error) {
-        console.log("delete survey error:", error);
+        console.log("Error occured in DELETESurvey");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });

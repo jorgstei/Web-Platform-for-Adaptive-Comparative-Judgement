@@ -135,5 +135,5 @@ Project Link: [https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative
 [stars-url]: https://github.com/skelletore/064bachelor2021/stargazers
 [issues-shield]: https://img.shields.io/github/issues/skelletore/064bachelor2021.svg?style=for-the-badge
 [issues-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/issues
-[license-shield]: https://img.shields.io/badge/license-CC%20(by--nc--sa)-green
+[license-shield]: https://img.shields.io/badge/license-CC%20(by--nc--sa)-green?style=for-the-badge
 [license-url]: https://creativecommons.org/licenses/by-nc-sa/4.0/en/legalcode

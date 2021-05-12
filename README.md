@@ -72,6 +72,30 @@ This is an example of how to list things you need to use the software and how to
    cd server
    npm install
    ```
+4. Make necessary changes in docker-compose.yml (ports and volumes for the services)
+5. Create a .env file for MongoDB and a .env file for REST-API server
+   ```sh
+    cp ./mongodb/default.env ./mongodb/.env;
+    cp./server/default.env ./server/.env
+   ```
+6. Fill out  /server/.env and /mongodb/.env
+7. Change /client/rollup.config.js such that apiBasePath is set to the correct server-adress
+8. Change /client/package.json "scripts.prod" to point to the correct certificate and key
+9. Add the domain to the list of allowed origins for CORS in /server/server.js
+10. Make ./build.sh runable
+    ```sh
+    chmod +x ./build.sh
+    ```
+11. Run
+    ```sh
+    .build.sh
+    ```
+12. Ensure that all services are running by running
+    ```sh
+    docker.ps
+    ```
+    
+
 
 ### Deployment
 

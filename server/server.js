@@ -15,6 +15,7 @@ var cookieParser = require('cookie-parser')
 const { hash } = require('./Utility/hashing')
 const User = require('./models/User')
 const fileUpload = require('express-fileupload')
+const { exit } = require('process')
  
 const mongoConnectionString = process.env.MongoDBConnectionString;
 mongoose.connect(mongoConnectionString,
@@ -80,7 +81,6 @@ const userRoute = require('./routes/user_route')
 server.use("/api/user", userRoute)
 
 const surveyItemFileRoute = require('./routes/survey_item_file_route')
-const { exit } = require('process')
 server.use("/api/surveyitemfile", surveyItemFileRoute)
 
 if(process.env.privateKeyPath != undefined && process.env.certPath != undefined && process.env.caPath != undefined){

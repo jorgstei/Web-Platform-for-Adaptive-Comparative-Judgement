@@ -67,6 +67,7 @@ router.get("/", auth, async (req, res) => {
         }
         res.json(surveyAnswers)
     } catch(error) {
+        console.log("Error occured in GETAllSurveyanswer")
         res.status(404).json({message: "Empty collection"})
     }
 })
@@ -100,7 +101,7 @@ router.get("/:id", auth, async (req, res) => {
         }
         res.json(surveyAnswer)
     } catch(error) {
-        console.log(error)
+        console.log("Error occured in GETSurveyanswerById")
         res.status(404).json({message: "Empty collection"})
     }
 })
@@ -110,7 +111,7 @@ router.get("/:id", auth, async (req, res) => {
  * @apiName GETSurveyanswerByJudgeId
  * @apiGroup Surveyanswer
  * @apiVersion 0.1.0
- * @apiParam (Parameter) id The ID of the surveyanswer to get
+ * @apiParam (Parameter) id The ID of the judge you want to get the answers for
  * @apiUse SuccessGetSurveyAnswerArray
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
@@ -133,6 +134,7 @@ router.get("/judge/:id", auth, async (req, res) => {
         }
         res.json(surveyAnswers)
     } catch(error) {
+        console.log("Error occured in GETSurveyanswerByJudgeId")
         res.status(404).json({message: "Empty collection"})
     }
 })
@@ -142,7 +144,7 @@ router.get("/judge/:id", auth, async (req, res) => {
  * @apiName GETSurveyanswerBySurveyId
  * @apiGroup Surveyanswer
  * @apiVersion 0.1.0
- * @apiParam (Parameter) id The ID of the surveyanswer to get
+ * @apiParam (Parameter) id The ID of the survey you want to get the answers for
  * @apiUse SuccessGetSurveyAnswerArray
  * @apiPermission AdminOrOwner
  * @apiUse AuthMiddleware
@@ -165,6 +167,7 @@ router.get("/survey/:id", auth, async (req, res) => {
         }
         res.json(surveyAnswers)
     } catch(error) {
+        console.log("Error occured in GETSurveyanswerBySurveyId")
         res.status(404).json({message: "Empty collection"})
     }
 })
@@ -174,16 +177,20 @@ router.get("/survey/:id", auth, async (req, res) => {
  * @apiName POSTSurveyanswer
  * @apiGroup Surveyanswer
  * @apiVersion 0.1.0
+ * @apiParam {Object} surveyAnswer The judge's answer.
+ * @apiParam {String} surveyAnswer.judgeId The ID of the judge.
+ * @apiParam {String} surveyAnswer.leftOption The ID of the left option.
+ * @apiParam {String} surveyAnswer.rightOption The ID of the right option.
+ * @apiParam {Number=0,1} surveyAnswer.winner 0 if right won, 1 of left won.
+ * @apiParam {String} surveyAnswer.surveyId The ID of the survey being answered.
  * @apiSuccess (201) {String} loc the location of the newly created document.
- * @apiPermission AdminOrOwner
+ * @apiPermission Judge
  * @apiUse AuthMiddleware
  * @apiError (404) 404 Not Found, No documents could be found.
  */
 router.post("/", auth, async (req, res) => {
     console.log("Insert one SurveyAnswer")
     const surveyAnswer = req.body
-    console.log("Inserted surveyAnswer: ", surveyAnswer)
-    console.log("req.role: ", req.role)
     if(req.auth["judge"]?.role !== "judge"){
         res.sendStatus(403)
         return
@@ -195,7 +202,7 @@ router.post("/", auth, async (req, res) => {
         }
         res.status(201).json({loc: surveyAnswerDoc._id})
     } catch(error) {
-        console.log(error)
+        console.log("Error occured in POSTSurveyanswer")
         res.sendStatus(500)
     }
 })
@@ -214,29 +221,34 @@ router.post("/", auth, async (req, res) => {
  */
 router.delete("/:id", auth, async (req, res) => {
     console.log("Delete one SurveyAnswer")
-    const surveyAnswerDoc = await SurveyAnswer.findOne({_id: {$eq: req.params.id}})
-    if(!surveyAnswerDoc || !surveyAnswerDoc._id){
-        res.sendStatus(404)
-        return
-    }
-    const surveyDoc = await Survey.findOne({_id: surveyAnswerDoc.surveyId})
-
-    if(!surveyDoc || !surveyDoc._id){
-        res.sendStatus(404)
-        return
-    }
-    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId 
-        && !userHasViewResultsRights(surveyDoc.surveyId, req.auth["user"]?.userid)
-    ){
-        res.sendStatus(403)
-        return
-    }
-    const result = await SurveyAnswer.deleteOne({_id: req.params.id})
-    if(result.deletedCount == 1){
-        res.sendStatus(204)
-    }
-    else{
-        res.sendStatus(500)
+    try {
+        const surveyAnswerDoc = await SurveyAnswer.findOne({_id: {$eq: req.params.id}})
+        if(!surveyAnswerDoc || !surveyAnswerDoc._id){
+            res.sendStatus(404)
+            return
+        }
+        const surveyDoc = await Survey.findOne({_id: surveyAnswerDoc.surveyId})
+    
+        if(!surveyDoc || !surveyDoc._id){
+            res.sendStatus(404)
+            return
+        }
+        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId 
+            && !userHasViewResultsRights(surveyDoc.surveyId, req.auth["user"]?.userid)
+        ){
+            res.sendStatus(403)
+            return
+        }
+        const result = await SurveyAnswer.deleteOne({_id: req.params.id})
+        if(result.deletedCount == 1){
+            res.sendStatus(204)
+        }
+        else{
+            throw new Error("Failed to delete survey answer")
+        }
+    } catch (error) {
+        console.log("Error occured in DELETESurveyanswer")
+        res.status(500).json({message: "Internal Server Error"})
     }
 })
 
@@ -254,37 +266,48 @@ router.delete("/:id", auth, async (req, res) => {
  */
  router.delete("/judge/:id", auth, async (req, res) => {
     console.log("Delete surveyAnswers by judge")
-    const surveyAnswers = await SurveyAnswer.find({judgeId: {$eq: req.params.id}})
-    if(!surveyAnswers || !surveyAnswers.length > 0){
-        res.sendStatus(404)
-        return
-    }
-    const surveyDoc = await Survey.findOne({_id: surveyAnswers[0].surveyId})
-    console.log("delete surveyAnswers: ", surveyAnswers)
-    console.log("delete surveyDoc: ", surveyDoc)
-    if(!surveyDoc || !surveyDoc._id){
-        res.sendStatus(404)
-        return
-    }
-    if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId && !userHasViewResultsRights(surveyDoc._id, req.auth["user"].userid)){
-        res.sendStatus(403)
-        return
-    }
-    const surveyAnswersIDs = surveyAnswers.map(e=>e._id);
-    console.log("Survey answer id's to be deleted: ", surveyAnswersIDs)
-    const result = await SurveyAnswer.deleteMany({_id: {$in:surveyAnswersIDs}})
-    console.log("Result from delete answers by judge: ", result);
-    if(result.deletedCount === surveyAnswers.length){
-        res.sendStatus(204)
-    }
-    else{
+    try {
+        const surveyAnswers = await SurveyAnswer.find({judgeId: {$eq: req.params.id}})
+        if(!surveyAnswers || !surveyAnswers.length > 0){
+            res.sendStatus(404)
+            return
+        }
+        const surveyDoc = await Survey.findOne({_id: surveyAnswers[0].surveyId})
+        if(!surveyDoc || !surveyDoc._id){
+            res.sendStatus(404)
+            return
+        }
+        if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== surveyDoc.ownerId && !userHasViewResultsRights(surveyDoc._id, req.auth["user"].userid)){
+            res.sendStatus(403)
+            return
+        }
+        const surveyAnswersIDs = surveyAnswers.map(e=>e._id);
+        console.log("Survey answer id's to be deleted: ", surveyAnswersIDs)
+        const result = await SurveyAnswer.deleteMany({_id: {$in:surveyAnswersIDs}})
+        if(result.deletedCount === surveyAnswers.length){
+            res.sendStatus(204)
+        }
+        else{
+            throw new Error("Error deleting survey answers by judge id")
+        }
+    } catch (error) {
+        console.log("Error occured in DELETESurveyanswer")
         res.sendStatus(500)
     }
 })
 
-
+/**
+ * @api {get} /api/surveyanswer/function/count/answers/:surveyid
+ * @apiName GetSurveyAnswersCountBySurveyId
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) surveyId The ID of the survey you want the answer count for
+ * @apiSuccess (200) {Number} count The number of comparisons done for this survey
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (500) 500 Internal Server Error
+ */
 router.get("/function/count/answers/:surveyid", auth, async (req, res) => {
-    //console.log("Get count of answers called");
     try {
         if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
             res.status(403).json({message: "Forbidden"})
@@ -293,20 +316,29 @@ router.get("/function/count/answers/:surveyid", auth, async (req, res) => {
         else{
             SurveyAnswer.countDocuments({surveyId: me(req.params.surveyid)})
             .then(count => {
-                //console.log("Got answer count:", count);
                 res.json(count)
             })
             return;
         }
 
     } catch (error) {
-        console.log("Could not count surveyanswers:", error)
+        console.log("Error occured in GetSurveyAnswersCountBySurveyId")
         res.status(500).json({message: "Internal Server Error"})
     }
 })
 
+/**
+ * @api {get} /api/surveyanswer/function/count/judges/:surveyid
+ * @apiName GetSurveyJudgeCountBySurveyId
+ * @apiGroup Surveyanswer
+ * @apiVersion 0.1.0
+ * @apiParam (Parameter) surveyId The ID of the survey you want the judge count for
+ * @apiSuccess (200) {Number} count The number of judges that has judged this survey
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (500) 500 Internal Server Error
+ */
 router.get("/function/count/judges/:surveyid", auth, async (req, res) => {
-    //console.log("Get count of judges called");
     try {
         if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher" && !userHasViewResultsRights(req.params.id, req.auth["user"]?.userid)) {
             res.status(403).json({message: "Forbidden"})
@@ -323,13 +355,9 @@ router.get("/function/count/judges/:surveyid", auth, async (req, res) => {
         }
 
     } catch (error) {
-        console.log("Could not count judges:", error)
+        console.log("Error occured in GetSurveyJudgeCountBySurveyId")
         res.status(500).json({message: "Internal Server Error"})
     }
 })
-
-
-
-
 
 module.exports = router

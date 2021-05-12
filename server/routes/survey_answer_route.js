@@ -189,7 +189,6 @@ router.get("/survey/:id", auth, async (req, res) => {
  * @apiError (404) 404 Not Found, No documents could be found.
  */
 router.post("/", auth, async (req, res) => {
-    console.log("Insert one SurveyAnswer")
     const surveyAnswer = req.body
     if(req.auth["judge"]?.role !== "judge"){
         res.sendStatus(403)
@@ -220,7 +219,6 @@ router.post("/", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.delete("/:id", auth, async (req, res) => {
-    console.log("Delete one SurveyAnswer")
     try {
         const surveyAnswerDoc = await SurveyAnswer.findOne({_id: {$eq: req.params.id}})
         if(!surveyAnswerDoc || !surveyAnswerDoc._id){
@@ -265,7 +263,6 @@ router.delete("/:id", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
  router.delete("/judge/:id", auth, async (req, res) => {
-    console.log("Delete surveyAnswers by judge")
     try {
         const surveyAnswers = await SurveyAnswer.find({judgeId: {$eq: req.params.id}})
         if(!surveyAnswers || !surveyAnswers.length > 0){
@@ -282,7 +279,6 @@ router.delete("/:id", auth, async (req, res) => {
             return
         }
         const surveyAnswersIDs = surveyAnswers.map(e=>e._id);
-        console.log("Survey answer id's to be deleted: ", surveyAnswersIDs)
         const result = await SurveyAnswer.deleteMany({_id: {$in:surveyAnswersIDs}})
         if(result.deletedCount === surveyAnswers.length){
             res.sendStatus(204)
@@ -348,7 +344,6 @@ router.get("/function/count/judges/:surveyid", auth, async (req, res) => {
             //SurveyAnswer.find({surveyId:{$eq: req.params.id}}).distinct("judgeId").count().then(count => res.json(count))
             SurveyAnswer.aggregate([{ $match: { surveyId: me(req.params.surveyid)}}, { $group: { _id: '$judgeId', count: {$sum: 1} } }])
             .then(result => {
-                //console.log("Got judge count:", result.length);
                 res.json(result.length);
             })
             return;

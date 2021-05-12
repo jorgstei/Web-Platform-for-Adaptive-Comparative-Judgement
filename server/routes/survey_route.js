@@ -19,7 +19,6 @@ function userHasEditSurveyRights(surveyId, userid) {
         }
         let owner = survey.owners.find((e) => e._id == userid);
         if (owner == undefined || owner.rights == undefined) {
-            console.log("userHasEditSurveyRights owner is undefined or has no rights");
             return false;
         }
         if (owner.rights.editSurvey != true) {
@@ -37,7 +36,6 @@ function userHasManageMembersRights(surveyId, userid) {
         }
         let owner = survey.owners.find((e) => e._id == userid);
         if (owner == undefined || owner.rights == undefined) {
-            console.log("userHasViewResultsRights owner is undefined or has no rights");
             return false;
         }
         if (owner.rights.manageMembers != true) {
@@ -53,7 +51,6 @@ async function generateUniqueHashCode(data) {
     //We use a prime number as mod m because it shares no factors
     const LARGEST_PRIME_BELOW_1M = 999983;
     const results = await Survey.countDocuments({ inviteCode: { $ne: -1 } });
-    console.log("Total number of surveys that are active with inviteCode: ", results);
     //If our fillrate is larger than 75%, we consider the cost to find a open key is too expensive, so we have to stop.
     if (results >= Math.floor(LARGEST_PRIME_BELOW_1M * 0.75)) {
         return -1;
@@ -151,7 +148,6 @@ async function generateUniqueHashCode(data) {
  * @apiUse AuthMiddleware
  */
 router.post("/function/estimate", auth, async (req, res) => {
-    console.log("Called survey/function/estimate");
     if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
         res.status(401).json({ message: "Forbidden" });
         return;
@@ -165,7 +161,7 @@ router.post("/function/estimate", auth, async (req, res) => {
     })
         .then((response) => res.status(200).json(response.data))
         .catch((response) => {
-            console.log(response);
+            console.log("Error calling estimate service");
             res.status(500).json({ message: "Internal Server Error" });
         });
 });
@@ -181,7 +177,6 @@ router.post("/function/estimate", auth, async (req, res) => {
  * @apiError (404) 404 Not Found, No documents could be found.
  */
 router.get("/", auth, async (req, res) => {
-    console.log("Called get all surveys");
     try {
         if (req.auth["user"]?.role !== "admin") {
             res.status(403).json({ message: "Forbidden" });
@@ -193,7 +188,7 @@ router.get("/", auth, async (req, res) => {
         }
         res.json(surveys);
     } catch (error) {
-        console.log("Error get all surveys: ", error);
+        console.log("Error occured in GetAllSurveys");
         res.status(404).json({ message: "Could not find any documents." });
     }
 });
@@ -210,7 +205,6 @@ router.get("/", auth, async (req, res) => {
  * @apiError (404) 404 Not found, empty collection
  */
 router.get("/user/:id", auth, async (req, res) => {
-    console.log("Called get all surveys for user");
     try {
         if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== req.params.id) {
             res.status(403).json({ message: "Forbidden" });
@@ -222,7 +216,7 @@ router.get("/user/:id", auth, async (req, res) => {
         }
         res.json(surveys);
     } catch (error) {
-        console.log("Error get all surveys: ", error);
+        console.log("Error occured in GetAllSurveysForUser");
         res.status(404).json({ message: "Could not find any documents." });
     }
 });
@@ -238,7 +232,6 @@ router.get("/user/:id", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.get("/function/count", auth, async (req, res) => {
-    console.log("Get count of surveys");
     try {
         if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher") {
             res.status(403).json({ message: "Forbidden" });
@@ -252,7 +245,7 @@ router.get("/function/count", auth, async (req, res) => {
             Survey.countDocuments({ "owners.ownerId": userid }).then((count) => res.json(count));
         }
     } catch (error) {
-        console.log("survey/function/count error:", error);
+        console.log("Error occured in GETSurveyCountForUser");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -271,7 +264,6 @@ router.get("/function/count", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.get("/items_to_compare/:id", auth, async (req, res) => {
-    console.log("called get random pair from survey by id for item");
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id });
         if (!surveyDoc || surveyDoc._id == null) {
@@ -289,7 +281,6 @@ router.get("/items_to_compare/:id", auth, async (req, res) => {
             amountOfUniqueComparisons += toAdd;
             toAdd++;
         }
-        console.log("Length of survey items is " + count + ". It has " + amountOfUniqueComparisons + " unique comparisons");
         if (count < 2) {
             res.status(500).json({ message: "Survey does not have enough items to do a comparison." });
             return;
@@ -351,7 +342,6 @@ router.get("/items_to_compare/:id", auth, async (req, res) => {
  * @apiError (404) 404 Not Found
  */
 router.get("/:id", auth, async (req, res) => {
-    console.log("Called get survey by id");
     try {
         const survey = await Survey.findOne({ _id: { $eq: req.params.id } });
         const foundOwner = survey.owners.find((owner) => owner.ownerId === req.auth["user"]?.userid);
@@ -359,13 +349,12 @@ router.get("/:id", auth, async (req, res) => {
             res.status(403).json({ message: "Forbidden" });
             return;
         }
-        console.log("Survey: ", survey);
         if (!survey || survey._id === null) {
             throw new Error("survey_route.js GET by id: Could not find document");
         }
         res.status(200).json(survey);
     } catch (error) {
-        console.log("Error getting 1 survey by id: ", error);
+        console.log("Error occured in GetSurveyById");
         res.status(404).json({ message: "Could not find survey." });
     }
 });
@@ -388,9 +377,7 @@ router.get("/:id", auth, async (req, res) => {
  * @apiError (404) 404 Not Found
  */
 router.get("/judge/:id", auth, async (req, res) => {
-    console.log("Called get survey by id as judge");
     try {
-        console.log("In judge by id survey:", req.params.id);
         let survey = undefined;
         if (req.params.id.length === 6) {
             const code = parseInt(req.params.id, 10);
@@ -403,7 +390,6 @@ router.get("/judge/:id", auth, async (req, res) => {
             res.status(404).json({ message: "Could not find the requested Survey" });
             return;
         }
-        console.log("Survey in get by id as judge: ", survey);
         const foundOwner = survey.owners.find((owner) => owner.ownerId === req.auth["user"]?.userid);
 
         if (
@@ -433,7 +419,7 @@ router.get("/judge/:id", auth, async (req, res) => {
 
         res.status(200).json(survey);
     } catch (error) {
-        console.log("Error getting survey by id with judge authentication: ", error);
+        console.log("Error occured in GetSurveyForJudgeById");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -449,7 +435,6 @@ router.get("/judge/:id", auth, async (req, res) => {
  * @apiError (500) {String} Internal Server Error
  */
 router.get("/function/checkPIN/:PIN", async (req, res) => {
-    console.log("Called check if pin exists as judge");
     try {
         const surveyWithPIN = await Survey.findOne({ inviteCode: { $eq: req.params.PIN } });
         if (surveyWithPIN?._id == null) {
@@ -491,7 +476,6 @@ router.get("/function/checkPIN/:PIN", async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.post("/", auth, async (req, res) => {
-    console.log("called post one for survey");
     const {
         owners,
         expectedComparisons,
@@ -512,7 +496,6 @@ router.post("/", auth, async (req, res) => {
         let inviteCode = -1;
         if (active === true) {
             inviteCode = await generateUniqueHashCode(new mongoose.Types.ObjectId());
-            console.log("Invite code became: ", inviteCode);
         }
         const survey = await Survey.create({
             owners,
@@ -532,11 +515,21 @@ router.post("/", auth, async (req, res) => {
         }
         res.status(201).json({ loc: survey._id });
     } catch (error) {
-        console.log(error);
+        console.log("Error occured in POSTSurvey");
         res.status(500).json({ message: "Internal Server Error: Could not save the object." });
     }
 });
 
+/**
+ * @api {put} /api/survey/:id/owners
+ * @apiName PUTSurveyById
+ * @apiGroup Survey
+ * @apiVersion 0.1.0
+ * @apiSuccess (204) 204 No content
+ * @apiPermission AdminOrOwner
+ * @apiUse AuthMiddleware
+ * @apiError (500) 500 Internal Server Error
+ */
 router.put("/:id/owners", auth, async (req, res) => {
     try {
         const surveyDoc = await Survey.findOne({ _id: {$eq: req.params.id} })
@@ -545,14 +538,12 @@ router.put("/:id/owners", auth, async (req, res) => {
             return
         }
         const me_owners = me(req.body);
-        console.log("meowners:", me_owners);
         surveyDoc.updateOne({owners: me_owners})
         .then(updateResult => {
-            console.log("put owners result: ", updateResult)
             res.sendStatus(204);
         });
     } catch (error) {
-        console.log("PUT survey/:id/owners error");
+        console.log("Error occured in PUTSurveyById");
         res.status(500).json({ message: "Internal Server Error when updating owners" });
     }
 });
@@ -580,7 +571,6 @@ router.put("/:id/owners", auth, async (req, res) => {
  * @apiError (500) 500 Internal Server Error
  */
 router.put("/:id", auth, async (req, res) => {
-    console.log("called put for survey");
     let { expectedComparisons, items, active, title, internalDescription, judgeInstructions, surveyQuestion, purpose, mediaType } = me(
         req.body
     );
@@ -654,8 +644,7 @@ router.delete("/:id", auth, async (req, res) => {
     */
     try {
         const surveyDoc = await Survey.findOne({ _id: req.params.id });
-        console.log(surveyDoc.owners);
-        const foundOwner = surveyDoc.owners.find((owner) => owner.ownerId === req.auth["user"]?.userid);
+        const foundOwner = surveyDoc?.owners?.find((owner) => owner.ownerId === req.auth["user"]?.userid);
         if (req.auth["user"]?.role !== "admin" && req.auth["user"]?.userid !== foundOwner.ownerId) {
             res.status(403).json({ message: "Forbidden." });
             return;
@@ -869,7 +858,6 @@ router.get("/function/sort", auth, async (req, res) => {
  */
 router.post("/function/search/:term", auth, async (req, res) => {
     const { fields, sortField, skip, limit, direction } = req.body;
-    console.log("req body:", req.body);
     let me_sortField = me(sortField);
     let me_fields = me(fields);
     let me_term = escapeStringRegexp(me(req.params.term));
@@ -885,16 +873,13 @@ router.post("/function/search/:term", auth, async (req, res) => {
     }
 
     if (me_fields === undefined || me_term === undefined || me_skip === undefined || me_limit === undefined) {
-        console.log("fields:", fields, ", term:", me_term, ", skip:", me_skip, ", limit:", me_limit);
         res.status(400).json({ message: "Missing one of the required parameters." });
         return;
     }
     if (me_skip < 0 || me_limit < 1 || (me_direction != 1 && me_direction != -1)) {
-        console.log("me_skip:", me_skip, ", me_limit:", me_limit, ", me_direction:", me_direction);
         res.status(422).json({ message: "One of the following parameters have an invalid value: limit, skip or direction" });
         return;
     }
-    console.log(me_fields);
     const orFields = me_fields.map((field, i) => {
         return {
             [me_fields[i]]: {
@@ -956,10 +941,9 @@ router.post("/function/search/:term", auth, async (req, res) => {
             { $skip: me_skip },
             { $limit: me_limit },
         ]);
-        console.log(surveys);
         res.json(surveys);
     } catch (error) {
-        console.log("Error searching surveys:", error);
+        console.log("Error occured in GetSortedSurveys");
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
@@ -990,7 +974,6 @@ router.post("/function/upload_item/:id", auth, async (req, res) => {
     try {
         const tag = me(req.query.tag);
         const fileName = req.files?.file?.name?.replace("..", "");
-        console.log("Find me: ", req.files);
         if (req.files?.file == undefined || req.files?.file == null || req.files?.file?.truncated == true) {
             res.status(422).json({ message: "Filesize too large for file: " + fileName + ".\nMax supported filesize is 16MB" });
             return;
@@ -1002,7 +985,6 @@ router.post("/function/upload_item/:id", auth, async (req, res) => {
             fileName: fileName,
             mimeType: req.files.file.mimetype,
         }).then((file) => {
-            console.log("Successfully created file:", file);
             Survey.updateOne(
                 { _id: me(req.params.id) },
                 {
@@ -1014,12 +996,10 @@ router.post("/function/upload_item/:id", auth, async (req, res) => {
                     },
                 }
             ).then((updateOneResult) => {
-                console.log(updateOneResult);
                 res.status(201).json({ loc: file._id });
             });
         });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });

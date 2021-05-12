@@ -35,9 +35,11 @@
 
 - [Svelte]()
 - [MongoDB]()
+- [Mongoose]()
 - [Express]()
 - [Axios]()
 - [Cors]()
+- [Svelte-Materialify](https://svelte-materialify.vercel.app/)
 
 <!-- GETTING STARTED -->
 
@@ -62,6 +64,10 @@ This is an example of how to list things you need to use the software and how to
    ```
 2. Install NPM packages
    ```sh
+   cd client
+   npm install
+   cd ..
+   cd server
    npm install
    ```
 
@@ -109,9 +115,12 @@ Project Link: [https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative
 
 ## Acknowledgements
 
-- []()
-- []()
-- []()
+- [Supervisor:]()
+- [Olav Skundberg]
+- 
+- [Product owners:]()
+- [Tore Alexander Forebregd]()
+- [Hermund André Torkildsen]()
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

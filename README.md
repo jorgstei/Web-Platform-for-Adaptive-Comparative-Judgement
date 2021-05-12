@@ -33,12 +33,12 @@
 
 ### Built With
 
-- [Svelte]()
-- [MongoDB]()
-- [Mongoose]()
-- [Express]()
-- [Axios]()
-- [Cors]()
+- [Svelte](https://svelte.dev/)
+- [MongoDB](https://www.mongodb.com/)
+- [Mongoose](https://mongoosejs.com/)
+- [Express](https://expressjs.com/)
+- [Axios](https://www.npmjs.com/package/axios)
+- [Cors](https://www.npmjs.com/package/cors)
 - [Svelte-Materialify](https://svelte-materialify.vercel.app/)
 
 <!-- GETTING STARTED -->
@@ -62,11 +62,13 @@ This is an example of how to list things you need to use the software and how to
    ```sh
    git clone https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement.git
    ```
-2. Install NPM packages
+2. Install NPM packages for client
    ```sh
    cd client
    npm install
-   cd ..
+   ```
+3. Install NPM packages for server
+   ```sh
    cd server
    npm install
    ```
@@ -115,12 +117,12 @@ Project Link: [https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative
 
 ## Acknowledgements
 
-- [Supervisor:]()
-- [Olav Skundberg]
-- 
-- [Product owners:]()
-- [Tore Alexander Forebregd]()
-- [Hermund André Torkildsen]()
+- Supervisor:
+- [Olav Skundberg](https://www.ntnu.no/ansatte/olav.skundberg)
+
+- Product owners:
+- [Tore Alexander Forebregd](https://www.ntnu.no/ansatte/tore.a.forbregd)
+- [Hermund André Torkildsen](https://www.ntnu.no/ansatte/hermund.a.torkildsen)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

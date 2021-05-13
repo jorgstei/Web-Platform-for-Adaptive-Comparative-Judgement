@@ -225,7 +225,9 @@ router.get("/function/sort", auth, async (req, res) => {
                 locale: "en_US",
                 numericOrdering: true,
             })
-            .then((result) => res.json(result));
+            .then((result) => {
+                res.json(result)
+            });
     } catch (error) {
         console.log("Error occured in GETUserSort");
         res.status(500).json({ message: "Internal Server Error" });

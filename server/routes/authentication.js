@@ -21,21 +21,18 @@ const router = Router()
  */
 const auth = (req, res, next) => {
     if (!req.headers.cookie) {
-        console.log("auth, no req.headers.cookie")
         res.sendStatus(401)
         return
     }
     const cookies = req.cookies
 
     if (!cookies["access-token"] && !cookies["judge-token"]) {
-        console.log("cookies", cookies)
         res.sendStatus(401)
         return
     }
     else{
         req.auth = []
         if (cookies["judge-token"]) {
-            console.log("secret:", cookies["judge-token"], typeof cookies["judge-token"])
             jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, (err, decoded) => {
                 if (err) {
                     console.log("Judge verify error in auth:",err)
@@ -52,7 +49,6 @@ const auth = (req, res, next) => {
         if (cookies["access-token"]) {
             jwt.verify(cookies["access-token"], process.env.JWTSecret, (err, decoded) => {
                 if (err) {
-                    console.log(err)
                     res.sendStatus(401)
                 }
                 else {
@@ -118,21 +114,16 @@ router.get("/logout/judge", async (req, res) => {
  * @apiError (500) {String} message Internal Server Error.
  */
 router.post("/login", async (req, res) => {
-    console.log("Called get /login")
-    console.log("login body: ", req.body)
     const { email, password } = req.body
     try {
         if (email && password) {
             const userDoc = await User.findOne({ email: {$eq: email} })
             if (userDoc) {
-                console.log("Found user with email: ", email)
                 if (compareHash(userDoc.hashed, password, userDoc.salt)) {
-                    console.log("authenticated successfully")
                     const now = new Date(Date.now())
                     const exp = new Date(now)
                     exp.setMinutes(exp.getMinutes() + 30)
                     const expSeconds = Math.floor(exp.getTime() / 1000)
-                    console.log("JWT Expires in seconds: ", expSeconds)
                     const token = jwt.sign(
                         {
                             exp: expSeconds,
@@ -154,7 +145,7 @@ router.post("/login", async (req, res) => {
         }
         res.status(401).json({message: "Incorrect username or password"})
     } catch (error) {
-        console.log("Internal Server Error in /login route")
+        console.log("Error occured in POSTLogin")
         res.status(500).json({message: "Internal Server Error"})
     }
 })
@@ -170,31 +161,25 @@ router.post("/login", async (req, res) => {
  * @apiError (401) User is not logged in, no cookies received, or token has expired.
  */
 router.post("/refresh-token", async (req, res) => {
-    console.log("Called post /refresh-token")
     if (!req.headers.cookie) {
         res.sendStatus(401)
-        console.log("Sent status 401 because no cookies");
         return
     }
     const cookies = req.cookies
     if (!cookies["access-token"]) {
         res.sendStatus(401)
-        console.log("Sent status 401 because no cookies #2");
         return
     }
     if(cookies["access-token"]) {
         jwt.verify(cookies["access-token"], process.env.JWTSecret, async (err, decoded) => {
             if (err) {
-                console.log(err)
                 res.sendStatus(401);
-                console.log("Sent status 401 couldnt verify");
                 return
             }
             else {
                 const userDoc = await User.findOne({ _id: decoded.userid })
                 if (!userDoc) {
                     res.sendStatus(401)
-                    console.log("Sent status 401 because no userDoc");
                     return
                 }
                 const now = new Date(Date.now())
@@ -221,7 +206,7 @@ router.post("/refresh-token", async (req, res) => {
         })
     }
     else{
-        res.sendStatus(401);
+        res.status(401).json({message: "Unauthorized"});
         return
     }   
 })
@@ -239,10 +224,8 @@ router.post("/refresh-token", async (req, res) => {
 router.post("/refresh-judge-token", async (req, res) => {
     const cookies = req.cookies
     if (cookies["judge-token"]) {
-        console.log("Judge token found")
         jwt.verify(cookies["judge-token"], process.env.JWTJudgeSecret, async (err, decoded) => {
             if (err) {
-                console.log(err)
                 res.status(401).json({ error: "Not authorized." })
                 return
             }
@@ -271,7 +254,7 @@ router.post("/refresh-judge-token", async (req, res) => {
         })
     }
     else{
-        res.sendStatus(401);
+        res.status(401).json({message: "Missing token, unauthorized"});
         return
     }
 })
@@ -288,7 +271,6 @@ router.post("/refresh-judge-token", async (req, res) => {
  * @apiError (401) {String} message Occurs when username or password is wrong.
  */
 router.post("/login/judge", async (req, res) => {
-    console.log("Called get /login/judge")
     const { requestedSurveyID } = req.body
     try {
         if (requestedSurveyID) {
@@ -296,7 +278,6 @@ router.post("/login/judge", async (req, res) => {
             const exp = new Date(now)
             exp.setMinutes(exp.getMinutes() + 30)
             const expSeconds = Math.floor(exp.getTime() / 1000)
-            console.log("JWT Expires in seconds: ", expSeconds)
             const userId = new mongoose.mongo.ObjectId()
             const token = jwt.sign(
                 {
@@ -317,8 +298,8 @@ router.post("/login/judge", async (req, res) => {
         }
         throw new Error("Email or password not provided.")
     } catch (error) {
-        console.log("Error: ", error)
-        res.sendStatus(401)
+        console.log("Error occured in POSTLoginJudge.")
+        res.status(401).json({message: "Unathorized"})
     }
 })
 module.exports = { router, auth }

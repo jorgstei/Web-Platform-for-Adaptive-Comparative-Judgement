@@ -34,7 +34,6 @@ router.get("/:id", auth, async (req, res) => {
     }
     try {
         const me_id = me(req.params.id)
-        console.log("me_id:", me_id)
         SurveyItemFile.findOne({_id: me_id})
         .then(file => {
             console.log("Retrieved file: ", file)
@@ -47,7 +46,7 @@ router.get("/:id", auth, async (req, res) => {
             )
         })
     } catch (error) {
-        console.log("error getting itemfile", error)
+        console.log("Error occured in GETSurveyItemFileById")
         res.status(500).json({message: "Internal Server Error"})
     }
 })
@@ -74,10 +73,8 @@ router.get("/:id/view", auth, async (req, res) => {
     }
     try {
         const me_id = me(req.params.id)
-        console.log("me_id:", me_id)
         SurveyItemFile.findOne({_id: me_id}).select(["-data", "-surveyId"])
         .then(file => {
-            console.log("Retrieved file: ", file)
             if(file?._id == null){
                 res.status(404).json({message: "Could not find file."})
                 return
@@ -87,7 +84,7 @@ router.get("/:id/view", auth, async (req, res) => {
             )
         })
     } catch (error) {
-        console.log("error getting itemfile", error)
+        console.log("Error occured in GETSurveyItemFileViewById")
         res.status(500).json({message: "Internal Server Error"})
     }
 })
@@ -109,15 +106,11 @@ router.patch("/:id", auth, async (req, res) => {
     const me_fieldName = req.body?.fieldName?.replace("$","")
     let me_value = me(req.body.value)
     const me_id = me(req.params.id)
-    console.log("patch SurveyItemFile fn: ", me_fieldName)
     if(me_fieldName === "data"){
-        console.log("me_value before buffer: ", me_value, " typeof: ", typeof(me_value))
         me_value = Buffer.from(me_value)
-        console.log("me_value after buffer: ", me_value)
     }
     SurveyItemFile.updateOne({_id: me_id}, {$set: {[me_fieldName]: me_value}})
     .then(updateResult => {
-        console.log("patch SurveyItemFile result: ", updateResult)
         if(updateResult?.ok == 1){
             res.status(204).json({message: "Successfully updated "+me_id+"."+me_fieldName})
             return;
@@ -127,7 +120,7 @@ router.patch("/:id", auth, async (req, res) => {
         }
     })
     .catch(error =>{
-        console.log("ItemFileError",error)
+        console.log("Error occured in PATCHSurveyItemFileById")
         res.status(500).json({message: "Internal Server Error"})
     })
 })
@@ -149,11 +142,9 @@ router.patch("/:id", auth, async (req, res) => {
 router.post("/:id", auth, async (req, res) => {
     const me_fieldName = "data"
     let me_value = req?.files?.value?.data
-    console.log("file upload: ", me_value)
     const me_id = me(req.params.id)
     SurveyItemFile.updateOne({_id: me_id}, {$set: {[me_fieldName]: me_value}})
     .then(updateResult => {
-        console.log("post SurveyItemFile result: ", updateResult)
         if(updateResult?.ok == 1){
             res.status(204).json({message: "Successfully updated "+me_id+"."+me_fieldName})
             return;
@@ -163,7 +154,7 @@ router.post("/:id", auth, async (req, res) => {
         }
     })
     .catch(error =>{
-        console.log("ItemFileError",error)
+        console.log("Error occured in POSTSurveyItemFileById")
         res.status(500).json({message: "Internal Server Error"})
     })
 })
@@ -187,14 +178,12 @@ router.delete("/:id", auth, async (req, res) => {
     SurveyItemFile.deleteOne({_id: me_id})
     .then(async deleteOneResponse => {
         const survey = await Survey.findOne({"items.data": me_id})
-        console.log("survey: ", survey)
         const item = survey?.items?.find(e => e.data == me_id)
         if(item == undefined){
             console.log("Unable to find item with matching ItemFile ID")
         }
         else{
-            const surveyAnswerDeleteResponse = await SurveyAnswer.deleteMany({$or: [ {leftOption: item._id}, {rightOption: item._id}]})
-            console.log("surveyAnswerDeleteResponse: ", surveyAnswerDeleteResponse)
+            await SurveyAnswer.deleteMany({$or: [ {leftOption: item._id}, {rightOption: item._id}]})
         }
         await Survey.updateOne({"items.data": me_id}, {$pull: {
             items: {
@@ -205,7 +194,7 @@ router.delete("/:id", auth, async (req, res) => {
         res.status(204).json({message: "Successfully deleted item."})
     })
     .catch(error =>{
-        console.log("error deleting survey item file")
+        console.log("Error occured in DELETESurveyItemFileById")
         res.status(500).json({message: "Internal Server Error"})
     })
 })

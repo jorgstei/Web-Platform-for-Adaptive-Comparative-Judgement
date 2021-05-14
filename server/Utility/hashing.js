@@ -1,17 +1,18 @@
-const sjcl = require('sjcl')
+const crypto = require('crypto')
 
+const iterations = 1000000
 function hash(data) {
-    var salt = sjcl.random.randomWords(64);
-    var saltstring = sjcl.codec.hex.fromBits(salt);
+    var salt = crypto.randomBytes(256).toString('hex');
+    var result = crypto.pbkdf2Sync(data, salt, iterations, 32, "sha256").toString('hex')
     return {
-        hash: sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(data + saltstring)),
-        salt: sjcl.codec.hex.fromBits(salt)
+        hash: result,
+        salt: salt
     };
 }
 
 // This method is used when the user logs in
 function compareHash(hash, data, salt) {
-    var newHash = sjcl.codec.hex.fromBits(sjcl.hash.sha256.hash(data + salt));
+    var newHash = crypto.pbkdf2Sync(data, salt, iterations, 32, "sha256").toString('hex')
     return hash == newHash;
 }
 

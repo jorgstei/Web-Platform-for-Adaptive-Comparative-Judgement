@@ -651,11 +651,11 @@ router.delete("/:id", auth, async (req, res) => {
                $and: [{ "owners.ownerId": { $eq: req.params.id } }, { owners: { $size: 1 } }],
            });
            await Survey.updateMany(
-               { "owners.owner_id": { $eq: req.params.id } },
+               { "owners.ownerId": { $eq: req.params.id } },
                {
                    $pull: {
                        owners: {
-                           owner_id: req.params.id,
+                           ownerId: req.params.id,
                        },
                    },
                }
@@ -668,11 +668,11 @@ router.delete("/:id", auth, async (req, res) => {
        } else {
            const result = await User.deleteOne({ _id: req.params.id });
            await Survey.updateMany(
-               { "owners.owner_id": req.params.id },
+               { "owners.ownerId": req.params.id },
                {
                    $pull: {
                        owners: {
-                           owner_id: req.params.id,
+                           ownerId: req.params.id,
                        },
                    },
                }

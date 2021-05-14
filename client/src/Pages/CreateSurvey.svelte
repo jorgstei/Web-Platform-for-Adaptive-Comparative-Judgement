@@ -88,51 +88,14 @@
     allowLeavePageWithoutWarning = true;
   })
 
-  const pdf = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+  //An array of functions to run when we press submit/edit survey. Remember to remove the corresponding function when removing the item that added the function
+  let submitButtonFunctions = [];
+  let surveyOptions = [];
 
-  const classes = {
-      overall: null,
-      controls: null,
-      container: null,
-  };
-
-  const options = {
-      // "paged" or "all"
-      display: "paged",
-      // "dark" or "light" or your own
-      theme: "dark",
-  };
-
-    // The current page number
-    let currentPage;
-
-    // To override the text between the forward and back buttons
-    const pageNumberText = (currentPage, maximumPages) => currentPage + "/" + maximumPages;
-
-    //An array of functions to run when we press submit/edit survey. Remember to remove the corresponding function when removing the item that added the function
-    let submitButtonFunctions = [];
-    let surveyOptions = [];
-
-    /*
-    window.onbeforeunload = function() {
-        return "Do you really want to leave our brilliant application?";
-    };
-    */
   let searchHint = "";
   let oldSearchTerm = "";
   let epochMsAtLastSearch = new Date().getTime();
-  let surveyResearchers = [
-    {
-      ownerId: userInfo.userid,
-      owner_email: userInfo.email,
-      obligatory: true,
-      rights: {
-        manageMembers: true,
-        editSurvey: true,
-        viewResults: true,
-      },
-    },
-  ];
+  let surveyResearchers = [];
 
   let searchResults = [];
   let surveyID = null;
@@ -140,59 +103,59 @@
   let userIsAllowedToManageMembers = true;
 
   /*
-        tag: String, user friendly name for the item, f.ex. filename, or whatever the user decides it to be
-        mediaType: String, user friendly view of the mimetype (application/pdf -> pdf f.ex.)
-        mimeType: String, the mimetype of the data (application/pdf, application/jpg etc.)
-        data: Mixed, String for mediaType text, File for other types
-        showOverlay: Boolean, used by card to toggle fullscreen/preview of the item
-        showTooltip: Boolean, used by card to show info about the component f.ex. when hovering an (i) icon
-    */
-    const addSurveyOption = (tag, mediaType, mimeType, data, showOverlay, showTooltip, created = true, _id = undefined, fileName = "") => {
-        const uuid = uuidv4();
-        data = {
-            tag: tag,
-            fileName: fileName,
-            mediaType: mediaType,
-            mimeType: mimeType,
-            data: data,
-            _id: _id,
-            showOverlay: showOverlay,
-            showTooltip: showTooltip,
-            uuid: uuid,
-            created: created,
-            editedArr: [],
-        };
-        surveyOptions.push(data);
+      tag: String, user friendly name for the item, f.ex. filename, or whatever the user decides it to be
+      mediaType: String, user friendly view of the mimetype (application/pdf -> pdf f.ex.)
+      mimeType: String, the mimetype of the data (application/pdf, application/jpg etc.)
+      data: Mixed, String for mediaType text, File for other types
+      showOverlay: Boolean, used by card to toggle fullscreen/preview of the item
+      showTooltip: Boolean, used by card to show info about the component f.ex. when hovering an (i) icon
+  */
+  const addSurveyOption = (tag, mediaType, mimeType, data, showOverlay, showTooltip, created = true, _id = undefined, fileName = "") => {
+      const uuid = uuidv4();
+      data = {
+          tag: tag,
+          fileName: fileName,
+          mediaType: mediaType,
+          mimeType: mimeType,
+          data: data,
+          _id: _id,
+          showOverlay: showOverlay,
+          showTooltip: showTooltip,
+          uuid: uuid,
+          created: created,
+          editedArr: [],
+      };
+      surveyOptions.push(data);
 
-        submitButtonFunctions.push({
-            addtype: "surveyItem",
-            uuid: uuid,
-            func: (surveyId) => {
-                let foundObject = surveyOptions.find((e) => {
-                    return e.uuid == uuid;
-                });
-                if (foundObject != null && foundObject != undefined) {
-                    if (foundObject.created == false && Object.keys(foundObject.editedArr).length == 0) {
-                        return Promise.resolve();
-                    } else if (foundObject != null && foundObject != undefined && foundObject.created == true) {
-                        return surveyService.uploadFile(foundObject.data, surveyId, foundObject.tag);
-                    } else if (foundObject != null && foundObject != undefined && Object.keys(foundObject.editedArr).length > 0) {
-                        let promises = [];
-                        for (let fieldName in foundObject.editedArr) {
-                            promises.push(surveyItemFileService.patch(fieldName, foundObject[fieldName], foundObject._id));
-                        }
+      submitButtonFunctions.push({
+          addtype: "surveyItem",
+          uuid: uuid,
+          func: (surveyId) => {
+              let foundObject = surveyOptions.find((e) => {
+                  return e.uuid == uuid;
+              });
+              if (foundObject != null && foundObject != undefined) {
+                  if (foundObject.created == false && Object.keys(foundObject.editedArr).length == 0) {
+                      return Promise.resolve();
+                  } else if (foundObject != null && foundObject != undefined && foundObject.created == true) {
+                      return surveyService.uploadFile(foundObject.data, surveyId, foundObject.tag);
+                  } else if (foundObject != null && foundObject != undefined && Object.keys(foundObject.editedArr).length > 0) {
+                      let promises = [];
+                      for (let fieldName in foundObject.editedArr) {
+                          promises.push(surveyItemFileService.patch(fieldName, foundObject[fieldName], foundObject._id));
+                      }
 
-                        return promises;
-                    } else {
-                        return Promise.reject(new Error("Could not find data to upload"));
-                    }
-                } else {
-                    return Promise.reject(new Error("Could not find data to upload"));
-                }
-            },
-        });
-        surveyOptions = surveyOptions;
-    };
+                      return promises;
+                  } else {
+                      return Promise.reject(new Error("Could not find data to upload"));
+                  }
+              } else {
+                  return Promise.reject(new Error("Could not find data to upload"));
+              }
+          },
+      });
+      surveyOptions = surveyOptions;
+  };
 
   const removeSurveyOption = (option) => {
     const index = surveyOptions.findIndex((e) => e == option);
@@ -247,8 +210,10 @@
           //TODO: Change this to a await Promise.all style fetch
           for (let i = 0; i < data.owners.length; i++) {
             let owner = await userService.getUserByID(data.owners[i].ownerId);
-            data.owners[i].owner_email = owner.email;
-            surveyResearchers.push(data.owners[i]);
+            if(owner.email != undefined){
+              data.owners[i].owner_email = owner.email;
+              surveyResearchers.push(data.owners[i]);
+            }
             
             if(data.owners[i].ownerId == userInfo.userid){
               currentUserIsOwnerInSurvey = true;
@@ -318,11 +283,22 @@
                     swal("Error", "Error getting survey data: " + data.data.message + ".", "error");
                 }
             });
-        } else {
-            addSurveyOption("tag" + surveyOptions.length, "plain", getInputFieldTypeFromMediaType("text"), "", false, false, true);
-            addSurveyOption("tag" + surveyOptions.length, "plain", getInputFieldTypeFromMediaType("text"), "", false, false, true);
+    }
+    else {
+      addSurveyOption("tag" + surveyOptions.length, "plain", getInputFieldTypeFromMediaType("text"), "", false, false, true);
+      addSurveyOption("tag" + surveyOptions.length, "plain", getInputFieldTypeFromMediaType("text"), "", false, false, true);
+      surveyResearchers.push({
+        ownerId: userInfo.userid,
+        owner_email: userInfo.email,
+        obligatory: true,
+        rights: {
+          manageMembers: true,
+          editSurvey: true,
+          viewResults: true,
         }
-    });
+      })
+    }
+  });
 
     //Returns a number indicating how many possible ways you can uniquely combine arrayLength number of items in pairs
     const getAmountOfUniqueComparisons = (arrayLength) => {

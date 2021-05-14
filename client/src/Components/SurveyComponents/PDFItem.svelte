@@ -11,7 +11,6 @@
     export let functionObject;
     export let disableFields = false;
     export let onFocusFunc;
-    export let userHasBeenWarnedOnFocus = false;
     
     let uploadLabelText = "Choose File"
     let view = undefined

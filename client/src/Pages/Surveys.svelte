@@ -39,6 +39,10 @@
             viewName: "created",
         },
         {
+            fieldName: "purpose",
+            viewName: "purpose",
+        },
+        {
             fieldName: "itemsCount",
             viewName: "items",
         },
@@ -147,6 +151,7 @@
                 data[i].title,
                 email,
                 DD_MM_YYYY_Date,
+                data[i].purpose,
                 data[i].items.length,
                 strInviteCode,
                 foundJudges.data,

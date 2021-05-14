@@ -17,14 +17,13 @@
         mdiInformationOutline,
         mdiFullscreen,
     } from "@mdi/js";
-import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
     export let option;
     export let optionMediaTypeItems;
     export let functionObject;
     export let disableFields = false;
     export let onFocusFunc;
-    export let userHasBeenWarnedOnFocus = false;
 
     let view = option.data
 

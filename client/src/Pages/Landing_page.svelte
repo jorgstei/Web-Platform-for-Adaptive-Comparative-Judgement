@@ -43,8 +43,6 @@
 	onMount(()=>{
 		selectedNavbarListValue = "Home";
     })
-    onDestroy(()=>{
-    })
 	$:selectedNavbarListValue;
 </script>
 

@@ -8,7 +8,7 @@
   import RawSurveyData from "./RawSurveyData.svelte";
   import LoginPage from "./LoginPage.svelte";
   import Profile from "./Profile.svelte";
-import { onMount } from "svelte";
+  import { onMount } from "svelte";
   
   //userInfo contains email, userid and role when we are logged in. Should be null otherwise
   export let userInfo;

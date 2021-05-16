@@ -41,8 +41,6 @@ const auth = (req, res, next) => {
                 else {
                     //Set the potentially required feilds contained in the token to the request
                     req.auth["judge"] = {userid: decoded.userid, role: decoded.role}
-                    //req.userid = decoded.userid
-                    //req.role = decoded.role
                 }
             })
         }
@@ -54,8 +52,6 @@ const auth = (req, res, next) => {
                 else {
                     //Set the potentially required feilds contained in the token to the request
                     req.auth["user"] = {userid: decoded.userid, role: decoded.role}
-                    //req.userid = decoded.userid
-                    //req.role = decoded.role
                 }
             })
         }

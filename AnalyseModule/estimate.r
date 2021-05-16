@@ -16,7 +16,7 @@ cors <- function(req, res) {
   }
 }
 
-#This module is written by Tore Alexander Forbregd
+# This module is written by Tore Alexander Forbregd
 
 #* Estimate BTM 
 #* @serializer unboxedJSON

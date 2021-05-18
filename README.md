@@ -154,9 +154,9 @@ Project Link: [https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative
 [contributors-shield]: https://img.shields.io/github/contributors/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement.svg?style=for-the-badge
 [contributors-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/contributors
 [forks-shield]: https://img.shields.io/github/forks/skelletore/064bachelor2021.svg?style=for-the-badge
-[forks-url]: https://github.com/skelletore/064bachelor2021/network/members
+[forks-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/network/members
 [stars-shield]: https://img.shields.io/github/stars/skelletore/064bachelor2021.svg?style=for-the-badge
-[stars-url]: https://github.com/skelletore/064bachelor2021/stargazers
+[stars-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/stargazers
 [issues-shield]: https://img.shields.io/github/issues/skelletore/064bachelor2021.svg?style=for-the-badge
 [issues-url]: https://github.com/jorgstei/Web-Platform-for-Adaptive-Comparative-Judgement/issues
 [license-shield]: https://img.shields.io/badge/license-CC%20(by--nc--sa)-green?style=for-the-badge

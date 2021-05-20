@@ -8,3 +8,4 @@ REST-tests/
 docker/
 docker-compose.yml
 docker-compose.yaml
+build.sh

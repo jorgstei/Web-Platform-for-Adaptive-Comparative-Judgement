@@ -12,8 +12,8 @@ const mongoose = require("mongoose");
 const router = Router();
 
 //Checks if a given user has edit survey rights to a given survey
-function userHasEditSurveyRights(surveyId, userid) {
-    Survey.findOne({ _id: { $eq: surveyId } }).then((survey) => {
+async function userHasEditSurveyRights(surveyId, userid) {
+    await Survey.findOne({ _id: { $eq: surveyId } }).then((survey) => {
         if (survey == undefined || survey == null || survey._id == null) {
             return false;
         }
@@ -29,8 +29,8 @@ function userHasEditSurveyRights(surveyId, userid) {
 }
 
 //Checks if a given user has manage members rights to a given survey
-function userHasManageMembersRights(surveyId, userid) {
-    Survey.findOne({ _id: { $eq: surveyId } }).then((survey) => {
+async function userHasManageMembersRights(surveyId, userid) {
+    await Survey.findOne({ _id: { $eq: surveyId } }).then((survey) => {
         if (survey == undefined || survey == null || survey._id == null) {
             return false;
         }

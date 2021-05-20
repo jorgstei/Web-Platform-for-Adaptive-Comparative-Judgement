@@ -6,10 +6,12 @@ const me = require('mongo-escape').escape
 
 const router = Router()
 
-function userHasViewResultsRights(surveyId, userid){
-    Survey.findOne({_id: {$eq: surveyId}})
+async function userHasViewResultsRights(surveyId, userid){
+    console.log("userHasViewResultsRights: ", surveyId, " userid", userid)
+    await Survey.findOne({_id: {$eq: surveyId}})
     .then(survey => {
         if(survey == undefined || survey == null || survey._id == null){
+            console.log("userHasViewResultsRights Error fetching survey")
             return false;
         }
         let owner = survey.owners.find(e => e.ownerId == userid)
@@ -18,6 +20,7 @@ function userHasViewResultsRights(surveyId, userid){
             return false
         }
         if(owner.rights.viewResults != true){
+            console.log("userHasViewResultsRights missing view rights")
             return false
         }
         return true
@@ -118,7 +121,7 @@ router.get("/:id", auth, async (req, res) => {
  * @apiError (404) 404 Not Found, No documents could be found.
  */
 router.get("/judge/:id", auth, async (req, res) => {
-    console.log("Get SurveyAnswer by id called")
+    console.log("Get SurveyAnswer by id called for judge")
     try{
         if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
             res.sendStatus(403)
@@ -151,10 +154,11 @@ router.get("/judge/:id", auth, async (req, res) => {
  * @apiError (404) 404 Not Found, No documents could be found.
  */
 router.get("/survey/:id", auth, async (req, res) => {
-    console.log("Get SurveyAnswer by id called")
+    console.log("Get SurveyAnswer by id called for survey")
     try{
         if(req.auth["user"]?.role !== "admin" && req.auth["user"]?.role !== "researcher"){
-            res.sendStatus(403)
+            console.log("User not admin or researcher")
+            res.status(403).json({message: "Insufficient rights"})
             return
         }
         const surveyAnswers = await SurveyAnswer.find({surveyId: {$eq: req.params.id}})
@@ -162,7 +166,8 @@ router.get("/survey/:id", auth, async (req, res) => {
             throw new Error("survey_answer_route.js, couldn't get by id")
         }
         if(req.auth["user"]?.role != "admin" && !userHasViewResultsRights(req.params.id, req.auth["user"]?.userid)){
-            res.sendStatus(403)
+            console.log("Missing rights")
+            res.status(403).json({message: "Insufficient rights"})
             return
         }
         res.json(surveyAnswers)

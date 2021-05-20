@@ -12,7 +12,7 @@ function userHasViewResultsRights(surveyId, userid){
         if(survey == undefined || survey == null || survey._id == null){
             return false;
         }
-        let owner = survey.owners.find(e => e._id == userid)
+        let owner = survey.owners.find(e => e.ownerId == userid)
         if(owner == undefined || owner.rights == undefined){
             console.log("userHasViewResultsRights owner is undefined or has no rights")
             return false

@@ -507,6 +507,7 @@ router.post("/", async (req, res) => {
     const [real, role] = await verifyUserRegistration(token, email);
     if (!real || role == null) {
         res.status(422).json({ message: "Invite link has expired, or the wrong email was profided" });
+        return;
     }
     if (!acceptablePassword(password, role)) {
         res.status(422).json({ message: "Password too weak." });

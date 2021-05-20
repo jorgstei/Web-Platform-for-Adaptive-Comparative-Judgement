@@ -17,7 +17,7 @@ function userHasEditSurveyRights(surveyId, userid) {
         if (survey == undefined || survey == null || survey._id == null) {
             return false;
         }
-        let owner = survey.owners.find((e) => e._id == userid);
+        let owner = survey.owners.find((e) => e.ownerId == userid);
         if (owner == undefined || owner.rights == undefined) {
             return false;
         }
@@ -34,7 +34,7 @@ function userHasManageMembersRights(surveyId, userid) {
         if (survey == undefined || survey == null || survey._id == null) {
             return false;
         }
-        let owner = survey.owners.find((e) => e._id == userid);
+        let owner = survey.owners.find((e) => e.ownerId == userid);
         if (owner == undefined || owner.rights == undefined) {
             return false;
         }

@@ -116,7 +116,7 @@
 
                     {#if tableAttributes.findIndex(e => e.viewName === 'delete') != -1}
                         {#if userRights != undefined && userRights != null && userRights.length > 0 && userRights[tableData.findIndex(e=>e==row)].editSurvey}
-                        <td class="col" title="{"Deletess " + itemName}"  style="cursor:pointer;"
+                        <td class="col" title="{"Delete " + itemName}"  style="cursor:pointer;"
                             on:click={()=>{
                                 // Content id is gotten from a column with the header id or judge id. These are necessary to make the delete function work.
                                 // 

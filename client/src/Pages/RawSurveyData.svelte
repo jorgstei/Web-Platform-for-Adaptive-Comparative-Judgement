@@ -16,13 +16,22 @@
     let params = queryString.parse(window.location.search);
     let surveyID = params.id;
     console.log("SurveyID from RawSurveyData.svelte: ", surveyID);
-
+    let userRight;
+    let userRights = [];
     let survey = {};
     onMount(async () => {
         await surveyService.getSurveyByID(surveyID).then((data) => {
             if(data.status == 200){
                 data = data.data;
                 console.log("onMount survey data with id: " + surveyID, data);
+                console.log("onMount userInfo", userInfo);
+                data.owners.forEach((e)=>{
+                    if(e.ownerId == userInfo.userid){
+                        userRight = e.rights;
+                        return
+                    }
+                })
+                console.log(userRight);
                 survey = data;
             }
             else{
@@ -181,6 +190,7 @@
 
                     let allJudges2DArray = [];
                     allJudges.forEach((e) => {
+                        userRights.push(userRight);
                         const leftBias = getLeftBias(answers, e.judge);
                         const medianTime = getMedianTime(answers, e.judge);
                         const averageTime = getAverageTime(answers, e.judge);
@@ -585,6 +595,7 @@
             <Table
                 bind:tableData={allJudges}
                 bind:userInfo
+                bind:userRights
                 tableAttributes={allJudgesHeaders}
                 element={csvDownloadByJudgeButton}
                 itemName="judge's answers"
